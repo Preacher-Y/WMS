@@ -8,3 +8,4 @@ The project focuses on **business rules, transactions, concurrency, and testable
 
 **Full project spec, task breakdown, and requirements:**
 [Logistics Capstone Project — Notion](https://quartz-hemisphere-61a.notion.site/Logistics-Capstone-Project-08094a1a2f4c83e9adb6814588a281d7)
+

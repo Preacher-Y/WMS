@@ -1,4 +1,4 @@
-package group.australia.warehouse_management_system.feature.stockHistory.dto;
-
-public class StockHistoryResponseDto {
-}
+//package group.australia.warehouse_management_system.feature.stockHistory.dto;
+//
+//public class StockHistoryResponseDto {
+//}

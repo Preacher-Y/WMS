@@ -141,4 +141,5 @@ src/main/java/group/australia/warehouse_management_system/
 
 ---
 
-> **NOTE**: When you run the App and meet some issues just know it the issue for its mostly because i created the place holders of the codes so it might fail 
+> **NOTE**: As you are about to implement a particular task 
+> *Please remember to uncomment relevant files*.

@@ -4,4 +4,5 @@ import group.australia.warehouse_management_system.feature.warehouse.entity.Ware
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface WarehouseRepository extends JpaRepository<Warehouse, Long> {
+    boolean existsByWarehouseNumber(String warehouseNumber);
 }

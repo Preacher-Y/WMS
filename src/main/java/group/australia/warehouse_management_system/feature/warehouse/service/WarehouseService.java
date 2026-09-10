@@ -1,5 +1,6 @@
 package group.australia.warehouse_management_system.feature.warehouse.service;
 
+import group.australia.warehouse_management_system.common.exceptions.ConflictException;
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
 import group.australia.warehouse_management_system.feature.warehouse.dto.RequestWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.ResponseWarehouseDto;
@@ -8,35 +9,63 @@ import group.australia.warehouse_management_system.feature.warehouse.entity.Ware
 import group.australia.warehouse_management_system.feature.warehouse.mapper.WarehouseMapper;
 import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class WarehouseService {
+
     private final WarehouseMapper warehouseMapper;
     private final WarehouseRepository warehouseRepository;
 
-    public ResponseWarehouseDto insertNewWarehouse(RequestWarehouseDto req){
-        Warehouse warehouse = warehouseMapper.toEntityFromRequest(req);
-        warehouse.setWarehouseNumber(String.format(
-                "WH-%03d", Integer.parseInt(warehouse.getWarehouseNumber())
-        ));
+    public ResponseWarehouseDto insertNewWarehouse(RequestWarehouseDto req) {
 
-        return warehouseMapper.toDto(warehouseRepository.save(warehouse));
-    }
+        String warehouseNumber = String.format(
+                "WH-%03d",
+                Integer.parseInt(req.warehouseNumber())
+        );
 
-    public ResponseWarehouseDto updateWarehouse(Long id, UpdateWarehouseDto update){
-
-        Optional<Warehouse> warehouse = warehouseRepository.findById(id);
-        if (warehouse.isEmpty()) {
-            throw new NotFoundException("Warehouse not found");
+        if (warehouseRepository.existsByWarehouseNumber(warehouseNumber)) {
+            throw new ConflictException(
+                    "Warehouse number already exists: " + warehouseNumber
+            );
         }
 
-        warehouse.get().setName(update.name());
-        warehouse.get().setActive(update.active());
+        Warehouse warehouse = warehouseMapper.toEntityFromRequest(req);
+        warehouse.setWarehouseNumber(warehouseNumber);
 
-        return  warehouseMapper.toDto(warehouseRepository.save(warehouse.get()));
+        try {
+            Warehouse savedWarehouse = warehouseRepository.save(warehouse);
+            return warehouseMapper.toDto(savedWarehouse);
+
+        } catch (DataIntegrityViolationException ex) {
+            throw new ConflictException(
+                    "Warehouse number already exists: " + warehouseNumber
+            );
+        }
+    }
+
+    public ResponseWarehouseDto updateWarehouse(
+            Long id,
+            UpdateWarehouseDto update
+    ) {
+
+        Warehouse warehouse = warehouseRepository.findById(id)
+                .orElseThrow(() ->
+                        new NotFoundException("Warehouse not found")
+                );
+
+        warehouse.setName(update.name());
+        warehouse.setActive(update.active());
+
+        try {
+            Warehouse updatedWarehouse = warehouseRepository.save(warehouse);
+            return warehouseMapper.toDto(updatedWarehouse);
+
+        } catch (DataIntegrityViolationException ex) {
+            throw new ConflictException("Warehouse update conflicts with existing data");
+        }
     }
 }

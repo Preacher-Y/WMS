@@ -1,14 +1,18 @@
 package group.australia.warehouse_management_system.feature.warehouse.mapper;
 
-import group.australia.warehouse_management_system.feature.warehouse.dto.WarehouseRequestDto;
-import group.australia.warehouse_management_system.feature.warehouse.dto.WarehouseResponseDto;
+import group.australia.warehouse_management_system.feature.warehouse.dto.RequestWarehouseDto;
+import group.australia.warehouse_management_system.feature.warehouse.dto.ResponseWarehouseDto;
+import group.australia.warehouse_management_system.feature.warehouse.dto.UpdateWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.entity.Warehouse;
 import org.mapstruct.*;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface WarehouseMapper {
-    WarehouseResponseDto toDto(Warehouse warehouse);
+    ResponseWarehouseDto toDto(Warehouse warehouse);
 
     @BeanMapping(unmappedTargetPolicy = ReportingPolicy.IGNORE)
-    Warehouse toEntity(WarehouseRequestDto req);
+    Warehouse toEntityFromRequest(RequestWarehouseDto req);
+
+    @BeanMapping(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+    Warehouse toEntityFromUpdate(UpdateWarehouseDto update);
 }

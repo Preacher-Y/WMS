@@ -4,6 +4,6 @@ import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
 
-public record WarehouseResponseDto(Long id, @NotNull String warehouseNumber, @NotNull String name, boolean active,
+public record ResponseWarehouseDto(Long id, @NotNull String warehouseNumber, @NotNull String name, boolean active,
                                    Integer version) implements Serializable {
 }

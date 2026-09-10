@@ -4,5 +4,5 @@ import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
 
-public record WarehouseRequestDto(@NotNull String warehouseNumber, @NotNull String name) implements Serializable {
+public record RequestWarehouseDto(@NotNull String warehouseNumber, @NotNull String name) implements Serializable {
 }

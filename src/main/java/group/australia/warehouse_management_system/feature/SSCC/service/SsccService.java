@@ -10,6 +10,7 @@ import group.australia.warehouse_management_system.feature.SSCC.repository.SsccR
 import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeader;
 import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -39,7 +40,11 @@ public class SsccService {
 
         SSCC sscc = ssccMapper.toEntity(req);
         sscc.setCartonHeader(cartonHeader);
-
-        return ssccMapper.toDto(ssccRepository.save(sscc));
+        try {
+            SSCC savedSscc = ssccRepository.save(sscc);
+            return ssccMapper.toDto(savedSscc);
+        } catch (DataIntegrityViolationException ex) {
+            throw new ConflictException("SSCC conflicts with existing data");
+        }
     }
 }

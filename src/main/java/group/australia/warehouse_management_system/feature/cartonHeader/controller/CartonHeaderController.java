@@ -2,11 +2,9 @@ package group.australia.warehouse_management_system.feature.cartonHeader.control
 
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.RequestCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.ResponseCartonHeaderDto;
-import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeader;
 import group.australia.warehouse_management_system.feature.cartonHeader.service.CartonHeaderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

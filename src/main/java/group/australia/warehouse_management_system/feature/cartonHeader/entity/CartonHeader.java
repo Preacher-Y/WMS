@@ -29,6 +29,7 @@ public class CartonHeader {
     private  Integer version;
 
     @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdTimestamp;
 
     @UpdateTimestamp

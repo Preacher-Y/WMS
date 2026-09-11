@@ -1,0 +1,10 @@
+package group.australia.warehouse_management_system.feature.SSCC.dto;
+
+import group.australia.warehouse_management_system.feature.cartonHeader.dto.ResponseCartonHeaderDto;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
+public record ResponseSsccDto(Long id, String sscc, ResponseCartonHeaderDto cartonHeader, Integer version,
+                              LocalDateTime receivedTimestamp) implements Serializable {
+}

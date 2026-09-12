@@ -27,9 +27,6 @@ public class SSCC {
     @JoinColumn(name = "cartonHeaderId")
     private CartonHeader cartonHeader;
 
-    @Version
-    private Integer version;
-
     private LocalDateTime receivedTimestamp;
 
     @CreationTimestamp

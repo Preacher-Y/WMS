@@ -5,6 +5,6 @@ import group.australia.warehouse_management_system.feature.cartonHeader.dto.Resp
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public record ResponseSsccDto(Long id, String sscc, ResponseCartonHeaderDto cartonHeader, Integer version,
+public record ResponseSsccDto(Long id, String sscc, ResponseCartonHeaderDto cartonHeader,
                               LocalDateTime receivedTimestamp) implements Serializable {
 }

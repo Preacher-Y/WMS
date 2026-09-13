@@ -79,7 +79,7 @@ class ServiceWarehouseTests {
                 .active(true)
                 .build();
 
-        when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouse));
+        when(warehouseRepository.findById(1L)).thenReturn(Optional.ofNullable(warehouse));
         when(warehouseRepository.save(Mockito.any(Warehouse.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 

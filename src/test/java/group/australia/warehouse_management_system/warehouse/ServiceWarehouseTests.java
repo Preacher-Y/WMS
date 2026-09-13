@@ -35,7 +35,7 @@ class ServiceWarehouseTests {
     void WarehouseService_CreateWarehouse_ReturnsResponseWarehouseDto() {
         RequestWarehouseDto dto = RequestWarehouseDto.builder()
                 .name("Test Warehouse 1")
-                .warehouseNumber("1")
+                .warehouseNumber(1)
                 .build();
 
         Warehouse warehouse = Warehouse.builder()
@@ -77,6 +77,7 @@ class ServiceWarehouseTests {
                 .name("Test Warehouse 1")
                 .warehouseNumber("WH-001")
                 .active(true)
+                .version(0)
                 .build();
 
         when(warehouseRepository.findById(1L)).thenReturn(Optional.ofNullable(warehouse));
@@ -91,6 +92,7 @@ class ServiceWarehouseTests {
                             .id(savedWarehouse.getId())
                             .name(savedWarehouse.getName())
                             .warehouseNumber(savedWarehouse.getWarehouseNumber())
+                            .version(1)
                             .active(savedWarehouse.isActive())
                             .build();
                 });
@@ -101,6 +103,7 @@ class ServiceWarehouseTests {
         Assertions.assertThat(result.id()).isEqualTo(1L);
         Assertions.assertThat(result.name()).isEqualTo("Test Warehouse 1 - Updated");
         Assertions.assertThat(result.warehouseNumber()).isEqualTo("WH-001");
+        Assertions.assertThat(result.version()).isGreaterThan(0);
         Assertions.assertThat(result.active()).isFalse();
 
     }

@@ -55,10 +55,10 @@ class RepositoryCartonHeaderTests {
 
     @Test
     void CartonHeaderRepository_FindByBarcode_ReturnCartonHeader(){
-        CartonHeader existCartonHeader = cartonHeaderRepository.findByBarcode(savedCartonHeader.getBarcode());
+        Optional<CartonHeader> existCartonHeader = cartonHeaderRepository.findByBarcode(savedCartonHeader.getBarcode());
 
-        Assertions.assertThat(existCartonHeader).isNotNull();
-        Assertions.assertThat(existCartonHeader.getBarcode()).isEqualTo(savedCartonHeader.getBarcode());
-        Assertions.assertThat(existCartonHeader.getDescription()).isEqualTo(savedCartonHeader.getDescription());
+        Assertions.assertThat(existCartonHeader).isPresent();
+        Assertions.assertThat(existCartonHeader.get().getBarcode()).isEqualTo(savedCartonHeader.getBarcode());
+        Assertions.assertThat(existCartonHeader.get().getDescription()).isEqualTo(savedCartonHeader.getDescription());
     }
 }

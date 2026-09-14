@@ -24,7 +24,7 @@ public class WarehouseService {
 
         String warehouseNumber = String.format(
                 "WH-%03d",
-                Integer.parseInt(req.warehouseNumber())
+                req.warehouseNumber()
         );
 
         if (warehouseRepository.existsByWarehouseNumber(warehouseNumber)) {

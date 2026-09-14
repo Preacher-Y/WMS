@@ -1,6 +1,7 @@
 package group.australia.warehouse_management_system.feature.cartonHeader.service;
 
 import group.australia.warehouse_management_system.common.exceptions.ConflictException;
+import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.RequestCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.ResponseCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.UpdateCartonHeaderDto;
@@ -10,6 +11,8 @@ import group.australia.warehouse_management_system.feature.cartonHeader.reposito
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 
 @Service
@@ -42,13 +45,19 @@ public class CartonHeaderService {
             String barcode,
             UpdateCartonHeaderDto updateRequest
     ) {
-        CartonHeader cartonHeader = cartonHeaderRepository.findByBarcode(barcode);
+        Optional<CartonHeader> cartonHeader = cartonHeaderRepository.findByBarcode(barcode);
 
-        cartonHeader.setDescription(updateRequest.description());
+        if (cartonHeader.isEmpty()){
+            throw new NotFoundException(
+                    "Carton Header not found"
+            );
+        }
+
+        cartonHeader.get().setDescription(updateRequest.description());
 
         try {
-            cartonHeaderRepository.save(cartonHeader);
-            return cartonHeaderMapper.toDto(cartonHeader);
+            cartonHeaderRepository.save(cartonHeader.get());
+            return cartonHeaderMapper.toDto(cartonHeader.get());
         } catch (DataIntegrityViolationException ex) {
             throw new ConflictException("Carton Header update conflicts with existing data");
         }

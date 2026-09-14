@@ -2,11 +2,10 @@ package group.australia.warehouse_management_system.feature.cartonHeader.control
 
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.RequestCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.ResponseCartonHeaderDto;
-import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeader;
+import group.australia.warehouse_management_system.feature.cartonHeader.dto.UpdateCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.service.CartonHeaderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +29,7 @@ public class CartonHeaderController {
     @PutMapping("{barcode}")
     public  ResponseEntity<ResponseCartonHeaderDto> updateCartonHeader(
             @PathVariable String barcode,
-            @RequestBody @Valid Map<String, String> req
+            @RequestBody @Valid UpdateCartonHeaderDto req
     ) {
         return ResponseEntity.ok(cartonHeaderService.updateCartonHeader(barcode, req));
     }

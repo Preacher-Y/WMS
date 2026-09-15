@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import java.util.Optional;
 
@@ -53,5 +55,35 @@ class RepositoryWarehouseTests {
         Assertions.assertThat(res).isTrue();
     }
 
+    @Test
+    void WarehouseRepository_DuplicateWarehouseNumber_ThrowsDataIntegrityViolationException() {
+        Warehouse duplicate = Warehouse.builder()
+                .name("Duplicate Warehouse")
+                .warehouseNumber("WH-Test001")
+                .active(true)
+                .build();
+
+        Assertions.assertThatThrownBy(() -> warehouseRepository.saveAndFlush(duplicate))
+                .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void WarehouseRepository_StaleVersion_ThrowsOptimisticLockingFailureException() {
+        Integer originalVersion = savedWarehouse.getVersion();
+
+        savedWarehouse.setName("First Update");
+        warehouseRepository.saveAndFlush(savedWarehouse);
+
+        Warehouse stale = Warehouse.builder()
+                .id(savedWarehouse.getId())
+                .name("Stale Update")
+                .warehouseNumber(savedWarehouse.getWarehouseNumber())
+                .active(savedWarehouse.isActive())
+                .version(originalVersion)
+                .build();
+
+        Assertions.assertThatThrownBy(() -> warehouseRepository.saveAndFlush(stale))
+                .isInstanceOf(ObjectOptimisticLockingFailureException.class);
+    }
 
 }

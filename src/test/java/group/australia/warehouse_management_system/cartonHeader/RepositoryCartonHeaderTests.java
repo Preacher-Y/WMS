@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import java.util.Optional;
 
@@ -60,5 +62,34 @@ class RepositoryCartonHeaderTests {
         Assertions.assertThat(existCartonHeader).isPresent();
         Assertions.assertThat(existCartonHeader.get().getBarcode()).isEqualTo(savedCartonHeader.getBarcode());
         Assertions.assertThat(existCartonHeader.get().getDescription()).isEqualTo(savedCartonHeader.getDescription());
+    }
+
+    @Test
+    void CartonHeaderRepository_DuplicateBarcode_ThrowsDataIntegrityViolationException() {
+        CartonHeader duplicate = CartonHeader.builder()
+                .barcode("13431324532")
+                .description("Another description")
+                .build();
+
+        Assertions.assertThatThrownBy(() -> cartonHeaderRepository.saveAndFlush(duplicate))
+                .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void CartonHeaderRepository_StaleVersion_ThrowsOptimisticLockingFailureException() {
+        Integer originalVersion = savedCartonHeader.getVersion();
+
+        savedCartonHeader.setDescription("First Update");
+        cartonHeaderRepository.saveAndFlush(savedCartonHeader);
+
+        CartonHeader stale = CartonHeader.builder()
+                .id(savedCartonHeader.getId())
+                .barcode(savedCartonHeader.getBarcode())
+                .description("Stale Update")
+                .version(originalVersion)
+                .build();
+
+        Assertions.assertThatThrownBy(() -> cartonHeaderRepository.saveAndFlush(stale))
+                .isInstanceOf(ObjectOptimisticLockingFailureException.class);
     }
 }

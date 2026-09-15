@@ -35,7 +35,7 @@ public class SsccService {
             );
         }
 
-        CartonHeader cartonHeader = cartonHeaderRepository.findByBarcode(barcode);
+        CartonHeader cartonHeader = cartonHeaderRepository.findByBarcode(barcode).orElseThrow();
 
 
         SSCC sscc = ssccMapper.toEntity(req);

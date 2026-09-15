@@ -1,9 +1,7 @@
 package group.australia.warehouse_management_system.feature.cartonHeader.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -11,8 +9,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "carton_headers")
-@Getter
-@Setter
+@Data
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class CartonHeader {
     @Id

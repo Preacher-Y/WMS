@@ -1,9 +1,10 @@
 package group.australia.warehouse_management_system.feature.cartonHeader.service;
 
-import group.australia.warehouse_management_system.common.exceptions.BadRequestException;
 import group.australia.warehouse_management_system.common.exceptions.ConflictException;
+import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.RequestCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.ResponseCartonHeaderDto;
+import group.australia.warehouse_management_system.feature.cartonHeader.dto.UpdateCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeader;
 import group.australia.warehouse_management_system.feature.cartonHeader.mapper.CartonHeaderMapper;
 import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderRepository;
@@ -11,7 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
+import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -41,19 +43,21 @@ public class CartonHeaderService {
 
     public ResponseCartonHeaderDto updateCartonHeader(
             String barcode,
-            Map<String, String> updateRequest
+            UpdateCartonHeaderDto updateRequest
     ) {
-        CartonHeader cartonHeader = cartonHeaderRepository.findByBarcode(barcode);
+        Optional<CartonHeader> cartonHeader = cartonHeaderRepository.findByBarcode(barcode);
 
-        if (updateRequest.get("description")==null){
-            throw new BadRequestException("Please recheck the description data");
+        if (cartonHeader.isEmpty()){
+            throw new NotFoundException(
+                    "Carton Header not found"
+            );
         }
 
-        cartonHeader.setDescription(updateRequest.get("description"));
+        cartonHeader.get().setDescription(updateRequest.description());
 
         try {
-            cartonHeaderRepository.save(cartonHeader);
-            return cartonHeaderMapper.toDto(cartonHeader);
+            cartonHeaderRepository.save(cartonHeader.get());
+            return cartonHeaderMapper.toDto(cartonHeader.get());
         } catch (DataIntegrityViolationException ex) {
             throw new ConflictException("Carton Header update conflicts with existing data");
         }

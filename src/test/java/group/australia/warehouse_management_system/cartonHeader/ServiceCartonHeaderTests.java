@@ -1,5 +1,7 @@
 package group.australia.warehouse_management_system.cartonHeader;
 
+import group.australia.warehouse_management_system.common.exceptions.ConflictException;
+import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.RequestCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.ResponseCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.UpdateCartonHeaderDto;
@@ -102,5 +104,30 @@ class ServiceCartonHeaderTests {
         Assertions.assertThat(result.barcode()).isEqualTo("123456789");
         Assertions.assertThat(result.description()).isEqualTo("Test description - Updated");
         Assertions.assertThat(result.version()).isGreaterThan(0);
+    }
+
+    @Test
+    void CartonHeaderService_CreateCartonHeader_DuplicateBarcode_ThrowsConflictException() {
+        RequestCartonHeaderDto req = RequestCartonHeaderDto.builder()
+                .barcode("123456789")
+                .description("Test description")
+                .build();
+
+        when(cartonHeaderRepository.existsByBarcode("123456789")).thenReturn(true);
+
+        Assertions.assertThatThrownBy(() -> cartonHeaderService.insertNewCartonHeader(req))
+                .isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    void CartonHeaderService_UpdateCartonHeader_UnknownBarcode_ThrowsNotFoundException() {
+        UpdateCartonHeaderDto update = UpdateCartonHeaderDto.builder()
+                .description("Any description")
+                .build();
+
+        when(cartonHeaderRepository.findByBarcode("UNKNOWN-999")).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> cartonHeaderService.updateCartonHeader("UNKNOWN-999", update))
+                .isInstanceOf(NotFoundException.class);
     }
 }

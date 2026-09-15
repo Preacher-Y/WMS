@@ -1,5 +1,7 @@
 package group.australia.warehouse_management_system.warehouse;
 
+import group.australia.warehouse_management_system.common.exceptions.ConflictException;
+import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
 import group.australia.warehouse_management_system.feature.warehouse.dto.RequestWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.ResponseWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.UpdateWarehouseDto;
@@ -105,6 +107,67 @@ class ServiceWarehouseTests {
         Assertions.assertThat(result.warehouseNumber()).isEqualTo("WH-001");
         Assertions.assertThat(result.version()).isGreaterThan(0);
         Assertions.assertThat(result.active()).isFalse();
+    }
 
+    @Test
+    void WarehouseService_CreateWarehouse_DuplicateWarehouseNumber_ThrowsConflictException() {
+        RequestWarehouseDto dto = RequestWarehouseDto.builder()
+                .name("Test Warehouse 1")
+                .warehouseNumber(1)
+                .build();
+
+        when(warehouseRepository.existsByWarehouseNumber("WH-001")).thenReturn(true);
+
+        Assertions.assertThatThrownBy(() -> warehouseService.insertNewWarehouse(dto))
+                .isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    void WarehouseService_UpdateWarehouse_ActivateWarehouse_ReturnsActiveDto() {
+        UpdateWarehouseDto update = UpdateWarehouseDto.builder()
+                .name("Test Warehouse 1")
+                .active(true)
+                .build();
+
+        Warehouse warehouse = Warehouse.builder()
+                .id(1L)
+                .name("Test Warehouse 1")
+                .warehouseNumber("WH-001")
+                .active(false)
+                .version(0)
+                .build();
+
+        when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouse));
+        when(warehouseRepository.save(Mockito.any(Warehouse.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(warehouseMapper.toDto(Mockito.any(Warehouse.class)))
+                .thenAnswer(invocation -> {
+                    Warehouse saved = invocation.getArgument(0);
+                    return ResponseWarehouseDto.builder()
+                            .id(saved.getId())
+                            .name(saved.getName())
+                            .warehouseNumber(saved.getWarehouseNumber())
+                            .active(saved.isActive())
+                            .version(0)
+                            .build();
+                });
+
+        ResponseWarehouseDto result = warehouseService.updateWarehouse(1L, update);
+
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result.active()).isTrue();
+    }
+
+    @Test
+    void WarehouseService_UpdateWarehouse_WarehouseNotFound_ThrowsNotFoundException() {
+        UpdateWarehouseDto update = UpdateWarehouseDto.builder()
+                .name("Any Name")
+                .active(true)
+                .build();
+
+        when(warehouseRepository.findById(99L)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> warehouseService.updateWarehouse(99L, update))
+                .isInstanceOf(NotFoundException.class);
     }
 }

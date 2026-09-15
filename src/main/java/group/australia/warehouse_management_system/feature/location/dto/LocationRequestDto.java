@@ -1,4 +1,11 @@
-//package group.australia.warehouse_management_system.feature.location.dto;
-//
-//public record LocationRequestDto() {
-//}
+package group.australia.warehouse_management_system.feature.location.dto;
+
+import jakarta.validation.constraints.NotNull;
+
+public record LocationRequestDto(
+        @NotNull(message = "row is required") Integer row,
+
+        @NotNull(message = "section is required") Integer section,
+        @NotNull(message = "shelf is required") Integer shelf) {
+
+}

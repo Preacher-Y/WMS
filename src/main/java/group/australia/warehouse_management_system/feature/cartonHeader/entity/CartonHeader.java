@@ -1,11 +1,14 @@
 package group.australia.warehouse_management_system.feature.cartonHeader.entity;
 
+import group.australia.warehouse_management_system.feature.item.entity.Item;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "carton_headers")
@@ -23,6 +26,9 @@ public class CartonHeader {
 
     @Column(nullable = false)
     private String description;
+
+    @OneToMany(mappedBy = "cartonHeader")
+    private List<Item> items = new ArrayList<>();
 
     @Version
     private  Integer version;

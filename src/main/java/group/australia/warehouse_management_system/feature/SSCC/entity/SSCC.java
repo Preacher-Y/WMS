@@ -2,9 +2,7 @@ package group.australia.warehouse_management_system.feature.SSCC.entity;
 
 import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeader;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -12,8 +10,10 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "sscc")
+@Builder
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
 public class SSCC {
     @Id

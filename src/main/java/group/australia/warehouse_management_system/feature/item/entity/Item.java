@@ -14,7 +14,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "items")
+@Table(name = "items", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"item_number", "location_id"})
+})
 @Data
 @Builder
 @NoArgsConstructor
@@ -25,7 +27,7 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false, name = "item_number")
+    @Column(nullable = false, name = "item_number")
     private String itemNumber;
 
     @Column(nullable = false)
@@ -44,7 +46,7 @@ public class Item {
     private Integer version;
 
     @CreationTimestamp
-    @Column(insertable = false, updatable = false, nullable = false)
+    @Column(updatable = false, nullable = false)
     private LocalDateTime creationTimestamp;
     @UpdateTimestamp
     private LocalDateTime updateTimestamp;

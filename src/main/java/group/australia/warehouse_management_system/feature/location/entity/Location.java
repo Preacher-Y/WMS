@@ -48,7 +48,7 @@ public class Location {
     private Integer version;
 
     @CreationTimestamp
-    @Column(updatable = false, insertable = false, nullable = false)
+    @Column(updatable = false, nullable = false)
     private LocalDateTime createdTimestamp;
 
     @UpdateTimestamp

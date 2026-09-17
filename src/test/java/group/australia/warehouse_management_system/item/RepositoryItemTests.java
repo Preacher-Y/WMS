@@ -96,6 +96,20 @@ class RepositoryItemTests {
     }
 
     @Test
+    void ItemRepository_ExistByItemNumber_ReturnsTrue(){
+        boolean exists = itemRepository.existsByItemNumber("ITEM-001");
+
+        Assertions.assertThat(exists).isTrue();
+    }
+
+    @Test
+    void ItemRepository_ExistByItemNumber_UnknownPair_ReturnsFalse(){
+        boolean exists = itemRepository.existsByItemNumber("ITEM-999");
+
+        Assertions.assertThat(exists).isFalse();
+    }
+
+    @Test
     void ItemRepository_FindByItemNumberAndLocation_ReturnsItem() {
         Optional<Item> result = itemRepository.findByItemNumberAndLocation("ITEM-001", savedLocation);
 

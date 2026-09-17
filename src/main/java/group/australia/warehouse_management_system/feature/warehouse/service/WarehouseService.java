@@ -48,11 +48,11 @@ public class WarehouseService {
     }
 
     public ResponseWarehouseDto updateWarehouse(
-            Long id,
+            String warehouseNumber,
             UpdateWarehouseDto update
     ) {
 
-        Warehouse warehouse = warehouseRepository.findById(id)
+        Warehouse warehouse = warehouseRepository.findByWarehouseNumber(warehouseNumber)
                 .orElseThrow(() ->
                         new NotFoundException("Warehouse not found")
                 );

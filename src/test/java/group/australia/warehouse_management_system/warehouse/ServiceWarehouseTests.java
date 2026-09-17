@@ -82,7 +82,7 @@ class ServiceWarehouseTests {
                 .version(0)
                 .build();
 
-        when(warehouseRepository.findById(1L)).thenReturn(Optional.ofNullable(warehouse));
+        when(warehouseRepository.findByWarehouseNumber(Mockito.anyString())).thenReturn(Optional.ofNullable(warehouse));
         when(warehouseRepository.save(Mockito.any(Warehouse.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -99,7 +99,7 @@ class ServiceWarehouseTests {
                             .build();
                 });
 
-        ResponseWarehouseDto result = warehouseService.updateWarehouse(1L, update);
+        ResponseWarehouseDto result = warehouseService.updateWarehouse("WH-001", update);
 
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result.id()).isEqualTo(1L);
@@ -137,7 +137,7 @@ class ServiceWarehouseTests {
                 .version(0)
                 .build();
 
-        when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouse));
+        when(warehouseRepository.findByWarehouseNumber(Mockito.anyString())).thenReturn(Optional.of(warehouse));
         when(warehouseRepository.save(Mockito.any(Warehouse.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
         when(warehouseMapper.toDto(Mockito.any(Warehouse.class)))
@@ -152,7 +152,7 @@ class ServiceWarehouseTests {
                             .build();
                 });
 
-        ResponseWarehouseDto result = warehouseService.updateWarehouse(1L, update);
+        ResponseWarehouseDto result = warehouseService.updateWarehouse("WH-001", update);
 
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result.active()).isTrue();
@@ -165,9 +165,9 @@ class ServiceWarehouseTests {
                 .active(true)
                 .build();
 
-        when(warehouseRepository.findById(99L)).thenReturn(Optional.empty());
+        when(warehouseRepository.findByWarehouseNumber(Mockito.anyString())).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> warehouseService.updateWarehouse(99L, update))
+        Assertions.assertThatThrownBy(() -> warehouseService.updateWarehouse("WH-999", update))
                 .isInstanceOf(NotFoundException.class);
     }
 }

@@ -82,7 +82,7 @@ class ControllerWarehouseTests {
                 .build();
 
         given(warehouseService.updateWarehouse(
-                ArgumentMatchers.eq(1L),
+                ArgumentMatchers.anyString(),
                 ArgumentMatchers.any(UpdateWarehouseDto.class)
                 )).willReturn(updateResDto);
 

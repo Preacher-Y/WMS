@@ -49,10 +49,20 @@ class RepositoryWarehouseTests {
     }
 
     @Test
-    void WarehouseRepository_ExistsByWarehouseNumber_ReturnWarehouse() {
+    void WarehouseRepository_ExistsByWarehouseNumber_ReturnTrue() {
         boolean res = warehouseRepository.existsByWarehouseNumber(savedWarehouse.getWarehouseNumber());
 
         Assertions.assertThat(res).isTrue();
+    }
+
+    @Test
+    void WarehouseRepository_FindByWarehouseNumber_ReturnWarehouse() {
+        Optional<Warehouse> res = warehouseRepository.findByWarehouseNumber(savedWarehouse.getWarehouseNumber());
+
+        Assertions.assertThat(res).isPresent();
+        Assertions.assertThat(res.get().getId()).isEqualTo(savedWarehouse.getId());
+        Assertions.assertThat(res.get().getWarehouseNumber()).isEqualTo("WH-Test001");
+
     }
 
     @Test

@@ -24,11 +24,11 @@ public class WarehouseController {
         return ResponseEntity.status(HttpStatus.CREATED).body(warehouseService.insertNewWarehouse(req));
     }
 
-    @PutMapping("{id}")
+    @PutMapping("{warehouseNumber}")
     public ResponseEntity<ResponseWarehouseDto> updateWarehouse(
-            @PathVariable Long id,
+            @PathVariable String warehouseNumber,
             @RequestBody @Valid UpdateWarehouseDto req
     ){
-        return ResponseEntity.ok(warehouseService.updateWarehouse(id,req));
+        return ResponseEntity.ok(warehouseService.updateWarehouse(warehouseNumber,req));
     }
 }

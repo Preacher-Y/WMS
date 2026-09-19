@@ -1,7 +1,7 @@
 package group.australia.warehouse_management_system.warehouse;
 
 import group.australia.warehouse_management_system.feature.warehouse.entity.WarehouseEntity;
-import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepository;
+import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ import java.util.Optional;
 class RepositoryWarehouseTests {
 
     @Autowired
-    private WarehouseRepository warehouseRepository;
+    private WarehouseJpaRepository warehouseRepository;
     private WarehouseEntity savedWarehouse;
 
     @BeforeEach

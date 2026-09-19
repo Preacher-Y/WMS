@@ -3,11 +3,10 @@ package group.australia.warehouse_management_system.feature.warehouse.service;
 import group.australia.warehouse_management_system.feature.warehouse.domain.Warehouse;
 import group.australia.warehouse_management_system.feature.warehouse.dto.CreateWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.UpdateWarehouseDto;
-import group.australia.warehouse_management_system.feature.warehouse.entity.WarehouseEntity;
 import group.australia.warehouse_management_system.feature.warehouse.exception.WarehouseDuplicateException;
 import group.australia.warehouse_management_system.feature.warehouse.exception.WarehouseNotFoundException;
 import group.australia.warehouse_management_system.feature.warehouse.mapper.WarehouseMapper;
-import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepository;
+import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,7 @@ import org.springframework.stereotype.Service;
 public class WarehouseService {
 
     private final WarehouseMapper warehouseMapper;
-    private final WarehouseRepository warehouseRepository;
+    private final WarehouseRepositoryPort warehouseRepository;
 
     public Warehouse insertNewWarehouse(CreateWarehouseDto req) {
 
@@ -37,8 +36,7 @@ public class WarehouseService {
                 .build();
 
         try {
-            WarehouseEntity saved = warehouseRepository.save(warehouseMapper.toEntity(warehouse));
-            return warehouseMapper.toDomain(saved);
+            return warehouseRepository.save(warehouse);
 
         } catch (DataIntegrityViolationException ex) {
             throw new WarehouseDuplicateException(warehouseNumber);
@@ -50,17 +48,14 @@ public class WarehouseService {
             UpdateWarehouseDto update
     ) {
 
-        Warehouse warehouse = warehouseMapper.toDomain(
-                warehouseRepository.findByWarehouseNumber(warehouseNumber)
-                        .orElseThrow(() -> new WarehouseNotFoundException(warehouseNumber))
-        );
+        Warehouse warehouse = warehouseRepository.findByWarehouseNumber(warehouseNumber)
+                .orElseThrow(() -> new WarehouseNotFoundException(warehouseNumber));
 
         Warehouse renamed = warehouse.rename(update.name());
         Warehouse updated = update.active() ? renamed.activate() : renamed.deactivate();
 
         try {
-            WarehouseEntity saved = warehouseRepository.save(warehouseMapper.toEntity(updated));
-            return warehouseMapper.toDomain(saved);
+            return warehouseRepository.save(updated);
 
         } catch (DataIntegrityViolationException ex) {
             throw new WarehouseDuplicateException(warehouseNumber);

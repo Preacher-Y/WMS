@@ -26,6 +26,7 @@ public class WarehouseEntity {
     @Column(nullable = false)
     private String name;
 
+    @Builder.Default
     @Column(nullable = false)
     private boolean active = true;
 

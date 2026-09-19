@@ -2,6 +2,7 @@ package group.australia.warehouse_management_system.warehouse;
 
 import group.australia.warehouse_management_system.common.exceptions.ConflictException;
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
+import group.australia.warehouse_management_system.feature.warehouse.domain.Warehouse;
 import group.australia.warehouse_management_system.feature.warehouse.dto.CreateWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.ResponseWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.UpdateWarehouseDto;
@@ -40,7 +41,14 @@ class ServiceWarehouseTests {
                 .warehouseNumber(1)
                 .build();
 
-        WarehouseEntity warehouse = WarehouseEntity.builder()
+        WarehouseEntity warehouseEntity = WarehouseEntity.builder()
+                .id(1L)
+                .name("Test Warehouse 1")
+                .warehouseNumber("WH-001")
+                .active(true)
+                .build();
+
+        Warehouse warehouseDomain = Warehouse.builder()
                 .id(1L)
                 .name("Test Warehouse 1")
                 .warehouseNumber("WH-001")
@@ -54,15 +62,17 @@ class ServiceWarehouseTests {
                 .active(true)
                 .build();
 
-        when(warehouseMapper.toEntityFromRequest(Mockito.any(CreateWarehouseDto.class))).thenReturn(warehouse);
-        when(warehouseRepository.save(Mockito.any(WarehouseEntity.class))).thenReturn(warehouse);
-        when(warehouseMapper.toDto(Mockito.any(WarehouseEntity.class))).thenReturn(responseDto);
+        when(warehouseMapper.toDomainFromCreate(Mockito.any(CreateWarehouseDto.class))).thenReturn(warehouseDomain);
+        when(warehouseMapper.toEntity(Mockito.any(Warehouse.class))).thenReturn(warehouseEntity);
+        when(warehouseRepository.save(Mockito.any(WarehouseEntity.class))).thenReturn(warehouseEntity);
+        when(warehouseMapper.toDomain(Mockito.any(WarehouseEntity.class))).thenReturn(warehouseDomain);
+        when(warehouseMapper.toDto(Mockito.any(Warehouse.class))).thenReturn(responseDto);
 
         ResponseWarehouseDto result = warehouseService.insertNewWarehouse(dto);
 
         Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.name()).isEqualTo(warehouse.getName());
-        Assertions.assertThat(result.warehouseNumber()).isEqualTo(warehouse.getWarehouseNumber());
+        Assertions.assertThat(result.name()).isEqualTo(warehouseEntity.getName());
+        Assertions.assertThat(result.warehouseNumber()).isEqualTo(warehouseEntity.getWarehouseNumber());
         Assertions.assertThat(result.active()).isTrue();
         Assertions.assertThat(result.id()).isGreaterThan(0);
     }
@@ -74,7 +84,7 @@ class ServiceWarehouseTests {
                 .active(false)
                 .build();
 
-        WarehouseEntity warehouse = WarehouseEntity.builder()
+        WarehouseEntity warehouseEntity = WarehouseEntity.builder()
                 .id(1L)
                 .name("Test Warehouse 1")
                 .warehouseNumber("WH-001")
@@ -82,22 +92,27 @@ class ServiceWarehouseTests {
                 .version(0)
                 .build();
 
-        when(warehouseRepository.findByWarehouseNumber(Mockito.anyString())).thenReturn(Optional.ofNullable(warehouse));
-        when(warehouseRepository.save(Mockito.any(WarehouseEntity.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+        Warehouse warehouseDomain = Warehouse.builder()
+                .id(1L)
+                .name("Test Warehouse 1")
+                .warehouseNumber("WH-001")
+                .active(true)
+                .version(0)
+                .build();
 
-        when(warehouseMapper.toDto(Mockito.any(WarehouseEntity.class)))
-                .thenAnswer(invocation -> {
-                    WarehouseEntity savedWarehouse = invocation.getArgument(0);
-
-                    return ResponseWarehouseDto.builder()
-                            .id(savedWarehouse.getId())
-                            .name(savedWarehouse.getName())
-                            .warehouseNumber(savedWarehouse.getWarehouseNumber())
-                            .version(1)
-                            .active(savedWarehouse.isActive())
-                            .build();
-                });
+        when(warehouseRepository.findByWarehouseNumber(Mockito.anyString())).thenReturn(Optional.of(warehouseEntity));
+        when(warehouseMapper.toDomain(Mockito.any(WarehouseEntity.class))).thenReturn(warehouseDomain);
+        when(warehouseMapper.toEntity(Mockito.any(Warehouse.class))).thenReturn(warehouseEntity);
+        when(warehouseRepository.save(Mockito.any(WarehouseEntity.class))).thenReturn(warehouseEntity);
+        when(warehouseMapper.toDto(Mockito.any(Warehouse.class))).thenReturn(
+                ResponseWarehouseDto.builder()
+                        .id(1L)
+                        .name("Test Warehouse 1 - Updated")
+                        .warehouseNumber("WH-001")
+                        .version(1)
+                        .active(false)
+                        .build()
+        );
 
         ResponseWarehouseDto result = warehouseService.updateWarehouse("WH-001", update);
 
@@ -129,7 +144,7 @@ class ServiceWarehouseTests {
                 .active(true)
                 .build();
 
-        WarehouseEntity warehouse = WarehouseEntity.builder()
+        WarehouseEntity warehouseEntity = WarehouseEntity.builder()
                 .id(1L)
                 .name("Test Warehouse 1")
                 .warehouseNumber("WH-001")
@@ -137,20 +152,27 @@ class ServiceWarehouseTests {
                 .version(0)
                 .build();
 
-        when(warehouseRepository.findByWarehouseNumber(Mockito.anyString())).thenReturn(Optional.of(warehouse));
-        when(warehouseRepository.save(Mockito.any(WarehouseEntity.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
-        when(warehouseMapper.toDto(Mockito.any(WarehouseEntity.class)))
-                .thenAnswer(invocation -> {
-                    WarehouseEntity saved = invocation.getArgument(0);
-                    return ResponseWarehouseDto.builder()
-                            .id(saved.getId())
-                            .name(saved.getName())
-                            .warehouseNumber(saved.getWarehouseNumber())
-                            .active(saved.isActive())
-                            .version(0)
-                            .build();
-                });
+        Warehouse warehouseDomain = Warehouse.builder()
+                .id(1L)
+                .name("Test Warehouse 1")
+                .warehouseNumber("WH-001")
+                .active(false)
+                .version(0)
+                .build();
+
+        when(warehouseRepository.findByWarehouseNumber(Mockito.anyString())).thenReturn(Optional.of(warehouseEntity));
+        when(warehouseMapper.toDomain(Mockito.any(WarehouseEntity.class))).thenReturn(warehouseDomain);
+        when(warehouseMapper.toEntity(Mockito.any(Warehouse.class))).thenReturn(warehouseEntity);
+        when(warehouseRepository.save(Mockito.any(WarehouseEntity.class))).thenReturn(warehouseEntity);
+        when(warehouseMapper.toDto(Mockito.any(Warehouse.class))).thenReturn(
+                ResponseWarehouseDto.builder()
+                        .id(1L)
+                        .name("Test Warehouse 1")
+                        .warehouseNumber("WH-001")
+                        .active(true)
+                        .version(0)
+                        .build()
+        );
 
         ResponseWarehouseDto result = warehouseService.updateWarehouse("WH-001", update);
 

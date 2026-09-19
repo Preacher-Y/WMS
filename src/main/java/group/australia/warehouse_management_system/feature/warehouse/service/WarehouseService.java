@@ -2,6 +2,7 @@ package group.australia.warehouse_management_system.feature.warehouse.service;
 
 import group.australia.warehouse_management_system.common.exceptions.ConflictException;
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
+import group.australia.warehouse_management_system.feature.warehouse.domain.Warehouse;
 import group.australia.warehouse_management_system.feature.warehouse.dto.CreateWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.ResponseWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.UpdateWarehouseDto;
@@ -33,12 +34,14 @@ public class WarehouseService {
             );
         }
 
-        WarehouseEntity warehouse = warehouseMapper.toEntityFromRequest(req);
-        warehouse.setWarehouseNumber(warehouseNumber);
+        Warehouse warehouse = warehouseMapper.toDomainFromCreate(req)
+                .toBuilder()
+                .warehouseNumber(warehouseNumber)
+                .build();
 
         try {
-            WarehouseEntity savedWarehouse = warehouseRepository.save(warehouse);
-            return warehouseMapper.toDto(savedWarehouse);
+            WarehouseEntity saved = warehouseRepository.save(warehouseMapper.toEntity(warehouse));
+            return warehouseMapper.toDto(warehouseMapper.toDomain(saved));
 
         } catch (DataIntegrityViolationException ex) {
             throw new ConflictException(
@@ -52,17 +55,21 @@ public class WarehouseService {
             UpdateWarehouseDto update
     ) {
 
-        WarehouseEntity warehouse = warehouseRepository.findByWarehouseNumber(warehouseNumber)
-                .orElseThrow(() ->
-                        new NotFoundException("Warehouse not found")
-                );
+        Warehouse warehouse = warehouseMapper.toDomain(
+                warehouseRepository.findByWarehouseNumber(warehouseNumber)
+                        .orElseThrow(() ->
+                                new NotFoundException("Warehouse not found")
+                        )
+        );
 
-        warehouse.setName(update.name());
-        warehouse.setActive(update.active());
+        Warehouse updated = warehouse.toBuilder()
+                .name(update.name())
+                .active(update.active())
+                .build();
 
         try {
-            WarehouseEntity updatedWarehouse = warehouseRepository.save(warehouse);
-            return warehouseMapper.toDto(updatedWarehouse);
+            WarehouseEntity saved = warehouseRepository.save(warehouseMapper.toEntity(updated));
+            return warehouseMapper.toDto(warehouseMapper.toDomain(saved));
 
         } catch (DataIntegrityViolationException ex) {
             throw new ConflictException("Warehouse update conflicts with existing data");

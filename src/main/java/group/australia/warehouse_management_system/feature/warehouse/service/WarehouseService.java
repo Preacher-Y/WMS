@@ -2,7 +2,7 @@ package group.australia.warehouse_management_system.feature.warehouse.service;
 
 import group.australia.warehouse_management_system.common.exceptions.ConflictException;
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
-import group.australia.warehouse_management_system.feature.warehouse.dto.RequestWarehouseDto;
+import group.australia.warehouse_management_system.feature.warehouse.dto.CreateWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.ResponseWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.UpdateWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.entity.Warehouse;
@@ -20,7 +20,7 @@ public class WarehouseService {
     private final WarehouseMapper warehouseMapper;
     private final WarehouseRepository warehouseRepository;
 
-    public ResponseWarehouseDto insertNewWarehouse(RequestWarehouseDto req) {
+    public ResponseWarehouseDto insertNewWarehouse(CreateWarehouseDto req) {
 
         String warehouseNumber = String.format(
                 "WH-%03d",

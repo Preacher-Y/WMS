@@ -1,9 +1,9 @@
 package group.australia.warehouse_management_system.warehouse;
 
+import group.australia.warehouse_management_system.feature.warehouse.dto.CreateWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.UpdateWarehouseDto;
 import tools.jackson.databind.ObjectMapper;
 import group.australia.warehouse_management_system.feature.warehouse.controller.WarehouseController;
-import group.australia.warehouse_management_system.feature.warehouse.dto.RequestWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.ResponseWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.service.WarehouseService;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,7 +60,7 @@ class ControllerWarehouseTests {
 
     @Test
     void WarehouseController_CreateWarehouse_ReturnCreated() throws Exception {
-        RequestWarehouseDto requestDto = RequestWarehouseDto.builder()
+        CreateWarehouseDto requestDto = CreateWarehouseDto.builder()
                 .name("Test Warehouse 1")
                 .warehouseNumber(1)
                 .build();

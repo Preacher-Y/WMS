@@ -2,7 +2,7 @@ package group.australia.warehouse_management_system.warehouse;
 
 import group.australia.warehouse_management_system.common.exceptions.ConflictException;
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
-import group.australia.warehouse_management_system.feature.warehouse.dto.RequestWarehouseDto;
+import group.australia.warehouse_management_system.feature.warehouse.dto.CreateWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.ResponseWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.UpdateWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.entity.Warehouse;
@@ -35,7 +35,7 @@ class ServiceWarehouseTests {
 
     @Test
     void WarehouseService_CreateWarehouse_ReturnsResponseWarehouseDto() {
-        RequestWarehouseDto dto = RequestWarehouseDto.builder()
+        CreateWarehouseDto dto = CreateWarehouseDto.builder()
                 .name("Test Warehouse 1")
                 .warehouseNumber(1)
                 .build();
@@ -54,7 +54,7 @@ class ServiceWarehouseTests {
                 .active(true)
                 .build();
 
-        when(warehouseMapper.toEntityFromRequest(Mockito.any(RequestWarehouseDto.class))).thenReturn(warehouse);
+        when(warehouseMapper.toEntityFromRequest(Mockito.any(CreateWarehouseDto.class))).thenReturn(warehouse);
         when(warehouseRepository.save(Mockito.any(Warehouse.class))).thenReturn(warehouse);
         when(warehouseMapper.toDto(Mockito.any(Warehouse.class))).thenReturn(responseDto);
 
@@ -111,7 +111,7 @@ class ServiceWarehouseTests {
 
     @Test
     void WarehouseService_CreateWarehouse_DuplicateWarehouseNumber_ThrowsConflictException() {
-        RequestWarehouseDto dto = RequestWarehouseDto.builder()
+        CreateWarehouseDto dto = CreateWarehouseDto.builder()
                 .name("Test Warehouse 1")
                 .warehouseNumber(1)
                 .build();

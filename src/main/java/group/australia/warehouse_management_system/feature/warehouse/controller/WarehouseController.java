@@ -1,6 +1,6 @@
 package group.australia.warehouse_management_system.feature.warehouse.controller;
 
-import group.australia.warehouse_management_system.feature.warehouse.dto.RequestWarehouseDto;
+import group.australia.warehouse_management_system.feature.warehouse.dto.CreateWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.ResponseWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.UpdateWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.service.WarehouseService;
@@ -19,7 +19,7 @@ public class WarehouseController {
 
     @PostMapping
     public ResponseEntity<ResponseWarehouseDto> createNewWarehouse(
-            @RequestBody @Valid RequestWarehouseDto req
+            @RequestBody @Valid CreateWarehouseDto req
     ){
         return ResponseEntity.status(HttpStatus.CREATED).body(warehouseService.insertNewWarehouse(req));
     }

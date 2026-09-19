@@ -56,10 +56,8 @@ public class WarehouseService {
                         .orElseThrow(() -> new WarehouseNotFoundException(warehouseNumber))
         );
 
-        Warehouse updated = warehouse.toBuilder()
-                .name(update.name())
-                .active(update.active())
-                .build();
+        Warehouse renamed = warehouse.rename(update.name());
+        Warehouse updated = update.active() ? renamed.activate() : renamed.deactivate();
 
         try {
             WarehouseEntity saved = warehouseRepository.save(warehouseMapper.toEntity(updated));

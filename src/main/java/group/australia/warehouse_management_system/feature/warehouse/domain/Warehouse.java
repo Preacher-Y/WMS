@@ -28,4 +28,16 @@ public class Warehouse {
     private LocalDateTime createdTimestamp;
 
     private LocalDateTime updatedTimestamp;
+
+    public Warehouse deactivate() {
+        return this.toBuilder().active(false).build();
+    }
+
+    public Warehouse activate() {
+        return this.toBuilder().active(true).build();
+    }
+
+    public Warehouse rename(String name) {
+        return this.toBuilder().name(name).build();
+    }
 }

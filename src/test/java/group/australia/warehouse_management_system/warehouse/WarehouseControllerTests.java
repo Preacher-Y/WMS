@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @WebMvcTest(controllers = WarehouseController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
-class ControllerWarehouseTests {
+class WarehouseControllerTests {
 
     @Autowired
     private MockMvc mockMvc;

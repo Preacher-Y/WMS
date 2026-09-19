@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-class RepositoryWarehouseTests {
+class WarehouseRepositoryTests {
 
     @Autowired
     private WarehouseJpaRepository warehouseRepository;

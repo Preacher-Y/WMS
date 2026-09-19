@@ -72,7 +72,7 @@ class ControllerWarehouseTests {
     }
 
     @Test
-    void WarehouseController_CreateWarehouse_ReturnCreated() throws Exception {
+    void Should_return_201_when_creating_warehouse() throws Exception {
         CreateWarehouseDto requestDto = CreateWarehouseDto.builder()
                 .name("Test Warehouse 1")
                 .warehouseNumber(1)
@@ -89,7 +89,7 @@ class ControllerWarehouseTests {
     }
 
     @Test
-    void WarehouseController_UpdateWarehouse_ReturnOk() throws Exception {
+    void Should_return_200_when_updating_warehouse() throws Exception {
         UpdateWarehouseDto updateDto = UpdateWarehouseDto.builder()
                 .name("Test Warehouse 1 - Update")
                 .active(false)

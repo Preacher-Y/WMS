@@ -34,7 +34,7 @@ class ServiceWarehouseTests {
     }
 
     @Test
-    void WarehouseService_CreateWarehouse_ReturnsResponseWarehouseDto() {
+    void Should_create_warehouse_if_it_does_not_exist_yet() {
         CreateWarehouseDto dto = CreateWarehouseDto.builder()
                 .name("Test Warehouse 1")
                 .warehouseNumber(1)
@@ -56,7 +56,7 @@ class ServiceWarehouseTests {
     }
 
     @Test
-    void WarehouseService_UpdateWarehouse_ReturnsResponseWarehouseDto() {
+    void Should_update_warehouse_when_it_exists() {
         warehouseRepository.save(Warehouse.builder()
                 .name("Test Warehouse 1")
                 .warehouseNumber("WH-001")
@@ -79,7 +79,7 @@ class ServiceWarehouseTests {
     }
 
     @Test
-    void WarehouseService_CreateWarehouse_DuplicateWarehouseNumber_ThrowsConflictException() {
+    void Should_throw_when_warehouse_number_already_exists() {
         warehouseRepository.save(Warehouse.builder()
                 .warehouseNumber("WH-001")
                 .name("Existing")
@@ -95,7 +95,7 @@ class ServiceWarehouseTests {
     }
 
     @Test
-    void WarehouseService_UpdateWarehouse_ActivateWarehouse_ReturnsActiveDto() {
+    void Should_activate_warehouse_on_update() {
         warehouseRepository.save(Warehouse.builder()
                 .name("Test Warehouse 1")
                 .warehouseNumber("WH-001")
@@ -115,7 +115,7 @@ class ServiceWarehouseTests {
     }
 
     @Test
-    void WarehouseService_UpdateWarehouse_WarehouseNotFound_ThrowsNotFoundException() {
+    void Should_throw_when_updating_non_existent_warehouse() {
         UpdateWarehouseDto update = UpdateWarehouseDto.builder()
                 .name("Any Name")
                 .active(true)

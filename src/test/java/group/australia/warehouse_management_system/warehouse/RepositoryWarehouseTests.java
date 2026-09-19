@@ -32,7 +32,7 @@ class RepositoryWarehouseTests {
     }
 
     @Test
-    void WarehouseRepository_SaveAll_ReturnSavedWarehouse() {
+    void Should_save_and_return_warehouse() {
         Assertions.assertThat(savedWarehouse).isNotNull();
         Assertions.assertThat(savedWarehouse.getId()).isGreaterThan(0);
         Assertions.assertThat(savedWarehouse.getName()).isEqualTo("Test Warehouse 1");
@@ -40,7 +40,7 @@ class RepositoryWarehouseTests {
     }
 
     @Test
-    void WarehouseRepository_FindById_ReturnWarehouse() {
+    void Should_find_warehouse_by_id() {
         Optional<WarehouseEntity> result = warehouseRepository.findById(savedWarehouse.getId());
 
         Assertions.assertThat(result).isPresent();
@@ -49,14 +49,14 @@ class RepositoryWarehouseTests {
     }
 
     @Test
-    void WarehouseRepository_ExistsByWarehouseNumber_ReturnTrue() {
+    void Should_return_true_when_warehouse_number_exists() {
         boolean res = warehouseRepository.existsByWarehouseNumber(savedWarehouse.getWarehouseNumber());
 
         Assertions.assertThat(res).isTrue();
     }
 
     @Test
-    void WarehouseRepository_FindByWarehouseNumber_ReturnWarehouse() {
+    void Should_find_warehouse_by_warehouse_number() {
         Optional<WarehouseEntity> res = warehouseRepository.findByWarehouseNumber(savedWarehouse.getWarehouseNumber());
 
         Assertions.assertThat(res).isPresent();
@@ -66,7 +66,7 @@ class RepositoryWarehouseTests {
     }
 
     @Test
-    void WarehouseRepository_DuplicateWarehouseNumber_ThrowsDataIntegrityViolationException() {
+    void Should_throw_on_duplicate_warehouse_number() {
         WarehouseEntity duplicate = WarehouseEntity.builder()
                 .name("Duplicate Warehouse")
                 .warehouseNumber("WH-Test001")
@@ -78,7 +78,7 @@ class RepositoryWarehouseTests {
     }
 
     @Test
-    void WarehouseRepository_StaleVersion_ThrowsOptimisticLockingFailureException() {
+    void Should_throw_on_optimistic_locking_conflict() {
         Integer originalVersion = savedWarehouse.getVersion();
 
         savedWarehouse.setName("First Update");

@@ -1,7 +1,7 @@
 package group.australia.warehouse_management_system.warehouse;
 
-import group.australia.warehouse_management_system.common.exceptions.ConflictException;
-import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
+import group.australia.warehouse_management_system.feature.warehouse.exception.WarehouseDuplicateException;
+import group.australia.warehouse_management_system.feature.warehouse.exception.WarehouseNotFoundException;
 import group.australia.warehouse_management_system.feature.warehouse.domain.Warehouse;
 import group.australia.warehouse_management_system.feature.warehouse.dto.CreateWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.ResponseWarehouseDto;
@@ -134,7 +134,7 @@ class ServiceWarehouseTests {
         when(warehouseRepository.existsByWarehouseNumber("WH-001")).thenReturn(true);
 
         Assertions.assertThatThrownBy(() -> warehouseService.insertNewWarehouse(dto))
-                .isInstanceOf(ConflictException.class);
+                .isInstanceOf(WarehouseDuplicateException.class);
     }
 
     @Test
@@ -190,6 +190,6 @@ class ServiceWarehouseTests {
         when(warehouseRepository.findByWarehouseNumber(Mockito.anyString())).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() -> warehouseService.updateWarehouse("WH-999", update))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(WarehouseNotFoundException.class);
     }
 }

@@ -1,12 +1,12 @@
 package group.australia.warehouse_management_system.feature.warehouse.service;
 
-import group.australia.warehouse_management_system.common.exceptions.ConflictException;
-import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
 import group.australia.warehouse_management_system.feature.warehouse.domain.Warehouse;
 import group.australia.warehouse_management_system.feature.warehouse.dto.CreateWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.ResponseWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.UpdateWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.entity.WarehouseEntity;
+import group.australia.warehouse_management_system.feature.warehouse.exception.WarehouseDuplicateException;
+import group.australia.warehouse_management_system.feature.warehouse.exception.WarehouseNotFoundException;
 import group.australia.warehouse_management_system.feature.warehouse.mapper.WarehouseMapper;
 import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +29,7 @@ public class WarehouseService {
         );
 
         if (warehouseRepository.existsByWarehouseNumber(warehouseNumber)) {
-            throw new ConflictException(
-                    "Warehouse number already exists: " + warehouseNumber
-            );
+            throw new WarehouseDuplicateException(warehouseNumber);
         }
 
         Warehouse warehouse = warehouseMapper.toDomainFromCreate(req)
@@ -44,9 +42,7 @@ public class WarehouseService {
             return warehouseMapper.toDto(warehouseMapper.toDomain(saved));
 
         } catch (DataIntegrityViolationException ex) {
-            throw new ConflictException(
-                    "Warehouse number already exists: " + warehouseNumber
-            );
+            throw new WarehouseDuplicateException(warehouseNumber);
         }
     }
 
@@ -57,9 +53,7 @@ public class WarehouseService {
 
         Warehouse warehouse = warehouseMapper.toDomain(
                 warehouseRepository.findByWarehouseNumber(warehouseNumber)
-                        .orElseThrow(() ->
-                                new NotFoundException("Warehouse not found")
-                        )
+                        .orElseThrow(() -> new WarehouseNotFoundException(warehouseNumber))
         );
 
         Warehouse updated = warehouse.toBuilder()
@@ -72,7 +66,7 @@ public class WarehouseService {
             return warehouseMapper.toDto(warehouseMapper.toDomain(saved));
 
         } catch (DataIntegrityViolationException ex) {
-            throw new ConflictException("Warehouse update conflicts with existing data");
+            throw new WarehouseDuplicateException(warehouseNumber);
         }
     }
 }

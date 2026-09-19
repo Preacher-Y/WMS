@@ -21,7 +21,7 @@ public class WarehouseService {
 
     public Warehouse insertNewWarehouse(CreateWarehouseDto req) {
 
-        String warehouseNumber = String.format(
+        var warehouseNumber = String.format(
                 "WH-%03d",
                 req.warehouseNumber()
         );
@@ -30,7 +30,7 @@ public class WarehouseService {
             throw new WarehouseDuplicateException(warehouseNumber);
         }
 
-        Warehouse warehouse = warehouseMapper.toDomainFromCreate(req)
+        var warehouse = warehouseMapper.toDomainFromCreate(req)
                 .toBuilder()
                 .warehouseNumber(warehouseNumber)
                 .build();
@@ -48,11 +48,11 @@ public class WarehouseService {
             UpdateWarehouseDto update
     ) {
 
-        Warehouse warehouse = warehouseRepository.findByWarehouseNumber(warehouseNumber)
+        var warehouse = warehouseRepository.findByWarehouseNumber(warehouseNumber)
                 .orElseThrow(() -> new WarehouseNotFoundException(warehouseNumber));
 
-        Warehouse renamed = warehouse.rename(update.name());
-        Warehouse updated = update.active() ? renamed.activate() : renamed.deactivate();
+        var renamed = warehouse.rename(update.name());
+        var updated = update.active() ? renamed.activate() : renamed.deactivate();
 
         try {
             return warehouseRepository.save(updated);

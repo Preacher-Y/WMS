@@ -5,7 +5,7 @@ import group.australia.warehouse_management_system.common.exceptions.NotFoundExc
 import group.australia.warehouse_management_system.feature.warehouse.dto.CreateWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.ResponseWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.UpdateWarehouseDto;
-import group.australia.warehouse_management_system.feature.warehouse.entity.Warehouse;
+import group.australia.warehouse_management_system.feature.warehouse.entity.WarehouseEntity;
 import group.australia.warehouse_management_system.feature.warehouse.mapper.WarehouseMapper;
 import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepository;
 import group.australia.warehouse_management_system.feature.warehouse.service.WarehouseService;
@@ -40,7 +40,7 @@ class ServiceWarehouseTests {
                 .warehouseNumber(1)
                 .build();
 
-        Warehouse warehouse = Warehouse.builder()
+        WarehouseEntity warehouse = WarehouseEntity.builder()
                 .id(1L)
                 .name("Test Warehouse 1")
                 .warehouseNumber("WH-001")
@@ -55,8 +55,8 @@ class ServiceWarehouseTests {
                 .build();
 
         when(warehouseMapper.toEntityFromRequest(Mockito.any(CreateWarehouseDto.class))).thenReturn(warehouse);
-        when(warehouseRepository.save(Mockito.any(Warehouse.class))).thenReturn(warehouse);
-        when(warehouseMapper.toDto(Mockito.any(Warehouse.class))).thenReturn(responseDto);
+        when(warehouseRepository.save(Mockito.any(WarehouseEntity.class))).thenReturn(warehouse);
+        when(warehouseMapper.toDto(Mockito.any(WarehouseEntity.class))).thenReturn(responseDto);
 
         ResponseWarehouseDto result = warehouseService.insertNewWarehouse(dto);
 
@@ -74,7 +74,7 @@ class ServiceWarehouseTests {
                 .active(false)
                 .build();
 
-        Warehouse warehouse = Warehouse.builder()
+        WarehouseEntity warehouse = WarehouseEntity.builder()
                 .id(1L)
                 .name("Test Warehouse 1")
                 .warehouseNumber("WH-001")
@@ -83,12 +83,12 @@ class ServiceWarehouseTests {
                 .build();
 
         when(warehouseRepository.findByWarehouseNumber(Mockito.anyString())).thenReturn(Optional.ofNullable(warehouse));
-        when(warehouseRepository.save(Mockito.any(Warehouse.class)))
+        when(warehouseRepository.save(Mockito.any(WarehouseEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        when(warehouseMapper.toDto(Mockito.any(Warehouse.class)))
+        when(warehouseMapper.toDto(Mockito.any(WarehouseEntity.class)))
                 .thenAnswer(invocation -> {
-                    Warehouse savedWarehouse = invocation.getArgument(0);
+                    WarehouseEntity savedWarehouse = invocation.getArgument(0);
 
                     return ResponseWarehouseDto.builder()
                             .id(savedWarehouse.getId())
@@ -129,7 +129,7 @@ class ServiceWarehouseTests {
                 .active(true)
                 .build();
 
-        Warehouse warehouse = Warehouse.builder()
+        WarehouseEntity warehouse = WarehouseEntity.builder()
                 .id(1L)
                 .name("Test Warehouse 1")
                 .warehouseNumber("WH-001")
@@ -138,11 +138,11 @@ class ServiceWarehouseTests {
                 .build();
 
         when(warehouseRepository.findByWarehouseNumber(Mockito.anyString())).thenReturn(Optional.of(warehouse));
-        when(warehouseRepository.save(Mockito.any(Warehouse.class)))
+        when(warehouseRepository.save(Mockito.any(WarehouseEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
-        when(warehouseMapper.toDto(Mockito.any(Warehouse.class)))
+        when(warehouseMapper.toDto(Mockito.any(WarehouseEntity.class)))
                 .thenAnswer(invocation -> {
-                    Warehouse saved = invocation.getArgument(0);
+                    WarehouseEntity saved = invocation.getArgument(0);
                     return ResponseWarehouseDto.builder()
                             .id(saved.getId())
                             .name(saved.getName())

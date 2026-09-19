@@ -1,6 +1,6 @@
 package group.australia.warehouse_management_system.warehouse;
 
-import group.australia.warehouse_management_system.feature.warehouse.entity.Warehouse;
+import group.australia.warehouse_management_system.feature.warehouse.entity.WarehouseEntity;
 import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,11 +20,11 @@ class RepositoryWarehouseTests {
 
     @Autowired
     private WarehouseRepository warehouseRepository;
-    private Warehouse savedWarehouse;
+    private WarehouseEntity savedWarehouse;
 
     @BeforeEach
     void setUp() {
-        savedWarehouse = warehouseRepository.save(Warehouse.builder()
+        savedWarehouse = warehouseRepository.save(WarehouseEntity.builder()
                 .name("Test Warehouse 1")
                 .warehouseNumber("WH-Test001")
                 .active(true)
@@ -41,7 +41,7 @@ class RepositoryWarehouseTests {
 
     @Test
     void WarehouseRepository_FindById_ReturnWarehouse() {
-        Optional<Warehouse> result = warehouseRepository.findById(savedWarehouse.getId());
+        Optional<WarehouseEntity> result = warehouseRepository.findById(savedWarehouse.getId());
 
         Assertions.assertThat(result).isPresent();
         Assertions.assertThat(result.get().getId()).isEqualTo(savedWarehouse.getId());
@@ -57,7 +57,7 @@ class RepositoryWarehouseTests {
 
     @Test
     void WarehouseRepository_FindByWarehouseNumber_ReturnWarehouse() {
-        Optional<Warehouse> res = warehouseRepository.findByWarehouseNumber(savedWarehouse.getWarehouseNumber());
+        Optional<WarehouseEntity> res = warehouseRepository.findByWarehouseNumber(savedWarehouse.getWarehouseNumber());
 
         Assertions.assertThat(res).isPresent();
         Assertions.assertThat(res.get().getId()).isEqualTo(savedWarehouse.getId());
@@ -67,7 +67,7 @@ class RepositoryWarehouseTests {
 
     @Test
     void WarehouseRepository_DuplicateWarehouseNumber_ThrowsDataIntegrityViolationException() {
-        Warehouse duplicate = Warehouse.builder()
+        WarehouseEntity duplicate = WarehouseEntity.builder()
                 .name("Duplicate Warehouse")
                 .warehouseNumber("WH-Test001")
                 .active(true)
@@ -84,7 +84,7 @@ class RepositoryWarehouseTests {
         savedWarehouse.setName("First Update");
         warehouseRepository.saveAndFlush(savedWarehouse);
 
-        Warehouse stale = Warehouse.builder()
+        WarehouseEntity stale = WarehouseEntity.builder()
                 .id(savedWarehouse.getId())
                 .name("Stale Update")
                 .warehouseNumber(savedWarehouse.getWarehouseNumber())

@@ -5,7 +5,7 @@ import group.australia.warehouse_management_system.common.exceptions.NotFoundExc
 import group.australia.warehouse_management_system.feature.warehouse.dto.CreateWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.ResponseWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.UpdateWarehouseDto;
-import group.australia.warehouse_management_system.feature.warehouse.entity.Warehouse;
+import group.australia.warehouse_management_system.feature.warehouse.entity.WarehouseEntity;
 import group.australia.warehouse_management_system.feature.warehouse.mapper.WarehouseMapper;
 import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,11 +33,11 @@ public class WarehouseService {
             );
         }
 
-        Warehouse warehouse = warehouseMapper.toEntityFromRequest(req);
+        WarehouseEntity warehouse = warehouseMapper.toEntityFromRequest(req);
         warehouse.setWarehouseNumber(warehouseNumber);
 
         try {
-            Warehouse savedWarehouse = warehouseRepository.save(warehouse);
+            WarehouseEntity savedWarehouse = warehouseRepository.save(warehouse);
             return warehouseMapper.toDto(savedWarehouse);
 
         } catch (DataIntegrityViolationException ex) {
@@ -52,7 +52,7 @@ public class WarehouseService {
             UpdateWarehouseDto update
     ) {
 
-        Warehouse warehouse = warehouseRepository.findByWarehouseNumber(warehouseNumber)
+        WarehouseEntity warehouse = warehouseRepository.findByWarehouseNumber(warehouseNumber)
                 .orElseThrow(() ->
                         new NotFoundException("Warehouse not found")
                 );
@@ -61,7 +61,7 @@ public class WarehouseService {
         warehouse.setActive(update.active());
 
         try {
-            Warehouse updatedWarehouse = warehouseRepository.save(warehouse);
+            WarehouseEntity updatedWarehouse = warehouseRepository.save(warehouse);
             return warehouseMapper.toDto(updatedWarehouse);
 
         } catch (DataIntegrityViolationException ex) {

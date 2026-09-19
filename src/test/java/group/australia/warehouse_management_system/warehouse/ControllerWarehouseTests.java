@@ -1,10 +1,12 @@
 package group.australia.warehouse_management_system.warehouse;
 
+import group.australia.warehouse_management_system.feature.warehouse.domain.Warehouse;
 import group.australia.warehouse_management_system.feature.warehouse.dto.CreateWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.UpdateWarehouseDto;
 import tools.jackson.databind.ObjectMapper;
 import group.australia.warehouse_management_system.feature.warehouse.controller.WarehouseController;
 import group.australia.warehouse_management_system.feature.warehouse.dto.ResponseWarehouseDto;
+import group.australia.warehouse_management_system.feature.warehouse.mapper.WarehouseMapper;
 import group.australia.warehouse_management_system.feature.warehouse.service.WarehouseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,20 +37,32 @@ class ControllerWarehouseTests {
     @MockitoBean
     private WarehouseService warehouseService;
 
+    @MockitoBean
+    private WarehouseMapper warehouseMapper;
+
     @Autowired
     private ObjectMapper objectMapper;
 
+    private Warehouse warehouseDomain;
     private ResponseWarehouseDto dto;
     private ResponseWarehouseDto updateResDto;
 
     @BeforeEach
     void setUp() {
+        warehouseDomain = Warehouse.builder()
+                .id(1L)
+                .name("Test Warehouse 1")
+                .warehouseNumber("WH-001")
+                .active(true)
+                .build();
+
         dto = ResponseWarehouseDto.builder()
                 .id(1L)
                 .name("Test Warehouse 1")
                 .warehouseNumber("WH-001")
                 .active(true)
                 .build();
+
         updateResDto = ResponseWarehouseDto.builder()
                 .id(1L)
                 .name("Test Warehouse 1 - Update")
@@ -57,7 +71,6 @@ class ControllerWarehouseTests {
                 .build();
     }
 
-
     @Test
     void WarehouseController_CreateWarehouse_ReturnCreated() throws Exception {
         CreateWarehouseDto requestDto = CreateWarehouseDto.builder()
@@ -65,7 +78,8 @@ class ControllerWarehouseTests {
                 .warehouseNumber(1)
                 .build();
 
-        given(warehouseService.insertNewWarehouse(ArgumentMatchers.any())).willReturn(dto);
+        given(warehouseService.insertNewWarehouse(ArgumentMatchers.any())).willReturn(warehouseDomain);
+        given(warehouseMapper.toDto(ArgumentMatchers.any(Warehouse.class))).willReturn(dto);
 
         ResultActions response = mockMvc.perform(post("/warehouses")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -84,7 +98,8 @@ class ControllerWarehouseTests {
         given(warehouseService.updateWarehouse(
                 ArgumentMatchers.anyString(),
                 ArgumentMatchers.any(UpdateWarehouseDto.class)
-                )).willReturn(updateResDto);
+        )).willReturn(warehouseDomain);
+        given(warehouseMapper.toDto(ArgumentMatchers.any(Warehouse.class))).willReturn(updateResDto);
 
         ResultActions response = mockMvc.perform(put("/warehouses/1")
                 .contentType(MediaType.APPLICATION_JSON)

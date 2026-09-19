@@ -2,7 +2,6 @@ package group.australia.warehouse_management_system.feature.warehouse.service;
 
 import group.australia.warehouse_management_system.feature.warehouse.domain.Warehouse;
 import group.australia.warehouse_management_system.feature.warehouse.dto.CreateWarehouseDto;
-import group.australia.warehouse_management_system.feature.warehouse.dto.ResponseWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.dto.UpdateWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.entity.WarehouseEntity;
 import group.australia.warehouse_management_system.feature.warehouse.exception.WarehouseDuplicateException;
@@ -21,7 +20,7 @@ public class WarehouseService {
     private final WarehouseMapper warehouseMapper;
     private final WarehouseRepository warehouseRepository;
 
-    public ResponseWarehouseDto insertNewWarehouse(CreateWarehouseDto req) {
+    public Warehouse insertNewWarehouse(CreateWarehouseDto req) {
 
         String warehouseNumber = String.format(
                 "WH-%03d",
@@ -39,14 +38,14 @@ public class WarehouseService {
 
         try {
             WarehouseEntity saved = warehouseRepository.save(warehouseMapper.toEntity(warehouse));
-            return warehouseMapper.toDto(warehouseMapper.toDomain(saved));
+            return warehouseMapper.toDomain(saved);
 
         } catch (DataIntegrityViolationException ex) {
             throw new WarehouseDuplicateException(warehouseNumber);
         }
     }
 
-    public ResponseWarehouseDto updateWarehouse(
+    public Warehouse updateWarehouse(
             String warehouseNumber,
             UpdateWarehouseDto update
     ) {
@@ -61,7 +60,7 @@ public class WarehouseService {
 
         try {
             WarehouseEntity saved = warehouseRepository.save(warehouseMapper.toEntity(updated));
-            return warehouseMapper.toDto(warehouseMapper.toDomain(saved));
+            return warehouseMapper.toDomain(saved);
 
         } catch (DataIntegrityViolationException ex) {
             throw new WarehouseDuplicateException(warehouseNumber);

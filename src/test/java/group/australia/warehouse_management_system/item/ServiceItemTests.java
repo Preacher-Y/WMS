@@ -46,7 +46,7 @@ class ServiceItemTests {
     }
 
     @Test
-    void ItemService_CreateItem_ReturnsItem() {
+    void Should_create_item_when_it_does_not_exist_yet() {
         var req = new ItemRequestDto("ITEM-001", 10, 1L, 1L);
 
         var location = new Location();
@@ -74,7 +74,7 @@ class ServiceItemTests {
     }
 
     @Test
-    void ItemService_CreateItem_DuplicateItem_ThrowsConflictException() {
+    void Should_throw_when_item_already_exists_at_location() {
         var location = new Location();
         location.setId(1L);
 
@@ -87,7 +87,7 @@ class ServiceItemTests {
     }
 
     @Test
-    void ItemService_CreateItem_LocationNotFound_ThrowsNotFoundException() {
+    void Should_throw_when_location_not_found() {
         var req = new ItemRequestDto("ITEM-001", 10, 999L, 1L);
 
         when(locationRepository.findById(999L)).thenReturn(Optional.empty());
@@ -97,7 +97,7 @@ class ServiceItemTests {
     }
 
     @Test
-    void ItemService_CreateItem_CartonHeaderNotFound_ThrowsNotFoundException() {
+    void Should_throw_when_carton_header_not_found() {
         var req = new ItemRequestDto("ITEM-001", 10, 1L, 999L);
 
         var location = new Location();

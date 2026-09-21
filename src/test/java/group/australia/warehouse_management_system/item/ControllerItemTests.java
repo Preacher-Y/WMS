@@ -55,7 +55,7 @@ class ControllerItemTests {
     }
 
     @Test
-    void ItemController_CreateItem_Returns201() throws Exception {
+    void Should_return_201_when_creating_item() throws Exception {
         var req = new ItemRequestDto("ITEM-001", 10, 1L, 1L);
 
         given(itemService.insertNewItem(any(ItemRequestDto.class))).willReturn(itemDomain);

@@ -63,7 +63,7 @@ class RepositoryItemTests {
     }
 
     @Test
-    void ItemRepository_Save_ReturnsItem() {
+    void Should_save_item_and_return_persisted_entity() {
         Assertions.assertThat(savedItem).isNotNull();
         Assertions.assertThat(savedItem.getId()).isGreaterThan(0);
         Assertions.assertThat(savedItem.getItemNumber()).isEqualTo("ITEM-001");
@@ -71,7 +71,7 @@ class RepositoryItemTests {
     }
 
     @Test
-    void ItemRepository_FindById_VerifiesLocationAndCartonHeaderRelationships() {
+    void Should_find_item_with_location_and_carton_header_relationships() {
         Optional<ItemEntity> result = itemRepository.findById(savedItem.getId());
 
         Assertions.assertThat(result).isPresent();
@@ -82,35 +82,35 @@ class RepositoryItemTests {
     }
 
     @Test
-    void ItemRepository_ExistsByItemNumberAndLocationId_ReturnsTrue() {
+    void Should_return_true_when_item_exists_at_location() {
         boolean exists = itemRepository.existsByItemNumberAndLocationId("ITEM-001", savedLocation.getId());
 
         Assertions.assertThat(exists).isTrue();
     }
 
     @Test
-    void ItemRepository_ExistsByItemNumberAndLocationId_UnknownPair_ReturnsFalse() {
+    void Should_return_false_when_item_number_location_pair_unknown() {
         boolean exists = itemRepository.existsByItemNumberAndLocationId("ITEM-999", savedLocation.getId());
 
         Assertions.assertThat(exists).isFalse();
     }
 
     @Test
-    void ItemRepository_ExistByItemNumber_ReturnsTrue() {
+    void Should_return_true_when_item_number_exists() {
         boolean exists = itemRepository.existsByItemNumber("ITEM-001");
 
         Assertions.assertThat(exists).isTrue();
     }
 
     @Test
-    void ItemRepository_ExistByItemNumber_UnknownPair_ReturnsFalse() {
+    void Should_return_false_when_item_number_unknown() {
         boolean exists = itemRepository.existsByItemNumber("ITEM-999");
 
         Assertions.assertThat(exists).isFalse();
     }
 
     @Test
-    void ItemRepository_FindByItemNumberAndLocation_ReturnsItem() {
+    void Should_find_item_by_item_number_and_location() {
         Optional<ItemEntity> result = itemRepository.findByItemNumberAndLocation("ITEM-001", savedLocation);
 
         Assertions.assertThat(result).isPresent();
@@ -119,7 +119,7 @@ class RepositoryItemTests {
     }
 
     @Test
-    void ItemRepository_DuplicateItemNumberAndLocation_ThrowsDataIntegrityViolationException() {
+    void Should_throw_when_duplicate_item_number_and_location() {
         var duplicate = ItemEntity.builder()
                 .itemNumber("ITEM-001")
                 .quantity(5)
@@ -132,7 +132,7 @@ class RepositoryItemTests {
     }
 
     @Test
-    void ItemRepository_StaleVersion_ThrowsOptimisticLockingFailureException() {
+    void Should_throw_when_saving_stale_version() {
         var originalVersion = savedItem.getVersion();
 
         savedItem.setQuantity(20);

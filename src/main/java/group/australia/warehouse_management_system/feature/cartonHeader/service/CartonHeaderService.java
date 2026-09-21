@@ -49,7 +49,7 @@ public class CartonHeaderService {
         }
 
         CartonHeader domain = cartonHeaderMapper.toDomain(entityOpt.get());
-        CartonHeader updated = domain.toBuilder().description(updateRequest.description()).build();
+        CartonHeader updated = domain.updateDescription(updateRequest.description());
         CartonHeaderEntity entity = cartonHeaderMapper.toEntity(updated);
 
         try {

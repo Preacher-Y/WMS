@@ -1,6 +1,6 @@
 package group.australia.warehouse_management_system.feature.SSCC.controller;
 
-import group.australia.warehouse_management_system.feature.SSCC.dto.RequestSsccDto;
+import group.australia.warehouse_management_system.feature.SSCC.dto.CreateSsccDto;
 import group.australia.warehouse_management_system.feature.SSCC.dto.ResponseSsccDto;
 import group.australia.warehouse_management_system.feature.SSCC.service.SsccService;
 import jakarta.validation.Valid;
@@ -18,7 +18,7 @@ public class SsccController {
     @PostMapping("/{barcode}/ssccs")
     public ResponseEntity<ResponseSsccDto> createNewSscc(
             @PathVariable String barcode,
-            @RequestBody @Valid RequestSsccDto req
+            @RequestBody @Valid CreateSsccDto req
     ){
         return ResponseEntity.status(HttpStatus.CREATED).body(ssccService.insertNewSscc(barcode,req));
     }

@@ -1,7 +1,7 @@
 package group.australia.warehouse_management_system.SSCC;
 
 import group.australia.warehouse_management_system.feature.SSCC.controller.SsccController;
-import group.australia.warehouse_management_system.feature.SSCC.dto.RequestSsccDto;
+import group.australia.warehouse_management_system.feature.SSCC.dto.CreateSsccDto;
 import group.australia.warehouse_management_system.feature.SSCC.dto.ResponseSsccDto;
 import group.australia.warehouse_management_system.feature.SSCC.service.SsccService;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.ResponseCartonHeaderDto;
@@ -56,11 +56,11 @@ class ControllerSsccTests {
 
     @Test
     void SsccController_CreateSscc_ReturnsCreated() throws Exception {
-        RequestSsccDto req = RequestSsccDto.builder()
+        CreateSsccDto req = CreateSsccDto.builder()
                 .sscc("1234567890123456789")
                 .build();
 
-        given(ssccService.insertNewSscc(anyString(), any(RequestSsccDto.class))).willReturn(responseDto);
+        given(ssccService.insertNewSscc(anyString(), any(CreateSsccDto.class))).willReturn(responseDto);
 
         ResultActions ra = mockMvc.perform(post("/warehouses/13431324532/ssccs")
                 .contentType(MediaType.APPLICATION_JSON)

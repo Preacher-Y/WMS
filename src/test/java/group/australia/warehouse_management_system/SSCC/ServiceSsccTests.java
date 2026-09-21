@@ -2,7 +2,7 @@ package group.australia.warehouse_management_system.SSCC;
 
 import group.australia.warehouse_management_system.common.exceptions.ConflictException;
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
-import group.australia.warehouse_management_system.feature.SSCC.dto.RequestSsccDto;
+import group.australia.warehouse_management_system.feature.SSCC.dto.CreateSsccDto;
 import group.australia.warehouse_management_system.feature.SSCC.dto.ResponseSsccDto;
 import group.australia.warehouse_management_system.feature.SSCC.entity.SSCC;
 import group.australia.warehouse_management_system.feature.SSCC.mapper.SsccMapper;
@@ -40,7 +40,7 @@ class ServiceSsccTests {
 
     @Test
     void SsccService_CreateSscc_ReturnsResponseSsccDto() {
-        RequestSsccDto req = RequestSsccDto.builder()
+        CreateSsccDto req = CreateSsccDto.builder()
                 .sscc("1234567890123456789")
                 .build();
 
@@ -71,7 +71,7 @@ class ServiceSsccTests {
         when(ssccRepository.existsBySscc("1234567890123456789")).thenReturn(false);
         when(cartonHeaderRepository.existsByBarcode("13431324532")).thenReturn(true);
         when(cartonHeaderRepository.findByBarcode("13431324532")).thenReturn(Optional.of(cartonHeader));
-        when(ssccMapper.toEntity(Mockito.any(RequestSsccDto.class))).thenReturn(sscc);
+        when(ssccMapper.toEntity(Mockito.any(CreateSsccDto.class))).thenReturn(sscc);
         when(ssccRepository.save(Mockito.any(SSCC.class))).thenReturn(sscc);
         when(ssccMapper.toDto(Mockito.any(SSCC.class))).thenReturn(responseDto);
 
@@ -84,7 +84,7 @@ class ServiceSsccTests {
 
     @Test
     void SsccService_CreateSscc_CorrectCartonHeaderAssociation() {
-        RequestSsccDto req = RequestSsccDto.builder()
+        CreateSsccDto req = CreateSsccDto.builder()
                 .sscc("1234567890123456789")
                 .build();
 
@@ -117,7 +117,7 @@ class ServiceSsccTests {
         when(ssccRepository.existsBySscc("1234567890123456789")).thenReturn(false);
         when(cartonHeaderRepository.existsByBarcode("13431324532")).thenReturn(true);
         when(cartonHeaderRepository.findByBarcode("13431324532")).thenReturn(Optional.of(cartonHeader));
-        when(ssccMapper.toEntity(Mockito.any(RequestSsccDto.class))).thenReturn(sscc);
+        when(ssccMapper.toEntity(Mockito.any(CreateSsccDto.class))).thenReturn(sscc);
         when(ssccRepository.save(Mockito.any(SSCC.class))).thenReturn(sscc);
         when(ssccMapper.toDto(Mockito.any(SSCC.class))).thenReturn(responseDto);
 
@@ -130,7 +130,7 @@ class ServiceSsccTests {
 
     @Test
     void SsccService_CreateSscc_DuplicateSscc_ThrowsConflictException() {
-        RequestSsccDto req = RequestSsccDto.builder()
+        CreateSsccDto req = CreateSsccDto.builder()
                 .sscc("1234567890123456789")
                 .build();
 
@@ -142,7 +142,7 @@ class ServiceSsccTests {
 
     @Test
     void SsccService_CreateSscc_UnknownCartonHeader_ThrowsNotFoundException() {
-        RequestSsccDto req = RequestSsccDto.builder()
+        CreateSsccDto req = CreateSsccDto.builder()
                 .sscc("1234567890123456789")
                 .build();
 

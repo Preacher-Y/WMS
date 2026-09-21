@@ -2,7 +2,7 @@ package group.australia.warehouse_management_system.feature.SSCC.service;
 
 import group.australia.warehouse_management_system.common.exceptions.ConflictException;
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
-import group.australia.warehouse_management_system.feature.SSCC.dto.RequestSsccDto;
+import group.australia.warehouse_management_system.feature.SSCC.dto.CreateSsccDto;
 import group.australia.warehouse_management_system.feature.SSCC.dto.ResponseSsccDto;
 import group.australia.warehouse_management_system.feature.SSCC.entity.SSCC;
 import group.australia.warehouse_management_system.feature.SSCC.mapper.SsccMapper;
@@ -21,7 +21,7 @@ public class SsccService {
     private final SsccMapper ssccMapper;
     private final CartonHeaderRepository cartonHeaderRepository;
 
-    public ResponseSsccDto insertNewSscc(String barcode,RequestSsccDto req){
+    public ResponseSsccDto insertNewSscc(String barcode, CreateSsccDto req){
 
         if (ssccRepository.existsBySscc(req.sscc())){
             throw new ConflictException(

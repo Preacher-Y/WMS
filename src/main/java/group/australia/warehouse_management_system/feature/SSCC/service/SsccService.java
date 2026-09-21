@@ -6,7 +6,6 @@ import group.australia.warehouse_management_system.feature.SSCC.exception.SsccCa
 import group.australia.warehouse_management_system.feature.SSCC.exception.SsccDuplicateException;
 import group.australia.warehouse_management_system.feature.SSCC.mapper.SsccMapper;
 import group.australia.warehouse_management_system.feature.SSCC.repository.SsccRepositoryPort;
-import group.australia.warehouse_management_system.feature.cartonHeader.domain.CartonHeader;
 import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -26,7 +25,7 @@ public class SsccService {
             throw new SsccDuplicateException(req.sscc());
         }
 
-        CartonHeader cartonHeader = cartonHeaderRepository.findByBarcode(barcode)
+        var cartonHeader = cartonHeaderRepository.findByBarcode(barcode)
                 .orElseThrow(() -> new SsccCartonHeaderNotFoundException(barcode));
 
         var sscc = ssccMapper.toDomainFromCreate(req).withCartonHeader(cartonHeader);

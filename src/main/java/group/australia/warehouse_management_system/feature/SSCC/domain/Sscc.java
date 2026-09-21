@@ -1,10 +1,8 @@
 package group.australia.warehouse_management_system.feature.SSCC.domain;
 
 import group.australia.warehouse_management_system.feature.cartonHeader.domain.CartonHeader;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 
 import java.time.LocalDateTime;
 
@@ -19,4 +17,8 @@ public class Sscc {
     private LocalDateTime receivedTimestamp;
     private LocalDateTime createdTimeStamp;
     private LocalDateTime updatedTimeStamp;
+
+    public Sscc withCartonHeader(CartonHeader cartonHeader) {
+        return this.toBuilder().cartonHeader(cartonHeader).build();
+    }
 }

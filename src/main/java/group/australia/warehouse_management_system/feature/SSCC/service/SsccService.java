@@ -34,7 +34,7 @@ public class SsccService {
 
         CartonHeader cartonHeader = cartonHeaderRepository.findByBarcode(barcode).orElseThrow();
 
-        Sscc sscc = ssccMapper.toDomainFromCreate(req).toBuilder().cartonHeader(cartonHeader).build();
+        Sscc sscc = ssccMapper.toDomainFromCreate(req).withCartonHeader(cartonHeader);
         SsccEntity entity = ssccMapper.toEntity(sscc);
         try {
             SsccEntity saved = ssccRepository.save(entity);

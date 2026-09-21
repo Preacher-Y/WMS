@@ -40,7 +40,7 @@ class ServiceSsccTests {
     }
 
     @Test
-    void SsccService_CreateSscc_ReturnsResponseSsccDto() {
+    void Should_create_sscc_if_it_does_not_exist_yet() {
         var req = CreateSsccDto.builder().sscc("1234567890123456789").build();
 
         var cartonHeader = CartonHeader.builder()
@@ -59,7 +59,7 @@ class ServiceSsccTests {
     }
 
     @Test
-    void SsccService_CreateSscc_CorrectCartonHeaderAssociation() {
+    void Should_associate_carton_header_when_creating_sscc() {
         var req = CreateSsccDto.builder().sscc("1234567890123456789").build();
 
         var cartonHeader = CartonHeader.builder()
@@ -77,7 +77,7 @@ class ServiceSsccTests {
     }
 
     @Test
-    void SsccService_CreateSscc_DuplicateSscc_ThrowsConflictException() {
+    void Should_throw_when_sscc_already_exists() {
         ssccRepository.save(Sscc.builder().sscc("1234567890123456789").build());
 
         var req = CreateSsccDto.builder().sscc("1234567890123456789").build();
@@ -87,7 +87,7 @@ class ServiceSsccTests {
     }
 
     @Test
-    void SsccService_CreateSscc_UnknownCartonHeader_ThrowsNotFoundException() {
+    void Should_throw_when_carton_header_not_found() {
         var req = CreateSsccDto.builder().sscc("1234567890123456789").build();
 
         when(cartonHeaderRepository.findByBarcode("UNKNOWN-999")).thenReturn(Optional.empty());

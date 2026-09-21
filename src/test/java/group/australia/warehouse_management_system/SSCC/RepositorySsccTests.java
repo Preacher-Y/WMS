@@ -42,7 +42,7 @@ class RepositorySsccTests {
     }
 
     @Test
-    void SsccRepository_SaveAll_ReturnsSscc() {
+    void Should_save_and_return_sscc() {
         Assertions.assertThat(savedSscc).isNotNull();
         Assertions.assertThat(savedSscc.getId()).isGreaterThan(0);
         Assertions.assertThat(savedSscc.getSscc()).isEqualTo("1234567890123456789");
@@ -51,7 +51,7 @@ class RepositorySsccTests {
     }
 
     @Test
-    void SsccRepository_FindById_ReturnsSscc() {
+    void Should_find_sscc_by_id() {
         Optional<SsccEntity> result = ssccRepository.findById(savedSscc.getId());
 
         Assertions.assertThat(result).isPresent();
@@ -60,14 +60,14 @@ class RepositorySsccTests {
     }
 
     @Test
-    void SsccRepository_ExistsBySscc_ReturnsTrue() {
+    void Should_return_true_when_sscc_exists() {
         boolean result = ssccRepository.existsBySscc(savedSscc.getSscc());
 
         Assertions.assertThat(result).isTrue();
     }
 
     @Test
-    void SsccRepository_DuplicateSscc_ThrowsDataIntegrityViolationException() {
+    void Should_throw_on_duplicate_sscc() {
         SsccEntity duplicate = SsccEntity.builder()
                 .sscc("1234567890123456789")
                 .cartonHeader(savedCartonHeader)

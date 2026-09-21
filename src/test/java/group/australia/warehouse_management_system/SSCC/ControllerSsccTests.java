@@ -75,7 +75,7 @@ class ControllerSsccTests {
     }
 
     @Test
-    void SsccController_CreateSscc_ReturnsCreated() throws Exception {
+    void Should_return_201_when_creating_sscc() throws Exception {
         CreateSsccDto req = CreateSsccDto.builder()
                 .sscc("1234567890123456789")
                 .build();

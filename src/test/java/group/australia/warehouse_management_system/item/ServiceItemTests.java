@@ -9,14 +9,13 @@ import group.australia.warehouse_management_system.feature.item.exception.ItemCa
 import group.australia.warehouse_management_system.feature.item.exception.ItemDuplicateException;
 import group.australia.warehouse_management_system.feature.item.exception.ItemLocationNotFoundException;
 import group.australia.warehouse_management_system.feature.item.mapper.ItemMapper;
-import group.australia.warehouse_management_system.feature.item.repository.ItemRepository;
 import group.australia.warehouse_management_system.feature.item.service.ItemService;
 import group.australia.warehouse_management_system.feature.location.entity.Location;
 import group.australia.warehouse_management_system.feature.location.repository.LocationRepository;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,9 +28,6 @@ import static org.mockito.Mockito.when;
 class ServiceItemTests {
 
     @Mock
-    private ItemRepository itemRepository;
-
-    @Mock
     private ItemMapper itemMapper;
 
     @Mock
@@ -40,8 +36,14 @@ class ServiceItemTests {
     @Mock
     private CartonHeaderRepositoryPort cartonHeaderRepository;
 
-    @InjectMocks
+    private InMemoryItemRepository itemRepository;
     private ItemService itemService;
+
+    @BeforeEach
+    void setUp() {
+        itemRepository = new InMemoryItemRepository();
+        itemService = new ItemService(itemMapper, itemRepository, locationRepository, cartonHeaderRepository);
+    }
 
     @Test
     void ItemService_CreateItem_ReturnsItem() {
@@ -57,30 +59,28 @@ class ServiceItemTests {
                 .id(1L).barcode("BC-001").description("Test Carton").version(0).build();
 
         var itemDomain = Item.builder().itemNumber("ITEM-001").quantity(10).build();
-        var itemDomainSaved = Item.builder().id(1L).itemNumber("ITEM-001").quantity(10)
-                .location(location).cartonHeader(cartonHeader).build();
-        var itemEntity = ItemEntity.builder().id(1L).itemNumber("ITEM-001").quantity(10).build();
 
-        when(itemRepository.existsByItemNumberAndLocationId("ITEM-001", 1L)).thenReturn(false);
         when(locationRepository.findById(1L)).thenReturn(Optional.of(location));
         when(cartonHeaderRepository.findById(1L)).thenReturn(Optional.of(cartonHeader));
         when(itemMapper.toDomainFromCreate(Mockito.any(ItemRequestDto.class))).thenReturn(itemDomain);
-        when(itemMapper.toEntity(Mockito.any(Item.class))).thenReturn(itemEntity);
-        when(itemRepository.save(Mockito.any(ItemEntity.class))).thenReturn(itemEntity);
-        when(itemMapper.toDomain(Mockito.any(ItemEntity.class))).thenReturn(itemDomainSaved);
 
         var result = itemService.insertNewItem(req);
 
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result.getItemNumber()).isEqualTo("ITEM-001");
         Assertions.assertThat(result.getId()).isGreaterThan(0);
+        Assertions.assertThat(result.getLocation()).isEqualTo(location);
+        Assertions.assertThat(result.getCartonHeader()).isEqualTo(cartonHeader);
     }
 
     @Test
     void ItemService_CreateItem_DuplicateItem_ThrowsConflictException() {
-        var req = new ItemRequestDto("ITEM-001", 10, 1L, 1L);
+        var location = new Location();
+        location.setId(1L);
 
-        when(itemRepository.existsByItemNumberAndLocationId("ITEM-001", 1L)).thenReturn(true);
+        itemRepository.save(Item.builder().itemNumber("ITEM-001").location(location).build());
+
+        var req = new ItemRequestDto("ITEM-001", 10, 1L, 1L);
 
         Assertions.assertThatThrownBy(() -> itemService.insertNewItem(req))
                 .isInstanceOf(ItemDuplicateException.class);
@@ -90,7 +90,6 @@ class ServiceItemTests {
     void ItemService_CreateItem_LocationNotFound_ThrowsNotFoundException() {
         var req = new ItemRequestDto("ITEM-001", 10, 999L, 1L);
 
-        when(itemRepository.existsByItemNumberAndLocationId("ITEM-001", 999L)).thenReturn(false);
         when(locationRepository.findById(999L)).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() -> itemService.insertNewItem(req))
@@ -107,7 +106,6 @@ class ServiceItemTests {
         location.setShelf(3);
         location.setLocationCode("1-2-3");
 
-        when(itemRepository.existsByItemNumberAndLocationId("ITEM-001", 1L)).thenReturn(false);
         when(locationRepository.findById(1L)).thenReturn(Optional.of(location));
         when(cartonHeaderRepository.findById(999L)).thenReturn(Optional.empty());
 

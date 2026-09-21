@@ -6,7 +6,7 @@ import group.australia.warehouse_management_system.feature.item.exception.ItemLo
 import group.australia.warehouse_management_system.feature.item.domain.Item;
 import group.australia.warehouse_management_system.feature.item.dto.ItemRequestDto;
 import group.australia.warehouse_management_system.feature.item.mapper.ItemMapper;
-import group.australia.warehouse_management_system.feature.item.repository.ItemRepository;
+import group.australia.warehouse_management_system.feature.item.repository.ItemRepositoryPort;
 import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderRepositoryPort;
 import group.australia.warehouse_management_system.feature.location.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 public class ItemService {
 
     private final ItemMapper itemMapper;
-    private final ItemRepository itemRepository;
+    private final ItemRepositoryPort itemRepository;
     private final LocationRepository locationRepository;
     private final CartonHeaderRepositoryPort cartonHeaderRepository;
 
@@ -34,10 +34,8 @@ public class ItemService {
         var item = itemMapper.toDomainFromCreate(req)
                 .withLocation(location)
                 .withCartonHeader(cartonHeader);
-        var entity = itemMapper.toEntity(item);
         try {
-            var saved = itemRepository.save(entity);
-            return itemMapper.toDomain(saved);
+            return itemRepository.save(item);
         } catch (DataIntegrityViolationException ex) {
             throw new ItemDuplicateException(req.itemNumber(), req.locationId());
         }

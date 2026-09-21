@@ -3,7 +3,7 @@ package group.australia.warehouse_management_system.item;
 import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeaderEntity;
 import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderJpaRepository;
 import group.australia.warehouse_management_system.feature.item.entity.ItemEntity;
-import group.australia.warehouse_management_system.feature.item.repository.ItemRepository;
+import group.australia.warehouse_management_system.feature.item.repository.ItemJpaRepository;
 import group.australia.warehouse_management_system.feature.location.entity.Location;
 import group.australia.warehouse_management_system.feature.location.repository.LocationRepository;
 import group.australia.warehouse_management_system.feature.warehouse.entity.WarehouseEntity;
@@ -24,7 +24,7 @@ import java.util.Optional;
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 class RepositoryItemTests {
 
-    @Autowired private ItemRepository itemRepository;
+    @Autowired private ItemJpaRepository itemRepository;
     @Autowired private LocationRepository locationRepository;
     @Autowired private CartonHeaderJpaRepository cartonHeaderRepository;
     @Autowired private WarehouseJpaRepository warehouseRepository;

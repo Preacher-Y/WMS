@@ -1,8 +1,8 @@
 package group.australia.warehouse_management_system.SSCC;
 
-import group.australia.warehouse_management_system.common.exceptions.ConflictException;
-import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
 import group.australia.warehouse_management_system.feature.SSCC.domain.Sscc;
+import group.australia.warehouse_management_system.feature.SSCC.exception.SsccCartonHeaderNotFoundException;
+import group.australia.warehouse_management_system.feature.SSCC.exception.SsccDuplicateException;
 import group.australia.warehouse_management_system.feature.SSCC.dto.CreateSsccDto;
 import group.australia.warehouse_management_system.feature.SSCC.dto.ResponseSsccDto;
 import group.australia.warehouse_management_system.feature.SSCC.entity.SsccEntity;
@@ -112,7 +112,7 @@ class ServiceSsccTests {
         when(ssccRepository.existsBySscc("1234567890123456789")).thenReturn(true);
 
         Assertions.assertThatThrownBy(() -> ssccService.insertNewSscc("13431324532", req))
-                .isInstanceOf(ConflictException.class);
+                .isInstanceOf(SsccDuplicateException.class);
     }
 
     @Test
@@ -123,6 +123,6 @@ class ServiceSsccTests {
         when(cartonHeaderRepository.existsByBarcode("UNKNOWN-999")).thenReturn(false);
 
         Assertions.assertThatThrownBy(() -> ssccService.insertNewSscc("UNKNOWN-999", req))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(SsccCartonHeaderNotFoundException.class);
     }
 }

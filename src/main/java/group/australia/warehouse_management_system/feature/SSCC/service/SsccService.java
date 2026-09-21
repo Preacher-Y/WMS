@@ -1,8 +1,8 @@
 package group.australia.warehouse_management_system.feature.SSCC.service;
 
-import group.australia.warehouse_management_system.common.exceptions.ConflictException;
-import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
 import group.australia.warehouse_management_system.feature.SSCC.domain.Sscc;
+import group.australia.warehouse_management_system.feature.SSCC.exception.SsccCartonHeaderNotFoundException;
+import group.australia.warehouse_management_system.feature.SSCC.exception.SsccDuplicateException;
 import group.australia.warehouse_management_system.feature.SSCC.dto.CreateSsccDto;
 import group.australia.warehouse_management_system.feature.SSCC.dto.ResponseSsccDto;
 import group.australia.warehouse_management_system.feature.SSCC.entity.SsccEntity;
@@ -25,11 +25,11 @@ public class SsccService {
     public ResponseSsccDto insertNewSscc(String barcode, CreateSsccDto req) {
 
         if (ssccRepository.existsBySscc(req.sscc())) {
-            throw new ConflictException("Serial Shipping Container Code already exist");
+            throw new SsccDuplicateException(req.sscc());
         }
 
         if (!cartonHeaderRepository.existsByBarcode(barcode)) {
-            throw new NotFoundException("Carton header not found");
+            throw new SsccCartonHeaderNotFoundException(barcode);
         }
 
         CartonHeader cartonHeader = cartonHeaderRepository.findByBarcode(barcode).orElseThrow();
@@ -40,7 +40,7 @@ public class SsccService {
             SsccEntity saved = ssccRepository.save(entity);
             return ssccMapper.toDto(ssccMapper.toDomain(saved));
         } catch (DataIntegrityViolationException ex) {
-            throw new ConflictException("SSCC conflicts with existing data");
+            throw new SsccDuplicateException(req.sscc());
         }
     }
 }

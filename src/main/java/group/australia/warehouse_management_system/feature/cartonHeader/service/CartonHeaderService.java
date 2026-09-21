@@ -23,7 +23,7 @@ public class CartonHeaderService {
             throw new CartonHeaderDuplicateException(req.barcode());
         }
 
-        CartonHeader cartonHeader = cartonHeaderMapper.toDomainFromCreate(req);
+        var cartonHeader = cartonHeaderMapper.toDomainFromCreate(req);
 
         try {
             return cartonHeaderRepository.save(cartonHeader);
@@ -36,10 +36,10 @@ public class CartonHeaderService {
             String barcode,
             UpdateCartonHeaderDto updateRequest
     ) {
-        CartonHeader cartonHeader = cartonHeaderRepository.findByBarcode(barcode)
+        var cartonHeader = cartonHeaderRepository.findByBarcode(barcode)
                 .orElseThrow(() -> new CartonHeaderNotFoundException(barcode));
 
-        CartonHeader updated = cartonHeader.updateDescription(updateRequest.description());
+        var updated = cartonHeader.updateDescription(updateRequest.description());
 
         try {
             return cartonHeaderRepository.save(updated);

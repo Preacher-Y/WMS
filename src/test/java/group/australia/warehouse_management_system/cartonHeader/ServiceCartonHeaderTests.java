@@ -34,7 +34,7 @@ class ServiceCartonHeaderTests {
     }
 
     @Test
-    void CartonHeaderService_CreateCartonHeader_ReturnsResponseCartonDto() {
+    void Should_create_carton_header_if_barcode_does_not_exist_yet() {
         CreateCartonHeaderDto req = CreateCartonHeaderDto.builder()
                 .barcode("123456789")
                 .description("Test description")
@@ -55,7 +55,7 @@ class ServiceCartonHeaderTests {
     }
 
     @Test
-    void CartonHeaderService_UpdateCartonHeader_ReturnsResponseCartonDto() {
+    void Should_update_description_when_carton_header_exists() {
         cartonHeaderRepository.save(CartonHeader.builder()
                 .barcode("123456789")
                 .description("Test description")
@@ -73,7 +73,7 @@ class ServiceCartonHeaderTests {
     }
 
     @Test
-    void CartonHeaderService_CreateCartonHeader_DuplicateBarcode_ThrowsConflictException() {
+    void Should_throw_when_barcode_already_exists() {
         cartonHeaderRepository.save(CartonHeader.builder()
                 .barcode("123456789")
                 .description("Test description")
@@ -89,7 +89,7 @@ class ServiceCartonHeaderTests {
     }
 
     @Test
-    void CartonHeaderService_UpdateCartonHeader_UnknownBarcode_ThrowsNotFoundException() {
+    void Should_throw_when_updating_non_existent_carton_header() {
         UpdateCartonHeaderDto update = UpdateCartonHeaderDto.builder()
                 .description("Any description")
                 .build();

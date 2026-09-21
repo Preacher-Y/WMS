@@ -32,7 +32,7 @@ class RepositoryCartonHeaderTests {
     }
 
     @Test
-    void CartonHeaderRepository_SaveAll_ReturnsCartonHeader() {
+    void Should_save_and_return_carton_header() {
         Assertions.assertThat(savedCartonHeader).isNotNull();
         Assertions.assertThat(savedCartonHeader.getBarcode()).isEqualTo("13431324532");
         Assertions.assertThat(savedCartonHeader.getDescription()).isEqualTo("Testing CartonHeader");
@@ -40,7 +40,7 @@ class RepositoryCartonHeaderTests {
     }
 
     @Test
-    void CartonHeaderRepository_FindById_ReturnsCartonHeader() {
+    void Should_find_carton_header_by_id() {
         Optional<CartonHeaderEntity> cartonHeader = cartonHeaderJpaRepository.findById(savedCartonHeader.getId());
 
         Assertions.assertThat(cartonHeader).isPresent();
@@ -49,14 +49,14 @@ class RepositoryCartonHeaderTests {
     }
 
     @Test
-    void CartonHeaderRepository_ExistByBarcode_ReturnsBoolean() {
+    void Should_return_true_when_barcode_exists() {
         boolean res = cartonHeaderJpaRepository.existsByBarcode(savedCartonHeader.getBarcode());
 
         Assertions.assertThat(res).isTrue();
     }
 
     @Test
-    void CartonHeaderRepository_FindByBarcode_ReturnCartonHeader() {
+    void Should_find_carton_header_by_barcode() {
         Optional<CartonHeaderEntity> existCartonHeader = cartonHeaderJpaRepository.findByBarcode(savedCartonHeader.getBarcode());
 
         Assertions.assertThat(existCartonHeader).isPresent();
@@ -65,7 +65,7 @@ class RepositoryCartonHeaderTests {
     }
 
     @Test
-    void CartonHeaderRepository_DuplicateBarcode_ThrowsDataIntegrityViolationException() {
+    void Should_throw_on_duplicate_barcode() {
         CartonHeaderEntity duplicate = CartonHeaderEntity.builder()
                 .barcode("13431324532")
                 .description("Another description")
@@ -76,7 +76,7 @@ class RepositoryCartonHeaderTests {
     }
 
     @Test
-    void CartonHeaderRepository_StaleVersion_ThrowsOptimisticLockingFailureException() {
+    void Should_throw_on_optimistic_locking_conflict() {
         Integer originalVersion = savedCartonHeader.getVersion();
 
         savedCartonHeader.setDescription("First Update");

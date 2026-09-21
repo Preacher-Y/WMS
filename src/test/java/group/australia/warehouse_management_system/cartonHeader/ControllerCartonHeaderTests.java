@@ -73,7 +73,7 @@ class ControllerCartonHeaderTests {
     }
 
     @Test
-    void CartonHeaderController_CreateCartonHeader_ReturnsCreated() throws Exception {
+    void Should_return_201_when_creating_carton_header() throws Exception {
         CreateCartonHeaderDto req = CreateCartonHeaderDto.builder()
                 .barcode("123456789")
                 .description("Test Description")
@@ -91,7 +91,7 @@ class ControllerCartonHeaderTests {
     }
 
     @Test
-    void CartonHeaderController_UpdateCartonHeader_ReturnsOk() throws Exception {
+    void Should_return_200_when_updating_carton_header() throws Exception {
         UpdateCartonHeaderDto update = UpdateCartonHeaderDto.builder()
                 .description("Test Description - Update")
                 .build();

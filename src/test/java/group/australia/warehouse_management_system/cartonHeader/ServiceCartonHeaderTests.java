@@ -1,12 +1,11 @@
 package group.australia.warehouse_management_system.cartonHeader;
 
 import group.australia.warehouse_management_system.feature.cartonHeader.domain.CartonHeader;
-import group.australia.warehouse_management_system.feature.cartonHeader.exception.CartonHeaderDuplicateException;
-import group.australia.warehouse_management_system.feature.cartonHeader.exception.CartonHeaderNotFoundException;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.CreateCartonHeaderDto;
-import group.australia.warehouse_management_system.feature.cartonHeader.dto.ResponseCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.UpdateCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeaderEntity;
+import group.australia.warehouse_management_system.feature.cartonHeader.exception.CartonHeaderDuplicateException;
+import group.australia.warehouse_management_system.feature.cartonHeader.exception.CartonHeaderNotFoundException;
 import group.australia.warehouse_management_system.feature.cartonHeader.mapper.CartonHeaderMapper;
 import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderRepository;
 import group.australia.warehouse_management_system.feature.cartonHeader.service.CartonHeaderService;
@@ -61,26 +60,18 @@ class ServiceCartonHeaderTests {
                 .version(0)
                 .build();
 
-        ResponseCartonHeaderDto res = ResponseCartonHeaderDto.builder()
-                .id(1L)
-                .barcode("123456789")
-                .description("Test description")
-                .version(0)
-                .build();
-
         when(cartonHeaderMapper.toDomainFromCreate(any(CreateCartonHeaderDto.class))).thenReturn(domainFromDto);
         when(cartonHeaderMapper.toEntity(any(CartonHeader.class))).thenReturn(entity);
         when(cartonHeaderRepository.save(any(CartonHeaderEntity.class))).thenReturn(entity);
         when(cartonHeaderMapper.toDomain(any(CartonHeaderEntity.class))).thenReturn(savedDomain);
-        when(cartonHeaderMapper.toDto(any(CartonHeader.class))).thenReturn(res);
 
-        ResponseCartonHeaderDto result = cartonHeaderService.insertNewCartonHeader(req);
+        CartonHeader result = cartonHeaderService.insertNewCartonHeader(req);
 
         Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.barcode()).isEqualTo("123456789");
-        Assertions.assertThat(result.description()).isEqualTo("Test description");
-        Assertions.assertThat(result.version()).isZero();
-        Assertions.assertThat(result.id()).isGreaterThan(0);
+        Assertions.assertThat(result.getBarcode()).isEqualTo("123456789");
+        Assertions.assertThat(result.getDescription()).isEqualTo("Test description");
+        Assertions.assertThat(result.getVersion()).isZero();
+        Assertions.assertThat(result.getId()).isGreaterThan(0);
     }
 
     @Test
@@ -117,25 +108,17 @@ class ServiceCartonHeaderTests {
                 .version(1)
                 .build();
 
-        ResponseCartonHeaderDto updateRes = ResponseCartonHeaderDto.builder()
-                .id(1L)
-                .barcode("123456789")
-                .description("Test description - Updated")
-                .version(1)
-                .build();
-
         when(cartonHeaderRepository.findByBarcode(anyString())).thenReturn(Optional.of(entityFromRepo));
         when(cartonHeaderMapper.toDomain(any(CartonHeaderEntity.class))).thenReturn(domain, updatedDomain);
         when(cartonHeaderMapper.toEntity(any(CartonHeader.class))).thenReturn(updatedEntity);
         when(cartonHeaderRepository.save(any(CartonHeaderEntity.class))).thenReturn(updatedEntity);
-        when(cartonHeaderMapper.toDto(any(CartonHeader.class))).thenReturn(updateRes);
 
-        ResponseCartonHeaderDto result = cartonHeaderService.updateCartonHeader("123456789", update);
+        CartonHeader result = cartonHeaderService.updateCartonHeader("123456789", update);
 
         Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.barcode()).isEqualTo("123456789");
-        Assertions.assertThat(result.description()).isEqualTo("Test description - Updated");
-        Assertions.assertThat(result.version()).isGreaterThan(0);
+        Assertions.assertThat(result.getBarcode()).isEqualTo("123456789");
+        Assertions.assertThat(result.getDescription()).isEqualTo("Test description - Updated");
+        Assertions.assertThat(result.getVersion()).isGreaterThan(0);
     }
 
     @Test

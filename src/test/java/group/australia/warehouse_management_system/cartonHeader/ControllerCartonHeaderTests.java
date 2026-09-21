@@ -1,9 +1,11 @@
 package group.australia.warehouse_management_system.cartonHeader;
 
 import group.australia.warehouse_management_system.feature.cartonHeader.controller.CartonHeaderController;
+import group.australia.warehouse_management_system.feature.cartonHeader.domain.CartonHeader;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.CreateCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.ResponseCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.UpdateCartonHeaderDto;
+import group.australia.warehouse_management_system.feature.cartonHeader.mapper.CartonHeaderMapper;
 import group.australia.warehouse_management_system.feature.cartonHeader.service.CartonHeaderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import tools.jackson.databind.ObjectMapper;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -32,17 +35,28 @@ class ControllerCartonHeaderTests {
     @MockitoBean
     private CartonHeaderService cartonHeaderService;
 
+    @MockitoBean
+    private CartonHeaderMapper cartonHeaderMapper;
+
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
 
+    private CartonHeader cartonHeaderDomain;
     private ResponseCartonHeaderDto res;
     private ResponseCartonHeaderDto updateRes;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
+        cartonHeaderDomain = CartonHeader.builder()
+                .id(1L)
+                .barcode("123456789")
+                .description("Test Description")
+                .version(0)
+                .build();
+
         res = ResponseCartonHeaderDto.builder()
                 .id(1L)
                 .barcode("123456789")
@@ -65,7 +79,9 @@ class ControllerCartonHeaderTests {
                 .description("Test Description")
                 .build();
 
-        given(cartonHeaderService.insertNewCartonHeader(Mockito.any(CreateCartonHeaderDto.class))).willReturn(res);
+        given(cartonHeaderService.insertNewCartonHeader(Mockito.any(CreateCartonHeaderDto.class)))
+                .willReturn(cartonHeaderDomain);
+        given(cartonHeaderMapper.toDto(any(CartonHeader.class))).willReturn(res);
 
         ResultActions ra = mockMvc.perform(post("/carton-headers")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -81,7 +97,8 @@ class ControllerCartonHeaderTests {
                 .build();
 
         given(cartonHeaderService.updateCartonHeader(Mockito.anyString(), Mockito.any(UpdateCartonHeaderDto.class)))
-                .willReturn(updateRes);
+                .willReturn(cartonHeaderDomain);
+        given(cartonHeaderMapper.toDto(any(CartonHeader.class))).willReturn(updateRes);
 
         ResultActions ra = mockMvc.perform(put("/carton-headers/123456789")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -89,5 +106,4 @@ class ControllerCartonHeaderTests {
 
         ra.andExpect(MockMvcResultMatchers.status().isOk());
     }
-
 }

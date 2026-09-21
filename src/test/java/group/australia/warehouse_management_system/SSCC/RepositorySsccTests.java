@@ -1,9 +1,9 @@
 package group.australia.warehouse_management_system.SSCC;
 
-import group.australia.warehouse_management_system.feature.SSCC.entity.SSCC;
-import group.australia.warehouse_management_system.feature.SSCC.repository.SsccRepository;
-import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeader;
-import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderRepository;
+import group.australia.warehouse_management_system.feature.SSCC.entity.SsccEntity;
+import group.australia.warehouse_management_system.feature.SSCC.repository.SsccJpaRepository;
+import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeaderEntity;
+import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,29 +20,29 @@ import java.util.Optional;
 class RepositorySsccTests {
 
     @Autowired
-    private SsccRepository ssccRepository;
+    private SsccJpaRepository ssccRepository;
 
     @Autowired
-    private CartonHeaderRepository cartonHeaderRepository;
+    private CartonHeaderJpaRepository cartonHeaderRepository;
 
-    private SSCC savedSscc;
-    private CartonHeader savedCartonHeader;
+    private SsccEntity savedSscc;
+    private CartonHeaderEntity savedCartonHeader;
 
     @BeforeEach
     void setUp() {
-        savedCartonHeader = cartonHeaderRepository.save(CartonHeader.builder()
+        savedCartonHeader = cartonHeaderRepository.save(CartonHeaderEntity.builder()
                 .barcode("13431324532")
                 .description("Test CartonHeader")
                 .build());
 
-        savedSscc = ssccRepository.save(SSCC.builder()
+        savedSscc = ssccRepository.save(SsccEntity.builder()
                 .sscc("1234567890123456789")
                 .cartonHeader(savedCartonHeader)
                 .build());
     }
 
     @Test
-    void SsccRepository_SaveAll_ReturnsSscc() {
+    void Should_save_and_return_sscc() {
         Assertions.assertThat(savedSscc).isNotNull();
         Assertions.assertThat(savedSscc.getId()).isGreaterThan(0);
         Assertions.assertThat(savedSscc.getSscc()).isEqualTo("1234567890123456789");
@@ -51,8 +51,8 @@ class RepositorySsccTests {
     }
 
     @Test
-    void SsccRepository_FindById_ReturnsSscc() {
-        Optional<SSCC> result = ssccRepository.findById(savedSscc.getId());
+    void Should_find_sscc_by_id() {
+        Optional<SsccEntity> result = ssccRepository.findById(savedSscc.getId());
 
         Assertions.assertThat(result).isPresent();
         Assertions.assertThat(result.get().getId()).isEqualTo(savedSscc.getId());
@@ -60,15 +60,15 @@ class RepositorySsccTests {
     }
 
     @Test
-    void SsccRepository_ExistsBySscc_ReturnsTrue() {
+    void Should_return_true_when_sscc_exists() {
         boolean result = ssccRepository.existsBySscc(savedSscc.getSscc());
 
         Assertions.assertThat(result).isTrue();
     }
 
     @Test
-    void SsccRepository_DuplicateSscc_ThrowsDataIntegrityViolationException() {
-        SSCC duplicate = SSCC.builder()
+    void Should_throw_on_duplicate_sscc() {
+        SsccEntity duplicate = SsccEntity.builder()
                 .sscc("1234567890123456789")
                 .cartonHeader(savedCartonHeader)
                 .build();

@@ -1,7 +1,8 @@
 package group.australia.warehouse_management_system.feature.SSCC.controller;
 
-import group.australia.warehouse_management_system.feature.SSCC.dto.RequestSsccDto;
+import group.australia.warehouse_management_system.feature.SSCC.dto.CreateSsccDto;
 import group.australia.warehouse_management_system.feature.SSCC.dto.ResponseSsccDto;
+import group.australia.warehouse_management_system.feature.SSCC.mapper.SsccMapper;
 import group.australia.warehouse_management_system.feature.SSCC.service.SsccService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,12 +15,14 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class SsccController {
     private final SsccService ssccService;
+    private final SsccMapper ssccMapper;
 
     @PostMapping("/{barcode}/ssccs")
     public ResponseEntity<ResponseSsccDto> createNewSscc(
             @PathVariable String barcode,
-            @RequestBody @Valid RequestSsccDto req
-    ){
-        return ResponseEntity.status(HttpStatus.CREATED).body(ssccService.insertNewSscc(barcode,req));
+            @RequestBody @Valid CreateSsccDto req
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ssccMapper.toDto(ssccService.insertNewSscc(barcode, req)));
     }
 }

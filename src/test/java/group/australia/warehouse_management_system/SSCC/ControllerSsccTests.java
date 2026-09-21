@@ -1,9 +1,12 @@
 package group.australia.warehouse_management_system.SSCC;
 
 import group.australia.warehouse_management_system.feature.SSCC.controller.SsccController;
-import group.australia.warehouse_management_system.feature.SSCC.dto.RequestSsccDto;
+import group.australia.warehouse_management_system.feature.SSCC.domain.Sscc;
+import group.australia.warehouse_management_system.feature.SSCC.dto.CreateSsccDto;
 import group.australia.warehouse_management_system.feature.SSCC.dto.ResponseSsccDto;
+import group.australia.warehouse_management_system.feature.SSCC.mapper.SsccMapper;
 import group.australia.warehouse_management_system.feature.SSCC.service.SsccService;
+import group.australia.warehouse_management_system.feature.cartonHeader.domain.CartonHeader;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.ResponseCartonHeaderDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,13 +38,30 @@ class ControllerSsccTests {
     @MockitoBean
     private SsccService ssccService;
 
+    @MockitoBean
+    private SsccMapper ssccMapper;
+
     @Autowired
     private ObjectMapper objectMapper;
 
+    private Sscc ssccDomain;
     private ResponseSsccDto responseDto;
 
     @BeforeEach
     void setUp() {
+        var cartonHeader = CartonHeader.builder()
+                .id(1L)
+                .barcode("13431324532")
+                .description("Test Description")
+                .version(0)
+                .build();
+
+        ssccDomain = Sscc.builder()
+                .id(1L)
+                .sscc("1234567890123456789")
+                .cartonHeader(cartonHeader)
+                .build();
+
         responseDto = ResponseSsccDto.builder()
                 .id(1L)
                 .sscc("1234567890123456789")
@@ -55,14 +75,15 @@ class ControllerSsccTests {
     }
 
     @Test
-    void SsccController_CreateSscc_ReturnsCreated() throws Exception {
-        RequestSsccDto req = RequestSsccDto.builder()
+    void Should_return_201_when_creating_sscc() throws Exception {
+        CreateSsccDto req = CreateSsccDto.builder()
                 .sscc("1234567890123456789")
                 .build();
 
-        given(ssccService.insertNewSscc(anyString(), any(RequestSsccDto.class))).willReturn(responseDto);
+        given(ssccService.insertNewSscc(anyString(), any(CreateSsccDto.class))).willReturn(ssccDomain);
+        given(ssccMapper.toDto(any(Sscc.class))).willReturn(responseDto);
 
-        ResultActions ra = mockMvc.perform(post("/warehouses/13431324532/ssccs")
+        ResultActions ra = mockMvc.perform(post("/carton-headers/13431324532/ssccs")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)));
 

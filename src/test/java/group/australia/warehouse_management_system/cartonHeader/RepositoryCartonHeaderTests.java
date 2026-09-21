@@ -1,7 +1,7 @@
 package group.australia.warehouse_management_system.cartonHeader;
 
-import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeader;
-import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderRepository;
+import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeaderEntity;
+import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,12 +19,12 @@ import java.util.Optional;
 class RepositoryCartonHeaderTests {
 
     @Autowired
-    private CartonHeaderRepository cartonHeaderRepository;
-    private CartonHeader savedCartonHeader;
+    private CartonHeaderJpaRepository cartonHeaderJpaRepository;
+    private CartonHeaderEntity savedCartonHeader;
 
     @BeforeEach
-    void setUp(){
-        savedCartonHeader = cartonHeaderRepository.save(CartonHeader.builder()
+    void setUp() {
+        savedCartonHeader = cartonHeaderJpaRepository.save(CartonHeaderEntity.builder()
                 .barcode("13431324532")
                 .description("Testing CartonHeader")
                 .build()
@@ -32,7 +32,7 @@ class RepositoryCartonHeaderTests {
     }
 
     @Test
-    void CartonHeaderRepository_SaveAll_ReturnsCartonHeader(){
+    void Should_save_and_return_carton_header() {
         Assertions.assertThat(savedCartonHeader).isNotNull();
         Assertions.assertThat(savedCartonHeader.getBarcode()).isEqualTo("13431324532");
         Assertions.assertThat(savedCartonHeader.getDescription()).isEqualTo("Testing CartonHeader");
@@ -40,8 +40,8 @@ class RepositoryCartonHeaderTests {
     }
 
     @Test
-    void CartonHeaderRepository_FindById_ReturnsCartonHeader(){
-        Optional<CartonHeader> cartonHeader = cartonHeaderRepository.findById(savedCartonHeader.getId());
+    void Should_find_carton_header_by_id() {
+        Optional<CartonHeaderEntity> cartonHeader = cartonHeaderJpaRepository.findById(savedCartonHeader.getId());
 
         Assertions.assertThat(cartonHeader).isPresent();
         Assertions.assertThat(cartonHeader.get().getId()).isGreaterThan(0);
@@ -49,15 +49,15 @@ class RepositoryCartonHeaderTests {
     }
 
     @Test
-    void CartonHeaderRepository_ExistByBarcode_ReturnsBoolean(){
-        boolean res = cartonHeaderRepository.existsByBarcode(savedCartonHeader.getBarcode());
+    void Should_return_true_when_barcode_exists() {
+        boolean res = cartonHeaderJpaRepository.existsByBarcode(savedCartonHeader.getBarcode());
 
         Assertions.assertThat(res).isTrue();
     }
 
     @Test
-    void CartonHeaderRepository_FindByBarcode_ReturnCartonHeader(){
-        Optional<CartonHeader> existCartonHeader = cartonHeaderRepository.findByBarcode(savedCartonHeader.getBarcode());
+    void Should_find_carton_header_by_barcode() {
+        Optional<CartonHeaderEntity> existCartonHeader = cartonHeaderJpaRepository.findByBarcode(savedCartonHeader.getBarcode());
 
         Assertions.assertThat(existCartonHeader).isPresent();
         Assertions.assertThat(existCartonHeader.get().getBarcode()).isEqualTo(savedCartonHeader.getBarcode());
@@ -65,31 +65,31 @@ class RepositoryCartonHeaderTests {
     }
 
     @Test
-    void CartonHeaderRepository_DuplicateBarcode_ThrowsDataIntegrityViolationException() {
-        CartonHeader duplicate = CartonHeader.builder()
+    void Should_throw_on_duplicate_barcode() {
+        CartonHeaderEntity duplicate = CartonHeaderEntity.builder()
                 .barcode("13431324532")
                 .description("Another description")
                 .build();
 
-        Assertions.assertThatThrownBy(() -> cartonHeaderRepository.saveAndFlush(duplicate))
+        Assertions.assertThatThrownBy(() -> cartonHeaderJpaRepository.saveAndFlush(duplicate))
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
-    void CartonHeaderRepository_StaleVersion_ThrowsOptimisticLockingFailureException() {
+    void Should_throw_on_optimistic_locking_conflict() {
         Integer originalVersion = savedCartonHeader.getVersion();
 
         savedCartonHeader.setDescription("First Update");
-        cartonHeaderRepository.saveAndFlush(savedCartonHeader);
+        cartonHeaderJpaRepository.saveAndFlush(savedCartonHeader);
 
-        CartonHeader stale = CartonHeader.builder()
+        CartonHeaderEntity stale = CartonHeaderEntity.builder()
                 .id(savedCartonHeader.getId())
                 .barcode(savedCartonHeader.getBarcode())
                 .description("Stale Update")
                 .version(originalVersion)
                 .build();
 
-        Assertions.assertThatThrownBy(() -> cartonHeaderRepository.saveAndFlush(stale))
+        Assertions.assertThatThrownBy(() -> cartonHeaderJpaRepository.saveAndFlush(stale))
                 .isInstanceOf(ObjectOptimisticLockingFailureException.class);
     }
 }

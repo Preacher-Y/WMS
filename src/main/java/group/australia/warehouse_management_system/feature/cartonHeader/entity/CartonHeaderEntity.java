@@ -1,32 +1,35 @@
-package group.australia.warehouse_management_system.feature.warehouse.entity;
+package group.australia.warehouse_management_system.feature.cartonHeader.entity;
 
+import group.australia.warehouse_management_system.feature.item.entity.Item;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "warehouses")
-@Data
+@Table(name = "carton_headers")
+@Getter
+@Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class Warehouse {
-
+@NoArgsConstructor
+public class CartonHeaderEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "warehouse_number", unique = true, nullable = false)
-    private String warehouseNumber;
+    @Column(unique = true, nullable = false)
+    private String barcode;
 
     @Column(nullable = false)
-    private String name;
+    private String description;
 
-    @Column(nullable = false)
-    private boolean active = true;
+    @OneToMany(mappedBy = "cartonHeader")
+    private List<Item> items = new ArrayList<>();
 
     @Version
     private Integer version;

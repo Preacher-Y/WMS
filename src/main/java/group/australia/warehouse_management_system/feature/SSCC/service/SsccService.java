@@ -1,14 +1,12 @@
 package group.australia.warehouse_management_system.feature.SSCC.service;
 
-import group.australia.warehouse_management_system.common.exceptions.ConflictException;
-import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
-import group.australia.warehouse_management_system.feature.SSCC.dto.RequestSsccDto;
-import group.australia.warehouse_management_system.feature.SSCC.dto.ResponseSsccDto;
-import group.australia.warehouse_management_system.feature.SSCC.entity.SSCC;
+import group.australia.warehouse_management_system.feature.SSCC.domain.Sscc;
+import group.australia.warehouse_management_system.feature.SSCC.dto.CreateSsccDto;
+import group.australia.warehouse_management_system.feature.SSCC.exception.SsccCartonHeaderNotFoundException;
+import group.australia.warehouse_management_system.feature.SSCC.exception.SsccDuplicateException;
 import group.australia.warehouse_management_system.feature.SSCC.mapper.SsccMapper;
-import group.australia.warehouse_management_system.feature.SSCC.repository.SsccRepository;
-import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeader;
-import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderRepository;
+import group.australia.warehouse_management_system.feature.SSCC.repository.SsccRepositoryPort;
+import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -17,34 +15,24 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SsccService {
 
-    private final SsccRepository ssccRepository;
     private final SsccMapper ssccMapper;
-    private final CartonHeaderRepository cartonHeaderRepository;
+    private final SsccRepositoryPort ssccRepository;
+    private final CartonHeaderRepositoryPort cartonHeaderRepository;
 
-    public ResponseSsccDto insertNewSscc(String barcode,RequestSsccDto req){
+    public Sscc insertNewSscc(String barcode, CreateSsccDto req) {
 
-        if (ssccRepository.existsBySscc(req.sscc())){
-            throw new ConflictException(
-                    "Serial Shipping Container Code already exist"
-            );
+        if (ssccRepository.existsBySscc(req.sscc())) {
+            throw new SsccDuplicateException(req.sscc());
         }
 
-        if (!cartonHeaderRepository.existsByBarcode(barcode)){
-            throw new NotFoundException(
-                    "Carton header not found"
-            );
-        }
+        var cartonHeader = cartonHeaderRepository.findByBarcode(barcode)
+                .orElseThrow(() -> new SsccCartonHeaderNotFoundException(barcode));
 
-        CartonHeader cartonHeader = cartonHeaderRepository.findByBarcode(barcode).orElseThrow();
-
-
-        SSCC sscc = ssccMapper.toEntity(req);
-        sscc.setCartonHeader(cartonHeader);
+        var sscc = ssccMapper.toDomainFromCreate(req).withCartonHeader(cartonHeader);
         try {
-            SSCC savedSscc = ssccRepository.save(sscc);
-            return ssccMapper.toDto(savedSscc);
+            return ssccRepository.save(sscc);
         } catch (DataIntegrityViolationException ex) {
-            throw new ConflictException("SSCC conflicts with existing data");
+            throw new SsccDuplicateException(req.sscc());
         }
     }
 }

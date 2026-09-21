@@ -1,15 +1,20 @@
 package group.australia.warehouse_management_system.feature.cartonHeader.mapper;
 
-import group.australia.warehouse_management_system.feature.cartonHeader.dto.RequestCartonHeaderDto;
-import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeader;
+import group.australia.warehouse_management_system.feature.cartonHeader.domain.CartonHeader;
+import group.australia.warehouse_management_system.feature.cartonHeader.dto.CreateCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.ResponseCartonHeaderDto;
+import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeaderEntity;
 import org.mapstruct.*;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CartonHeaderMapper {
 
-    ResponseCartonHeaderDto toDto(CartonHeader cartonHeader);
+    CartonHeader toDomain(CartonHeaderEntity entity);
 
-    @BeanMapping(unmappedTargetPolicy = ReportingPolicy.IGNORE)
-    CartonHeader toEntity(RequestCartonHeaderDto req);
+    CartonHeaderEntity toEntity(CartonHeader domain);
+
+    CartonHeader toDomainFromCreate(CreateCartonHeaderDto req);
+
+    ResponseCartonHeaderDto toDto(CartonHeader domain);
 }

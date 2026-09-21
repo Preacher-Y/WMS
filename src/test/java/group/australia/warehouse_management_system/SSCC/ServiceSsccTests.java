@@ -2,15 +2,16 @@ package group.australia.warehouse_management_system.SSCC;
 
 import group.australia.warehouse_management_system.common.exceptions.ConflictException;
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
+import group.australia.warehouse_management_system.feature.SSCC.domain.Sscc;
 import group.australia.warehouse_management_system.feature.SSCC.dto.CreateSsccDto;
 import group.australia.warehouse_management_system.feature.SSCC.dto.ResponseSsccDto;
-import group.australia.warehouse_management_system.feature.SSCC.entity.SSCC;
+import group.australia.warehouse_management_system.feature.SSCC.entity.SsccEntity;
 import group.australia.warehouse_management_system.feature.SSCC.mapper.SsccMapper;
 import group.australia.warehouse_management_system.feature.SSCC.repository.SsccRepository;
 import group.australia.warehouse_management_system.feature.SSCC.service.SsccService;
+import group.australia.warehouse_management_system.feature.cartonHeader.domain.CartonHeader;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.ResponseCartonHeaderDto;
-import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeader;
-import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderRepository;
+import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderRepositoryPort;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,49 +34,38 @@ class ServiceSsccTests {
     private SsccMapper ssccMapper;
 
     @Mock
-    private CartonHeaderRepository cartonHeaderRepository;
+    private CartonHeaderRepositoryPort cartonHeaderRepository;
 
     @InjectMocks
     private SsccService ssccService;
 
     @Test
     void SsccService_CreateSscc_ReturnsResponseSsccDto() {
-        CreateSsccDto req = CreateSsccDto.builder()
-                .sscc("1234567890123456789")
-                .build();
+        var req = CreateSsccDto.builder().sscc("1234567890123456789").build();
 
-        CartonHeader cartonHeader = CartonHeader.builder()
-                .id(1L)
-                .barcode("13431324532")
-                .description("Test CartonHeader")
-                .version(0)
-                .build();
+        var cartonHeader = CartonHeader.builder()
+                .id(1L).barcode("13431324532").description("Test CartonHeader").version(0).build();
 
-        SSCC sscc = SSCC.builder()
-                .id(1L)
-                .sscc("1234567890123456789")
-                .cartonHeader(cartonHeader)
-                .build();
+        var ssccDomain = Sscc.builder().sscc("1234567890123456789").build();
+        var ssccDomainWithCH = ssccDomain.toBuilder().cartonHeader(cartonHeader).build();
+        var ssccEntity = SsccEntity.builder().id(1L).sscc("1234567890123456789").build();
 
-        ResponseSsccDto responseDto = ResponseSsccDto.builder()
-                .id(1L)
-                .sscc("1234567890123456789")
+        var responseDto = ResponseSsccDto.builder()
+                .id(1L).sscc("1234567890123456789")
                 .cartonHeader(ResponseCartonHeaderDto.builder()
-                        .id(1L)
-                        .barcode("13431324532")
-                        .description("Test CartonHeader")
-                        .version(0)
-                        .build())
+                        .id(1L).barcode("13431324532").description("Test CartonHeader").version(0).build())
                 .build();
 
         when(ssccRepository.existsBySscc("1234567890123456789")).thenReturn(false);
         when(cartonHeaderRepository.existsByBarcode("13431324532")).thenReturn(true);
         when(cartonHeaderRepository.findByBarcode("13431324532")).thenReturn(Optional.of(cartonHeader));
-        when(ssccMapper.toEntity(Mockito.any(CreateSsccDto.class))).thenReturn(sscc);
-        when(ssccRepository.save(Mockito.any(SSCC.class))).thenReturn(sscc);
-        when(ssccMapper.toDto(Mockito.any(SSCC.class))).thenReturn(responseDto);
+        when(ssccMapper.toDomainFromCreate(Mockito.any(CreateSsccDto.class))).thenReturn(ssccDomain);
+        when(ssccMapper.toEntity(Mockito.any(Sscc.class))).thenReturn(ssccEntity);
+        when(ssccRepository.save(Mockito.any(SsccEntity.class))).thenReturn(ssccEntity);
+        when(ssccMapper.toDomain(Mockito.any(SsccEntity.class))).thenReturn(ssccDomainWithCH);
+        when(ssccMapper.toDto(Mockito.any(Sscc.class))).thenReturn(responseDto);
 
-        ResponseSsccDto result = ssccService.insertNewSscc("13431324532", req);
+        var result = ssccService.insertNewSscc("13431324532", req);
 
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result.sscc()).isEqualTo("1234567890123456789");
@@ -84,44 +74,31 @@ class ServiceSsccTests {
 
     @Test
     void SsccService_CreateSscc_CorrectCartonHeaderAssociation() {
-        CreateSsccDto req = CreateSsccDto.builder()
-                .sscc("1234567890123456789")
-                .build();
+        var req = CreateSsccDto.builder().sscc("1234567890123456789").build();
 
-        CartonHeader cartonHeader = CartonHeader.builder()
-                .id(1L)
-                .barcode("13431324532")
-                .description("Test CartonHeader")
-                .version(0)
-                .build();
+        var cartonHeader = CartonHeader.builder()
+                .id(1L).barcode("13431324532").description("Test CartonHeader").version(0).build();
 
-        SSCC sscc = SSCC.builder()
-                .id(1L)
-                .sscc("1234567890123456789")
-                .cartonHeader(cartonHeader)
-                .build();
+        var ssccDomain = Sscc.builder().sscc("1234567890123456789").build();
+        var ssccDomainWithCH = ssccDomain.toBuilder().cartonHeader(cartonHeader).build();
+        var ssccEntity = SsccEntity.builder().id(1L).sscc("1234567890123456789").build();
 
-        ResponseCartonHeaderDto cartonHeaderDto = ResponseCartonHeaderDto.builder()
-                .id(1L)
-                .barcode("13431324532")
-                .description("Test CartonHeader")
-                .version(0)
-                .build();
-
-        ResponseSsccDto responseDto = ResponseSsccDto.builder()
-                .id(1L)
-                .sscc("1234567890123456789")
-                .cartonHeader(cartonHeaderDto)
+        var responseDto = ResponseSsccDto.builder()
+                .id(1L).sscc("1234567890123456789")
+                .cartonHeader(ResponseCartonHeaderDto.builder()
+                        .id(1L).barcode("13431324532").description("Test CartonHeader").version(0).build())
                 .build();
 
         when(ssccRepository.existsBySscc("1234567890123456789")).thenReturn(false);
         when(cartonHeaderRepository.existsByBarcode("13431324532")).thenReturn(true);
         when(cartonHeaderRepository.findByBarcode("13431324532")).thenReturn(Optional.of(cartonHeader));
-        when(ssccMapper.toEntity(Mockito.any(CreateSsccDto.class))).thenReturn(sscc);
-        when(ssccRepository.save(Mockito.any(SSCC.class))).thenReturn(sscc);
-        when(ssccMapper.toDto(Mockito.any(SSCC.class))).thenReturn(responseDto);
+        when(ssccMapper.toDomainFromCreate(Mockito.any(CreateSsccDto.class))).thenReturn(ssccDomain);
+        when(ssccMapper.toEntity(Mockito.any(Sscc.class))).thenReturn(ssccEntity);
+        when(ssccRepository.save(Mockito.any(SsccEntity.class))).thenReturn(ssccEntity);
+        when(ssccMapper.toDomain(Mockito.any(SsccEntity.class))).thenReturn(ssccDomainWithCH);
+        when(ssccMapper.toDto(Mockito.any(Sscc.class))).thenReturn(responseDto);
 
-        ResponseSsccDto result = ssccService.insertNewSscc("13431324532", req);
+        var result = ssccService.insertNewSscc("13431324532", req);
 
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result.cartonHeader()).isNotNull();
@@ -130,9 +107,7 @@ class ServiceSsccTests {
 
     @Test
     void SsccService_CreateSscc_DuplicateSscc_ThrowsConflictException() {
-        CreateSsccDto req = CreateSsccDto.builder()
-                .sscc("1234567890123456789")
-                .build();
+        var req = CreateSsccDto.builder().sscc("1234567890123456789").build();
 
         when(ssccRepository.existsBySscc("1234567890123456789")).thenReturn(true);
 
@@ -142,9 +117,7 @@ class ServiceSsccTests {
 
     @Test
     void SsccService_CreateSscc_UnknownCartonHeader_ThrowsNotFoundException() {
-        CreateSsccDto req = CreateSsccDto.builder()
-                .sscc("1234567890123456789")
-                .build();
+        var req = CreateSsccDto.builder().sscc("1234567890123456789").build();
 
         when(ssccRepository.existsBySscc("1234567890123456789")).thenReturn(false);
         when(cartonHeaderRepository.existsByBarcode("UNKNOWN-999")).thenReturn(false);

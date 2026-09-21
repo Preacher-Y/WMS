@@ -62,7 +62,7 @@ class ControllerSsccTests {
 
         given(ssccService.insertNewSscc(anyString(), any(CreateSsccDto.class))).willReturn(responseDto);
 
-        ResultActions ra = mockMvc.perform(post("/warehouses/13431324532/ssccs")
+        ResultActions ra = mockMvc.perform(post("/carton-headers/13431324532/ssccs")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)));
 

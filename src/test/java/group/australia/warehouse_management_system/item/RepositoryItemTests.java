@@ -1,13 +1,13 @@
 package group.australia.warehouse_management_system.item;
 
-import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeader;
-import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderRepository;
-import group.australia.warehouse_management_system.feature.item.entity.Item;
+import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeaderEntity;
+import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderJpaRepository;
+import group.australia.warehouse_management_system.feature.item.entity.ItemEntity;
 import group.australia.warehouse_management_system.feature.item.repository.ItemRepository;
 import group.australia.warehouse_management_system.feature.location.entity.Location;
 import group.australia.warehouse_management_system.feature.location.repository.LocationRepository;
-import group.australia.warehouse_management_system.feature.warehouse.entity.Warehouse;
-import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepository;
+import group.australia.warehouse_management_system.feature.warehouse.entity.WarehouseEntity;
+import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,16 +26,16 @@ class RepositoryItemTests {
 
     @Autowired private ItemRepository itemRepository;
     @Autowired private LocationRepository locationRepository;
-    @Autowired private CartonHeaderRepository cartonHeaderRepository;
-    @Autowired private WarehouseRepository warehouseRepository;
+    @Autowired private CartonHeaderJpaRepository cartonHeaderRepository;
+    @Autowired private WarehouseJpaRepository warehouseRepository;
 
-    private Item savedItem;
+    private ItemEntity savedItem;
     private Location savedLocation;
-    private CartonHeader savedCartonHeader;
+    private CartonHeaderEntity savedCartonHeader;
 
     @BeforeEach
     void setUp() {
-        Warehouse warehouse = warehouseRepository.save(Warehouse.builder()
+        var warehouse = warehouseRepository.save(WarehouseEntity.builder()
                 .warehouseNumber("WH-TEST-001")
                 .name("Test Warehouse")
                 .active(true)
@@ -49,12 +49,12 @@ class RepositoryItemTests {
         savedLocation.setWarehouse(warehouse);
         savedLocation = locationRepository.save(savedLocation);
 
-        savedCartonHeader = cartonHeaderRepository.save(CartonHeader.builder()
+        savedCartonHeader = cartonHeaderRepository.save(CartonHeaderEntity.builder()
                 .barcode("BC-TEST-001")
                 .description("Test Carton")
                 .build());
 
-        savedItem = itemRepository.save(Item.builder()
+        savedItem = itemRepository.save(ItemEntity.builder()
                 .itemNumber("ITEM-001")
                 .quantity(10)
                 .location(savedLocation)
@@ -72,7 +72,7 @@ class RepositoryItemTests {
 
     @Test
     void ItemRepository_FindById_VerifiesLocationAndCartonHeaderRelationships() {
-        Optional<Item> result = itemRepository.findById(savedItem.getId());
+        Optional<ItemEntity> result = itemRepository.findById(savedItem.getId());
 
         Assertions.assertThat(result).isPresent();
         Assertions.assertThat(result.get().getLocation().getId()).isEqualTo(savedLocation.getId());
@@ -96,14 +96,14 @@ class RepositoryItemTests {
     }
 
     @Test
-    void ItemRepository_ExistByItemNumber_ReturnsTrue(){
+    void ItemRepository_ExistByItemNumber_ReturnsTrue() {
         boolean exists = itemRepository.existsByItemNumber("ITEM-001");
 
         Assertions.assertThat(exists).isTrue();
     }
 
     @Test
-    void ItemRepository_ExistByItemNumber_UnknownPair_ReturnsFalse(){
+    void ItemRepository_ExistByItemNumber_UnknownPair_ReturnsFalse() {
         boolean exists = itemRepository.existsByItemNumber("ITEM-999");
 
         Assertions.assertThat(exists).isFalse();
@@ -111,7 +111,7 @@ class RepositoryItemTests {
 
     @Test
     void ItemRepository_FindByItemNumberAndLocation_ReturnsItem() {
-        Optional<Item> result = itemRepository.findByItemNumberAndLocation("ITEM-001", savedLocation);
+        Optional<ItemEntity> result = itemRepository.findByItemNumberAndLocation("ITEM-001", savedLocation);
 
         Assertions.assertThat(result).isPresent();
         Assertions.assertThat(result.get().getItemNumber()).isEqualTo("ITEM-001");
@@ -120,7 +120,7 @@ class RepositoryItemTests {
 
     @Test
     void ItemRepository_DuplicateItemNumberAndLocation_ThrowsDataIntegrityViolationException() {
-        Item duplicate = Item.builder()
+        var duplicate = ItemEntity.builder()
                 .itemNumber("ITEM-001")
                 .quantity(5)
                 .location(savedLocation)
@@ -133,12 +133,12 @@ class RepositoryItemTests {
 
     @Test
     void ItemRepository_StaleVersion_ThrowsOptimisticLockingFailureException() {
-        Integer originalVersion = savedItem.getVersion();
+        var originalVersion = savedItem.getVersion();
 
         savedItem.setQuantity(20);
         itemRepository.saveAndFlush(savedItem);
 
-        Item stale = Item.builder()
+        var stale = ItemEntity.builder()
                 .id(savedItem.getId())
                 .itemNumber(savedItem.getItemNumber())
                 .quantity(99)

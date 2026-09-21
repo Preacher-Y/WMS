@@ -23,6 +23,11 @@ class InMemoryCartonHeaderRepository implements CartonHeaderRepositoryPort {
     }
 
     @Override
+    public Optional<CartonHeader> findById(Long id) {
+        return store.values().stream().filter(c -> id.equals(c.getId())).findFirst();
+    }
+
+    @Override
     public CartonHeader save(CartonHeader cartonHeader) {
         var id = cartonHeader.getId() != null ? cartonHeader.getId() : nextId++;
         var saved = cartonHeader.toBuilder().id(id).build();

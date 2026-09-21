@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import group.australia.warehouse_management_system.feature.item.entity.Item;
+import group.australia.warehouse_management_system.feature.item.entity.ItemEntity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import group.australia.warehouse_management_system.feature.warehouse.entity.Warehouse;
+import group.australia.warehouse_management_system.feature.warehouse.entity.WarehouseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,10 +39,10 @@ public class Location {
 
     @ManyToOne
     @JoinColumn(name = "warehouse_id", nullable = false)
-    private Warehouse warehouse;
+    private WarehouseEntity warehouse;
 
     @OneToMany(mappedBy = "location")
-    private List<Item> items = new ArrayList<>();
+    private List<ItemEntity> items = new ArrayList<>();
 
     @Version
     private Integer version;

@@ -1,6 +1,6 @@
 package group.australia.warehouse_management_system.feature.cartonHeader.entity;
 
-import group.australia.warehouse_management_system.feature.item.entity.Item;
+import group.australia.warehouse_management_system.feature.item.entity.ItemEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -29,7 +29,7 @@ public class CartonHeaderEntity {
     private String description;
 
     @OneToMany(mappedBy = "cartonHeader")
-    private List<Item> items = new ArrayList<>();
+    private List<ItemEntity> items = new ArrayList<>();
 
     @Version
     private Integer version;

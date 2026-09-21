@@ -9,11 +9,12 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "carton_headers")
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CartonHeader {
+public class CartonHeaderEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,7 +26,7 @@ public class CartonHeader {
     private String description;
 
     @Version
-    private  Integer version;
+    private Integer version;
 
     @CreationTimestamp
     @Column(updatable = false)

@@ -5,8 +5,6 @@ import group.australia.warehouse_management_system.feature.item.exception.ItemDu
 import group.australia.warehouse_management_system.feature.item.exception.ItemLocationNotFoundException;
 import group.australia.warehouse_management_system.feature.item.domain.Item;
 import group.australia.warehouse_management_system.feature.item.dto.ItemRequestDto;
-import group.australia.warehouse_management_system.feature.item.dto.ResponseItemDto;
-import group.australia.warehouse_management_system.feature.item.entity.ItemEntity;
 import group.australia.warehouse_management_system.feature.item.mapper.ItemMapper;
 import group.australia.warehouse_management_system.feature.item.repository.ItemRepository;
 import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderRepositoryPort;
@@ -24,7 +22,7 @@ public class ItemService {
     private final LocationRepository locationRepository;
     private final CartonHeaderRepositoryPort cartonHeaderRepository;
 
-    public ResponseItemDto insertNewItem(ItemRequestDto req) {
+    public Item insertNewItem(ItemRequestDto req) {
         if (itemRepository.existsByItemNumberAndLocationId(req.itemNumber(), req.locationId()))
             throw new ItemDuplicateException(req.itemNumber(), req.locationId());
 
@@ -39,7 +37,7 @@ public class ItemService {
         var entity = itemMapper.toEntity(item);
         try {
             var saved = itemRepository.save(entity);
-            return itemMapper.toDto(itemMapper.toDomain(saved));
+            return itemMapper.toDomain(saved);
         } catch (DataIntegrityViolationException ex) {
             throw new ItemDuplicateException(req.itemNumber(), req.locationId());
         }

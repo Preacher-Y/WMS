@@ -1,14 +1,13 @@
 package group.australia.warehouse_management_system.item;
 
-import group.australia.warehouse_management_system.feature.item.exception.ItemCartonHeaderNotFoundException;
-import group.australia.warehouse_management_system.feature.item.exception.ItemDuplicateException;
-import group.australia.warehouse_management_system.feature.item.exception.ItemLocationNotFoundException;
 import group.australia.warehouse_management_system.feature.cartonHeader.domain.CartonHeader;
 import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderRepositoryPort;
 import group.australia.warehouse_management_system.feature.item.domain.Item;
 import group.australia.warehouse_management_system.feature.item.dto.ItemRequestDto;
-import group.australia.warehouse_management_system.feature.item.dto.ResponseItemDto;
 import group.australia.warehouse_management_system.feature.item.entity.ItemEntity;
+import group.australia.warehouse_management_system.feature.item.exception.ItemCartonHeaderNotFoundException;
+import group.australia.warehouse_management_system.feature.item.exception.ItemDuplicateException;
+import group.australia.warehouse_management_system.feature.item.exception.ItemLocationNotFoundException;
 import group.australia.warehouse_management_system.feature.item.mapper.ItemMapper;
 import group.australia.warehouse_management_system.feature.item.repository.ItemRepository;
 import group.australia.warehouse_management_system.feature.item.service.ItemService;
@@ -45,7 +44,7 @@ class ServiceItemTests {
     private ItemService itemService;
 
     @Test
-    void ItemService_CreateItem_ReturnsResponseItemDto() {
+    void ItemService_CreateItem_ReturnsItem() {
         var req = new ItemRequestDto("ITEM-001", 10, 1L, 1L);
 
         var location = new Location();
@@ -62,11 +61,6 @@ class ServiceItemTests {
                 .location(location).cartonHeader(cartonHeader).build();
         var itemEntity = ItemEntity.builder().id(1L).itemNumber("ITEM-001").quantity(10).build();
 
-        var responseDto = ResponseItemDto.builder()
-                .id(1L).itemNumber("ITEM-001").quantity(10)
-                .locationLocationCode("1-2-3").cartonHeaderBarcode("BC-001")
-                .build();
-
         when(itemRepository.existsByItemNumberAndLocationId("ITEM-001", 1L)).thenReturn(false);
         when(locationRepository.findById(1L)).thenReturn(Optional.of(location));
         when(cartonHeaderRepository.findById(1L)).thenReturn(Optional.of(cartonHeader));
@@ -74,13 +68,12 @@ class ServiceItemTests {
         when(itemMapper.toEntity(Mockito.any(Item.class))).thenReturn(itemEntity);
         when(itemRepository.save(Mockito.any(ItemEntity.class))).thenReturn(itemEntity);
         when(itemMapper.toDomain(Mockito.any(ItemEntity.class))).thenReturn(itemDomainSaved);
-        when(itemMapper.toDto(Mockito.any(Item.class))).thenReturn(responseDto);
 
         var result = itemService.insertNewItem(req);
 
         Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.itemNumber()).isEqualTo("ITEM-001");
-        Assertions.assertThat(result.id()).isGreaterThan(0);
+        Assertions.assertThat(result.getItemNumber()).isEqualTo("ITEM-001");
+        Assertions.assertThat(result.getId()).isGreaterThan(0);
     }
 
     @Test

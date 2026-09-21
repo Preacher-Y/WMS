@@ -1,9 +1,12 @@
 package group.australia.warehouse_management_system.item;
 
 import group.australia.warehouse_management_system.feature.item.controller.ItemController;
+import group.australia.warehouse_management_system.feature.item.domain.Item;
 import group.australia.warehouse_management_system.feature.item.dto.ItemRequestDto;
 import group.australia.warehouse_management_system.feature.item.dto.ResponseItemDto;
+import group.australia.warehouse_management_system.feature.item.mapper.ItemMapper;
 import group.australia.warehouse_management_system.feature.item.service.ItemService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -34,16 +37,29 @@ class ControllerItemTests {
     @MockitoBean
     private ItemService itemService;
 
+    @MockitoBean
+    private ItemMapper itemMapper;
+
+    private Item itemDomain;
+    private ResponseItemDto responseDto;
+
+    @BeforeEach
+    void setUp() {
+        itemDomain = Item.builder()
+                .id(1L).itemNumber("ITEM-001").quantity(10).build();
+
+        responseDto = ResponseItemDto.builder()
+                .id(1L).itemNumber("ITEM-001").quantity(10)
+                .locationLocationCode("1-2-3").cartonHeaderBarcode("BC-001")
+                .build();
+    }
+
     @Test
     void ItemController_CreateItem_Returns201() throws Exception {
         var req = new ItemRequestDto("ITEM-001", 10, 1L, 1L);
 
-        var responseDto = ResponseItemDto.builder()
-                .id(1L).itemNumber("ITEM-001").quantity(10)
-                .locationLocationCode("1-2-3").cartonHeaderBarcode("BC-001")
-                .build();
-
-        given(itemService.insertNewItem(any(ItemRequestDto.class))).willReturn(responseDto);
+        given(itemService.insertNewItem(any(ItemRequestDto.class))).willReturn(itemDomain);
+        given(itemMapper.toDto(any(Item.class))).willReturn(responseDto);
 
         mockMvc.perform(post("/items")
                         .contentType(MediaType.APPLICATION_JSON)

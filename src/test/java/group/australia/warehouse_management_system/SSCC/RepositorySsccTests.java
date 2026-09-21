@@ -1,7 +1,7 @@
 package group.australia.warehouse_management_system.SSCC;
 
 import group.australia.warehouse_management_system.feature.SSCC.entity.SsccEntity;
-import group.australia.warehouse_management_system.feature.SSCC.repository.SsccRepository;
+import group.australia.warehouse_management_system.feature.SSCC.repository.SsccJpaRepository;
 import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeaderEntity;
 import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderJpaRepository;
 import org.assertj.core.api.Assertions;
@@ -20,7 +20,7 @@ import java.util.Optional;
 class RepositorySsccTests {
 
     @Autowired
-    private SsccRepository ssccRepository;
+    private SsccJpaRepository ssccRepository;
 
     @Autowired
     private CartonHeaderJpaRepository cartonHeaderRepository;

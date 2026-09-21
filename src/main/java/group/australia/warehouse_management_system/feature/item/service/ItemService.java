@@ -1,7 +1,8 @@
 package group.australia.warehouse_management_system.feature.item.service;
 
-import group.australia.warehouse_management_system.common.exceptions.ConflictException;
-import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
+import group.australia.warehouse_management_system.feature.item.exception.ItemCartonHeaderNotFoundException;
+import group.australia.warehouse_management_system.feature.item.exception.ItemDuplicateException;
+import group.australia.warehouse_management_system.feature.item.exception.ItemLocationNotFoundException;
 import group.australia.warehouse_management_system.feature.item.domain.Item;
 import group.australia.warehouse_management_system.feature.item.dto.ItemRequestDto;
 import group.australia.warehouse_management_system.feature.item.dto.ResponseItemDto;
@@ -25,12 +26,12 @@ public class ItemService {
 
     public ResponseItemDto insertNewItem(ItemRequestDto req) {
         if (itemRepository.existsByItemNumberAndLocationId(req.itemNumber(), req.locationId()))
-            throw new ConflictException("Item already exists at this location");
+            throw new ItemDuplicateException(req.itemNumber(), req.locationId());
 
         var location = locationRepository.findById(req.locationId())
-                .orElseThrow(() -> new NotFoundException("Location not found"));
+                .orElseThrow(() -> new ItemLocationNotFoundException(req.locationId()));
         var cartonHeader = cartonHeaderRepository.findById(req.cartonHeaderId())
-                .orElseThrow(() -> new NotFoundException("Carton Header not found"));
+                .orElseThrow(() -> new ItemCartonHeaderNotFoundException(req.cartonHeaderId()));
 
         var item = itemMapper.toDomainFromCreate(req).toBuilder()
                 .location(location).cartonHeader(cartonHeader).build();
@@ -39,7 +40,7 @@ public class ItemService {
             var saved = itemRepository.save(entity);
             return itemMapper.toDto(itemMapper.toDomain(saved));
         } catch (DataIntegrityViolationException ex) {
-            throw new ConflictException("Item conflicts with existing data");
+            throw new ItemDuplicateException(req.itemNumber(), req.locationId());
         }
     }
 }

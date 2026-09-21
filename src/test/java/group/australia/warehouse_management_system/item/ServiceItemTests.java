@@ -1,7 +1,8 @@
 package group.australia.warehouse_management_system.item;
 
-import group.australia.warehouse_management_system.common.exceptions.ConflictException;
-import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
+import group.australia.warehouse_management_system.feature.item.exception.ItemCartonHeaderNotFoundException;
+import group.australia.warehouse_management_system.feature.item.exception.ItemDuplicateException;
+import group.australia.warehouse_management_system.feature.item.exception.ItemLocationNotFoundException;
 import group.australia.warehouse_management_system.feature.cartonHeader.domain.CartonHeader;
 import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderRepositoryPort;
 import group.australia.warehouse_management_system.feature.item.domain.Item;
@@ -89,7 +90,7 @@ class ServiceItemTests {
         when(itemRepository.existsByItemNumberAndLocationId("ITEM-001", 1L)).thenReturn(true);
 
         Assertions.assertThatThrownBy(() -> itemService.insertNewItem(req))
-                .isInstanceOf(ConflictException.class);
+                .isInstanceOf(ItemDuplicateException.class);
     }
 
     @Test
@@ -100,7 +101,7 @@ class ServiceItemTests {
         when(locationRepository.findById(999L)).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() -> itemService.insertNewItem(req))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(ItemLocationNotFoundException.class);
     }
 
     @Test
@@ -118,6 +119,6 @@ class ServiceItemTests {
         when(cartonHeaderRepository.findById(999L)).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() -> itemService.insertNewItem(req))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(ItemCartonHeaderNotFoundException.class);
     }
 }

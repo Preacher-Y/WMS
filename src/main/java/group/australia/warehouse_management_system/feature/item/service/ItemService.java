@@ -33,8 +33,9 @@ public class ItemService {
         var cartonHeader = cartonHeaderRepository.findById(req.cartonHeaderId())
                 .orElseThrow(() -> new ItemCartonHeaderNotFoundException(req.cartonHeaderId()));
 
-        var item = itemMapper.toDomainFromCreate(req).toBuilder()
-                .location(location).cartonHeader(cartonHeader).build();
+        var item = itemMapper.toDomainFromCreate(req)
+                .withLocation(location)
+                .withCartonHeader(cartonHeader);
         var entity = itemMapper.toEntity(item);
         try {
             var saved = itemRepository.save(entity);

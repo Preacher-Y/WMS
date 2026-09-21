@@ -22,4 +22,12 @@ public class Item {
     private Integer version;
     private LocalDateTime creationTimestamp;
     private LocalDateTime updateTimestamp;
+
+    public Item withLocation(Location location) {
+        return this.toBuilder().location(location).build();
+    }
+
+    public Item withCartonHeader(CartonHeader cartonHeader) {
+        return this.toBuilder().cartonHeader(cartonHeader).build();
+    }
 }

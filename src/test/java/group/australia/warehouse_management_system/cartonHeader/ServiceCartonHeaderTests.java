@@ -2,7 +2,7 @@ package group.australia.warehouse_management_system.cartonHeader;
 
 import group.australia.warehouse_management_system.common.exceptions.ConflictException;
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
-import group.australia.warehouse_management_system.feature.cartonHeader.dto.RequestCartonHeaderDto;
+import group.australia.warehouse_management_system.feature.cartonHeader.dto.CreateCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.ResponseCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.UpdateCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeader;
@@ -35,7 +35,7 @@ class ServiceCartonHeaderTests {
 
     @Test
     void CartonHeaderService_CreateCartonHeader_ReturnsResponseCartonDto(){
-        RequestCartonHeaderDto req = RequestCartonHeaderDto.builder()
+        CreateCartonHeaderDto req = CreateCartonHeaderDto.builder()
                 .barcode("123456789")
                 .description("Test description")
                 .build();
@@ -54,7 +54,7 @@ class ServiceCartonHeaderTests {
                 .version(0)
                 .build();
 
-        when(cartonHeaderMapper.toEntity(Mockito.any(RequestCartonHeaderDto.class))).thenReturn(entity);
+        when(cartonHeaderMapper.toEntity(Mockito.any(CreateCartonHeaderDto.class))).thenReturn(entity);
         when(cartonHeaderRepository.save(Mockito.any(CartonHeader.class))).thenReturn(entity);
         when(cartonHeaderMapper.toDto(Mockito.any(CartonHeader.class))).thenReturn(res);
 
@@ -108,7 +108,7 @@ class ServiceCartonHeaderTests {
 
     @Test
     void CartonHeaderService_CreateCartonHeader_DuplicateBarcode_ThrowsConflictException() {
-        RequestCartonHeaderDto req = RequestCartonHeaderDto.builder()
+        CreateCartonHeaderDto req = CreateCartonHeaderDto.builder()
                 .barcode("123456789")
                 .description("Test description")
                 .build();

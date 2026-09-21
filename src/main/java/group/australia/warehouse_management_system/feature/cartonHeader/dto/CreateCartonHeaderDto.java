@@ -6,6 +6,6 @@ import lombok.Builder;
 import java.io.Serializable;
 
 @Builder
-public record RequestCartonHeaderDto(@NotNull(message = "Barcode is required") String barcode,
-                                     @NotNull String description) implements Serializable {
+public record CreateCartonHeaderDto(@NotNull(message = "Barcode is required") String barcode,
+                                    @NotNull String description) implements Serializable {
 }

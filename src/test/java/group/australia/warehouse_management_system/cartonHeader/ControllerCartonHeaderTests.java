@@ -1,7 +1,7 @@
 package group.australia.warehouse_management_system.cartonHeader;
 
 import group.australia.warehouse_management_system.feature.cartonHeader.controller.CartonHeaderController;
-import group.australia.warehouse_management_system.feature.cartonHeader.dto.RequestCartonHeaderDto;
+import group.australia.warehouse_management_system.feature.cartonHeader.dto.CreateCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.ResponseCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.UpdateCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.service.CartonHeaderService;
@@ -60,12 +60,12 @@ class ControllerCartonHeaderTests {
 
     @Test
     void CartonHeaderController_CreateCartonHeader_ReturnsCreated() throws Exception {
-        RequestCartonHeaderDto req = RequestCartonHeaderDto.builder()
+        CreateCartonHeaderDto req = CreateCartonHeaderDto.builder()
                 .barcode("123456789")
                 .description("Test Description")
                 .build();
 
-        given(cartonHeaderService.insertNewCartonHeader(Mockito.any(RequestCartonHeaderDto.class))).willReturn(res);
+        given(cartonHeaderService.insertNewCartonHeader(Mockito.any(CreateCartonHeaderDto.class))).willReturn(res);
 
         ResultActions ra = mockMvc.perform(post("/carton-headers")
                         .contentType(MediaType.APPLICATION_JSON)

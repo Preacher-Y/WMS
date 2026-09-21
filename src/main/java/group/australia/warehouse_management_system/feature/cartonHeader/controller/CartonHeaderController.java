@@ -1,6 +1,6 @@
 package group.australia.warehouse_management_system.feature.cartonHeader.controller;
 
-import group.australia.warehouse_management_system.feature.cartonHeader.dto.RequestCartonHeaderDto;
+import group.australia.warehouse_management_system.feature.cartonHeader.dto.CreateCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.ResponseCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.UpdateCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.service.CartonHeaderService;
@@ -9,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/carton-headers")
@@ -21,7 +19,7 @@ public class CartonHeaderController {
 
     @PostMapping
     public ResponseEntity<ResponseCartonHeaderDto> createCartonHeader(
-            @RequestBody @Valid RequestCartonHeaderDto req
+            @RequestBody @Valid CreateCartonHeaderDto req
     ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(cartonHeaderService.insertNewCartonHeader(req));
     }

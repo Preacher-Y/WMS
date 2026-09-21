@@ -2,7 +2,7 @@ package group.australia.warehouse_management_system.feature.cartonHeader.service
 
 import group.australia.warehouse_management_system.common.exceptions.ConflictException;
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
-import group.australia.warehouse_management_system.feature.cartonHeader.dto.RequestCartonHeaderDto;
+import group.australia.warehouse_management_system.feature.cartonHeader.dto.CreateCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.ResponseCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.UpdateCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeader;
@@ -22,7 +22,7 @@ public class CartonHeaderService {
     private final CartonHeaderRepository cartonHeaderRepository;
     private final CartonHeaderMapper cartonHeaderMapper;
 
-    public ResponseCartonHeaderDto insertNewCartonHeader(RequestCartonHeaderDto req){
+    public ResponseCartonHeaderDto insertNewCartonHeader(CreateCartonHeaderDto req){
         if (cartonHeaderRepository.existsByBarcode(req.barcode())){
             throw new ConflictException(
                     "Carton Header barcode already exists: " + req.barcode()

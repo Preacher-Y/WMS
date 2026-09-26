@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @WebMvcTest(controllers = CartonHeaderController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
-class ControllerCartonHeaderTests {
+class CartonHeaderControllerTests {
 
     @MockitoBean
     private CartonHeaderService cartonHeaderService;

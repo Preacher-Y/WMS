@@ -18,7 +18,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ServiceCartonHeaderTests {
+class CartonHeaderServiceTests {
 
     private InMemoryCartonHeaderRepository cartonHeaderRepository;
 
@@ -56,10 +56,7 @@ class ServiceCartonHeaderTests {
 
     @Test
     void Should_update_description_when_carton_header_exists() {
-        cartonHeaderRepository.save(CartonHeader.builder()
-                .barcode("123456789")
-                .description("Test description")
-                .build());
+        addCartonHeader();
 
         UpdateCartonHeaderDto update = UpdateCartonHeaderDto.builder()
                 .description("Test description - Updated")
@@ -74,10 +71,7 @@ class ServiceCartonHeaderTests {
 
     @Test
     void Should_throw_when_barcode_already_exists() {
-        cartonHeaderRepository.save(CartonHeader.builder()
-                .barcode("123456789")
-                .description("Test description")
-                .build());
+        addCartonHeader();
 
         CreateCartonHeaderDto req = CreateCartonHeaderDto.builder()
                 .barcode("123456789")
@@ -96,5 +90,12 @@ class ServiceCartonHeaderTests {
 
         Assertions.assertThatThrownBy(() -> cartonHeaderService.updateCartonHeader("UNKNOWN-999", update))
                 .isInstanceOf(CartonHeaderNotFoundException.class);
+    }
+
+    public void addCartonHeader() {
+        cartonHeaderRepository.save(CartonHeader.builder()
+                .barcode("123456789")
+                .description("Test description")
+                .build());
     }
 }

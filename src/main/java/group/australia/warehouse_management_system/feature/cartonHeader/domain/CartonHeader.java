@@ -19,7 +19,7 @@ public class CartonHeader {
     private LocalDateTime createdTimestamp;
     private LocalDateTime updatedTimestamp;
 
-    public CartonHeader updateDescription(String description) {
-        return this.toBuilder().description(description).build();
+    public void updateDescription(String description) {
+        this.description = description;
     }
 }

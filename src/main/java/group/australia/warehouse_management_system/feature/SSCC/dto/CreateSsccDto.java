@@ -7,5 +7,9 @@ import lombok.Builder;
 import java.io.Serializable;
 
 @Builder
-public record CreateSsccDto(@NotNull(message = "SSCC is required") @NotEmpty(message = "SSCC is required") String sscc) implements Serializable {
+public record CreateSsccDto(
+        @NotNull(message = "SSCC is required")
+        @NotEmpty(message = "SSCC is required")
+        String sscc
+) implements Serializable {
 }

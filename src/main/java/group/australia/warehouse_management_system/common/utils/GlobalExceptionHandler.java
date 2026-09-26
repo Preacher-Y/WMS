@@ -1,6 +1,7 @@
 package group.australia.warehouse_management_system.common.utils;
 
 import group.australia.warehouse_management_system.common.dtos.ErrorDto;
+import group.australia.warehouse_management_system.common.exceptions.BadRequestException;
 import group.australia.warehouse_management_system.common.exceptions.ConflictException;
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
 import org.jspecify.annotations.NonNull;
@@ -34,6 +35,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(new ErrorDto(exception.getMessage()));
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public  ResponseEntity<ErrorDto> handleBadRequestException(
+            BadRequestException ex
+    ) {
+        return  ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorDto(ex.getMessage()));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

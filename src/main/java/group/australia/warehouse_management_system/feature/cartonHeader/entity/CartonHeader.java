@@ -1,4 +1,0 @@
-//package group.australia.warehouse_management_system.feature.cartonHeader.entity;
-//
-//public class CartonHeader {
-//}

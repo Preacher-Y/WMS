@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-class RepositoryCartonHeaderTests {
+class CartonHeaderRepositoryTests {
 
     @Autowired
     private CartonHeaderJpaRepository cartonHeaderJpaRepository;

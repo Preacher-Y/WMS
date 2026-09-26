@@ -39,10 +39,10 @@ public class CartonHeaderService {
         var cartonHeader = cartonHeaderRepository.findByBarcode(barcode)
                 .orElseThrow(() -> new CartonHeaderNotFoundException(barcode));
 
-        var updated = cartonHeader.updateDescription(updateRequest.description());
+        cartonHeader.updateDescription(updateRequest.description());
 
         try {
-            return cartonHeaderRepository.save(updated);
+            return cartonHeaderRepository.save(cartonHeader);
         } catch (DataIntegrityViolationException ex) {
             throw new CartonHeaderDuplicateException(barcode);
         }

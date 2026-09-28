@@ -26,6 +26,9 @@ public class UserEntity {
     private String name;
 
     @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
     private Boolean active = true;
 
     @Version

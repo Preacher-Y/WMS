@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 public class User {
     private Long id;
 
+    private String email;
+
     private String name;
 
     private String password;

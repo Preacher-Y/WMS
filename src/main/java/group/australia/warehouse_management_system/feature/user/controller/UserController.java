@@ -24,12 +24,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.toDto(userService.create(req)));
     }
 
-    @PutMapping("{email}")
+    @PutMapping("/{id}")
     public ResponseEntity<ResponseUserDto> updateUser(
-            @PathVariable String email,
+            @PathVariable Long id,
             @RequestBody @Valid UpdateUserDto req
     ){
-        return ResponseEntity.ok(userMapper.toDto(userService.update(email, req)));
+        return ResponseEntity.ok(userMapper.toDto(userService.update(id, req)));
     }
 
     @GetMapping
@@ -44,8 +44,8 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/{email}")
-    public  ResponseEntity<ResponseUserDto> getUser(@PathVariable String email){
-        return ResponseEntity.ok(userMapper.toDto(userService.getByEmail(email)));
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseUserDto> getUser(@PathVariable Long id){
+        return ResponseEntity.ok(userMapper.toDto(userService.getById(id)));
     }
 }

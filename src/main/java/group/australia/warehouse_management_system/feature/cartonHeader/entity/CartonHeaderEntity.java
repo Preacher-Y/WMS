@@ -1,4 +1,4 @@
-package group.australia.warehouse_management_system.feature.warehouse.entity;
+package group.australia.warehouse_management_system.feature.cartonHeader.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,25 +8,22 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "warehouses")
-@Data
+@Table(name = "carton_headers")
+@Getter
+@Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class Warehouse {
-
+@NoArgsConstructor
+public class CartonHeaderEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "warehouse_number", unique = true, nullable = false)
-    private String warehouseNumber;
+    @Column(unique = true, nullable = false)
+    private String barcode;
 
     @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
-    private boolean active = true;
+    private String description;
 
     @Version
     private Integer version;

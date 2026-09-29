@@ -1,7 +1,7 @@
 package group.australia.warehouse_management_system.warehouse;
 
-import group.australia.warehouse_management_system.feature.warehouse.entity.Warehouse;
-import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepository;
+import group.australia.warehouse_management_system.feature.warehouse.entity.WarehouseEntity;
+import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,15 +16,15 @@ import java.util.Optional;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-class RepositoryWarehouseTests {
+class WarehouseRepositoryTests {
 
     @Autowired
-    private WarehouseRepository warehouseRepository;
-    private Warehouse savedWarehouse;
+    private WarehouseJpaRepository warehouseRepository;
+    private WarehouseEntity savedWarehouse;
 
     @BeforeEach
     void setUp() {
-        savedWarehouse = warehouseRepository.save(Warehouse.builder()
+        savedWarehouse = warehouseRepository.save(WarehouseEntity.builder()
                 .name("Test Warehouse 1")
                 .warehouseNumber("WH-Test001")
                 .active(true)
@@ -32,7 +32,7 @@ class RepositoryWarehouseTests {
     }
 
     @Test
-    void WarehouseRepository_SaveAll_ReturnSavedWarehouse() {
+    void Should_save_and_return_warehouse() {
         Assertions.assertThat(savedWarehouse).isNotNull();
         Assertions.assertThat(savedWarehouse.getId()).isGreaterThan(0);
         Assertions.assertThat(savedWarehouse.getName()).isEqualTo("Test Warehouse 1");
@@ -40,8 +40,8 @@ class RepositoryWarehouseTests {
     }
 
     @Test
-    void WarehouseRepository_FindById_ReturnWarehouse() {
-        Optional<Warehouse> result = warehouseRepository.findById(savedWarehouse.getId());
+    void Should_find_warehouse_by_id() {
+        Optional<WarehouseEntity> result = warehouseRepository.findById(savedWarehouse.getId());
 
         Assertions.assertThat(result).isPresent();
         Assertions.assertThat(result.get().getId()).isEqualTo(savedWarehouse.getId());
@@ -49,15 +49,15 @@ class RepositoryWarehouseTests {
     }
 
     @Test
-    void WarehouseRepository_ExistsByWarehouseNumber_ReturnTrue() {
+    void Should_return_true_when_warehouse_number_exists() {
         boolean res = warehouseRepository.existsByWarehouseNumber(savedWarehouse.getWarehouseNumber());
 
         Assertions.assertThat(res).isTrue();
     }
 
     @Test
-    void WarehouseRepository_FindByWarehouseNumber_ReturnWarehouse() {
-        Optional<Warehouse> res = warehouseRepository.findByWarehouseNumber(savedWarehouse.getWarehouseNumber());
+    void Should_find_warehouse_by_warehouse_number() {
+        Optional<WarehouseEntity> res = warehouseRepository.findByWarehouseNumber(savedWarehouse.getWarehouseNumber());
 
         Assertions.assertThat(res).isPresent();
         Assertions.assertThat(res.get().getId()).isEqualTo(savedWarehouse.getId());
@@ -66,8 +66,8 @@ class RepositoryWarehouseTests {
     }
 
     @Test
-    void WarehouseRepository_DuplicateWarehouseNumber_ThrowsDataIntegrityViolationException() {
-        Warehouse duplicate = Warehouse.builder()
+    void Should_throw_on_duplicate_warehouse_number() {
+        WarehouseEntity duplicate = WarehouseEntity.builder()
                 .name("Duplicate Warehouse")
                 .warehouseNumber("WH-Test001")
                 .active(true)
@@ -78,13 +78,13 @@ class RepositoryWarehouseTests {
     }
 
     @Test
-    void WarehouseRepository_StaleVersion_ThrowsOptimisticLockingFailureException() {
+    void Should_throw_on_optimistic_locking_conflict() {
         Integer originalVersion = savedWarehouse.getVersion();
 
         savedWarehouse.setName("First Update");
         warehouseRepository.saveAndFlush(savedWarehouse);
 
-        Warehouse stale = Warehouse.builder()
+        WarehouseEntity stale = WarehouseEntity.builder()
                 .id(savedWarehouse.getId())
                 .name("Stale Update")
                 .warehouseNumber(savedWarehouse.getWarehouseNumber())

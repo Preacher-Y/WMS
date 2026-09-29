@@ -5,6 +5,7 @@ import group.australia.warehouse_management_system.feature.user.mapper.UserMappe
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -28,5 +29,10 @@ public class UserRepositoryAdapter implements  UserRepositoryPort {
     @Override
     public User save(User user) {
         return userMapper.toDomain(userJpaRepository.save(userMapper.toEntity(user)));
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userJpaRepository.findAll().stream().map(userMapper::toDomain).toList();
     }
 }

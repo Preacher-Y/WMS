@@ -2,8 +2,10 @@ package group.australia.warehouse_management_system.auth;
 
 import group.australia.warehouse_management_system.common.security.JwtService;
 import group.australia.warehouse_management_system.feature.auth.dto.LoginRequestDto;
+import group.australia.warehouse_management_system.feature.auth.dto.LogoutRequestDto;
 import group.australia.warehouse_management_system.feature.auth.dto.RefreshRequestDto;
 import group.australia.warehouse_management_system.feature.auth.service.AuthService;
+import group.australia.warehouse_management_system.feature.auth.service.RefreshTokenService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,13 +38,15 @@ class AuthServiceTests {
     @Mock
     private UserDetailsService userDetailsService;
 
-    private AuthService authService;
+    @Mock
+    private RefreshTokenService refreshTokenService;
 
+    private AuthService authService;
     private UserDetails userDetails;
 
     @BeforeEach
     void setUp() {
-        authService = new AuthService(authenticationManager, jwtService, userDetailsService);
+        authService = new AuthService(authenticationManager, jwtService, userDetailsService, refreshTokenService);
         userDetails = new User("preacher@gmail.com", "hashed-secret", List.of());
     }
 
@@ -52,7 +57,7 @@ class AuthServiceTests {
 
         when(authenticationManager.authenticate(any())).thenReturn(authToken);
         when(jwtService.generateAccessToken(any(UserDetails.class))).thenReturn("access-token");
-        when(jwtService.generateRefreshToken(any(UserDetails.class))).thenReturn("refresh-token");
+        when(refreshTokenService.create(anyString())).thenReturn("refresh-token");
 
         var result = authService.login(request);
 
@@ -74,13 +79,11 @@ class AuthServiceTests {
     @Test
     void Should_return_new_tokens_on_valid_refresh() {
         var request = new RefreshRequestDto("valid-refresh-token");
+        var rotated = new RefreshTokenService.RotationResult("new-refresh-token", "preacher@gmail.com");
 
-        when(jwtService.extractEmail(anyString())).thenReturn("preacher@gmail.com");
+        when(refreshTokenService.useAndRotate(anyString())).thenReturn(rotated);
         when(userDetailsService.loadUserByUsername(anyString())).thenReturn(userDetails);
-        when(jwtService.isTokenValid(anyString(), any(UserDetails.class))).thenReturn(true);
-        when(jwtService.isRefreshToken(anyString())).thenReturn(true);
         when(jwtService.generateAccessToken(any(UserDetails.class))).thenReturn("new-access-token");
-        when(jwtService.generateRefreshToken(any(UserDetails.class))).thenReturn("new-refresh-token");
 
         var result = authService.refresh(request);
 
@@ -93,11 +96,31 @@ class AuthServiceTests {
     void Should_throw_when_refresh_token_is_expired_or_invalid() {
         var request = new RefreshRequestDto("expired-token");
 
-        when(jwtService.extractEmail(anyString())).thenReturn("preacher@gmail.com");
-        when(userDetailsService.loadUserByUsername(anyString())).thenReturn(userDetails);
-        when(jwtService.isTokenValid(anyString(), any(UserDetails.class))).thenReturn(false);
+        when(refreshTokenService.useAndRotate(anyString()))
+                .thenThrow(new BadCredentialsException("Refresh token expired"));
 
         Assertions.assertThatThrownBy(() -> authService.refresh(request))
                 .isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    void Should_throw_on_refresh_token_reuse() {
+        var request = new RefreshRequestDto("stolen-token");
+
+        when(refreshTokenService.useAndRotate(anyString()))
+                .thenThrow(new BadCredentialsException("Refresh token reuse detected — all sessions revoked"));
+
+        Assertions.assertThatThrownBy(() -> authService.refresh(request))
+                .isInstanceOf(BadCredentialsException.class)
+                .hasMessageContaining("reuse");
+    }
+
+    @Test
+    void Should_revoke_token_on_logout() {
+        var request = new LogoutRequestDto("valid-refresh-token");
+
+        doNothing().when(refreshTokenService).revoke(anyString());
+
+        Assertions.assertThatCode(() -> authService.logout(request)).doesNotThrowAnyException();
     }
 }

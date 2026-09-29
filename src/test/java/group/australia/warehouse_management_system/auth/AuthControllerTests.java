@@ -3,6 +3,7 @@ package group.australia.warehouse_management_system.auth;
 import group.australia.warehouse_management_system.feature.auth.controller.AuthController;
 import group.australia.warehouse_management_system.feature.auth.dto.LoginRequestDto;
 import group.australia.warehouse_management_system.feature.auth.dto.LoginResponseDto;
+import group.australia.warehouse_management_system.feature.auth.dto.LogoutRequestDto;
 import group.australia.warehouse_management_system.feature.auth.dto.RefreshRequestDto;
 import group.australia.warehouse_management_system.feature.auth.service.AuthService;
 import tools.jackson.databind.ObjectMapper;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @WebMvcTest(controllers = AuthController.class)
@@ -84,12 +86,25 @@ class AuthControllerTests {
         var request = new RefreshRequestDto("expired-token");
 
         given(authService.refresh(ArgumentMatchers.any(RefreshRequestDto.class)))
-                .willThrow(new BadCredentialsException("Invalid or expired refresh token"));
+                .willThrow(new BadCredentialsException("Invalid refresh token"));
 
         ResultActions result = mockMvc.perform(post("/auth/refresh")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));
 
         result.andExpect(MockMvcResultMatchers.status().isUnauthorized());
+    }
+
+    @Test
+    void Should_return_204_when_logout_is_successful() throws Exception {
+        var request = new LogoutRequestDto("valid-refresh-token");
+
+        willDoNothing().given(authService).logout(ArgumentMatchers.any(LogoutRequestDto.class));
+
+        ResultActions result = mockMvc.perform(post("/auth/logout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
+
+        result.andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 }

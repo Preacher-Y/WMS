@@ -4,7 +4,7 @@ import group.australia.warehouse_management_system.feature.cartonHeader.entity.C
 import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderJpaRepository;
 import group.australia.warehouse_management_system.feature.item.entity.ItemEntity;
 import group.australia.warehouse_management_system.feature.item.repository.ItemJpaRepository;
-import group.australia.warehouse_management_system.feature.location.entity.Location;
+import group.australia.warehouse_management_system.feature.location.entity.LocationEntity;
 import group.australia.warehouse_management_system.feature.location.repository.LocationRepository;
 import group.australia.warehouse_management_system.feature.warehouse.entity.WarehouseEntity;
 import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseJpaRepository;
@@ -30,7 +30,7 @@ class RepositoryItemTests {
     @Autowired private WarehouseJpaRepository warehouseRepository;
 
     private ItemEntity savedItem;
-    private Location savedLocation;
+    private LocationEntity savedLocation;
     private CartonHeaderEntity savedCartonHeader;
 
     @BeforeEach
@@ -41,11 +41,10 @@ class RepositoryItemTests {
                 .active(true)
                 .build());
 
-        savedLocation = new Location();
+        savedLocation = new LocationEntity();
         savedLocation.setRow(1);
         savedLocation.setSection(2);
         savedLocation.setShelf(3);
-        savedLocation.setLocationCode("1-2-3");
         savedLocation.setWarehouse(warehouse);
         savedLocation = locationRepository.save(savedLocation);
 
@@ -76,7 +75,9 @@ class RepositoryItemTests {
 
         Assertions.assertThat(result).isPresent();
         Assertions.assertThat(result.get().getLocation().getId()).isEqualTo(savedLocation.getId());
-        Assertions.assertThat(result.get().getLocation().getLocationCode()).isEqualTo("1-2-3");
+        Assertions.assertThat(result.get().getLocation().getRow()).isEqualTo(1);
+        Assertions.assertThat(result.get().getLocation().getSection()).isEqualTo(2);
+        Assertions.assertThat(result.get().getLocation().getShelf()).isEqualTo(3);
         Assertions.assertThat(result.get().getCartonHeader().getId()).isEqualTo(savedCartonHeader.getId());
         Assertions.assertThat(result.get().getCartonHeader().getBarcode()).isEqualTo("BC-TEST-001");
     }

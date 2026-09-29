@@ -1,7 +1,7 @@
 package group.australia.warehouse_management_system.feature.item.domain;
 
 import group.australia.warehouse_management_system.feature.cartonHeader.domain.CartonHeader;
-import group.australia.warehouse_management_system.feature.location.entity.Location;
+import group.australia.warehouse_management_system.feature.location.domain.Location;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

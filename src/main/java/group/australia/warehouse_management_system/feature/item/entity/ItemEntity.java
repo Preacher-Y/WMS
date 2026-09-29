@@ -1,7 +1,7 @@
 package group.australia.warehouse_management_system.feature.item.entity;
 
 import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeaderEntity;
-import group.australia.warehouse_management_system.feature.location.entity.Location;
+import group.australia.warehouse_management_system.feature.location.entity.LocationEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
@@ -34,7 +34,7 @@ public class ItemEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)
-    private Location location;
+    private LocationEntity location;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "carton_header_id", nullable = false)

@@ -4,12 +4,16 @@ import group.australia.warehouse_management_system.feature.item.domain.Item;
 import group.australia.warehouse_management_system.feature.item.dto.ItemRequestDto;
 import group.australia.warehouse_management_system.feature.item.dto.ResponseItemDto;
 import group.australia.warehouse_management_system.feature.item.entity.ItemEntity;
+import group.australia.warehouse_management_system.feature.location.mapper.LocationMapper;
 import org.mapstruct.*;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
-        unmappedTargetPolicy = ReportingPolicy.IGNORE)
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        uses = {LocationMapper.class})
 public interface ItemMapper {
     Item toDomain(ItemEntity entity);
+
+    @Mapping(target = "location", ignore = true)
     ItemEntity toEntity(Item domain);
     Item toDomainFromCreate(ItemRequestDto req);
 

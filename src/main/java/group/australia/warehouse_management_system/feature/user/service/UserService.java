@@ -1,5 +1,6 @@
 package group.australia.warehouse_management_system.feature.user.service;
 
+import group.australia.warehouse_management_system.feature.user.domain.Role;
 import group.australia.warehouse_management_system.feature.user.domain.User;
 import group.australia.warehouse_management_system.feature.user.dto.CreateUserDto;
 import group.australia.warehouse_management_system.feature.user.dto.UpdateUserDto;
@@ -9,6 +10,7 @@ import group.australia.warehouse_management_system.feature.user.mapper.UserMappe
 import group.australia.warehouse_management_system.feature.user.repository.UserRepositoryPort;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +21,7 @@ public class UserService {
 
     private final UserRepositoryPort userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     public User create(CreateUserDto req){
 
@@ -27,13 +30,17 @@ public class UserService {
         }
 
         var user = userMapper.toDomainFromCreate(req);
+        var prepared = user.toBuilder()
+                .password(passwordEncoder.encode(user.getPassword()))
+                .role(Role.USER)
+                .build();
 
         try {
 
-            return userRepository.save(user);
+            return userRepository.save(prepared);
 
         } catch (DataIntegrityViolationException ex) {
-            throw new UserDuplicateException(user.getEmail());
+            throw new UserDuplicateException(prepared.getEmail());
         }
     }
 

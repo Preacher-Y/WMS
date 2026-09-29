@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Component
 @AllArgsConstructor
-public class UserRepositoryAdapter implements  UserRepositoryPort {
+public class UserRepositoryAdapter implements UserRepositoryPort {
 
     private final UserJpaRepository userJpaRepository;
     private final UserMapper userMapper;
@@ -22,8 +22,8 @@ public class UserRepositoryAdapter implements  UserRepositoryPort {
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
-        return userJpaRepository.findByEmail(email).map(userMapper::toDomain);
+    public Optional<User> findById(Long id) {
+        return userJpaRepository.findById(id).map(userMapper::toDomain);
     }
 
     @Override

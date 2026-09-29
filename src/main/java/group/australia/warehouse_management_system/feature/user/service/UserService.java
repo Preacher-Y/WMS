@@ -37,10 +37,10 @@ public class UserService {
         }
     }
 
-    public User update(String email,UpdateUserDto update){
+    public User update(Long id, UpdateUserDto update){
 
-        var user = userRepository.findByEmail(email)
-                .orElseThrow(()-> new UserNotFound(email));
+        var user = userRepository.findById(id)
+                .orElseThrow(()-> new UserNotFound(id));
 
         user.rename(update.name());
 
@@ -53,7 +53,7 @@ public class UserService {
         try {
             return userRepository.save(user);
         } catch (DataIntegrityViolationException ex) {
-            throw new UserDuplicateException(email);
+            throw new UserDuplicateException(user.getEmail());
         }
     }
 
@@ -61,8 +61,8 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User getByEmail(String email){
-        return userRepository.findByEmail(email)
-                .orElseThrow(()-> new UserNotFound(email));
+    public User getById(Long id){
+        return userRepository.findById(id)
+                .orElseThrow(()-> new UserNotFound(id));
     }
 }

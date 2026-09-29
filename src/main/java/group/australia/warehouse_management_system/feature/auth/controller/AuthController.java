@@ -2,6 +2,7 @@ package group.australia.warehouse_management_system.feature.auth.controller;
 
 import group.australia.warehouse_management_system.feature.auth.dto.LoginRequestDto;
 import group.australia.warehouse_management_system.feature.auth.dto.LoginResponseDto;
+import group.australia.warehouse_management_system.feature.auth.dto.LogoutRequestDto;
 import group.australia.warehouse_management_system.feature.auth.dto.RefreshRequestDto;
 import group.australia.warehouse_management_system.feature.auth.service.AuthService;
 import jakarta.validation.Valid;
@@ -27,5 +28,11 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponseDto> refresh(@RequestBody @Valid RefreshRequestDto req) {
         return ResponseEntity.ok(authService.refresh(req));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestBody @Valid LogoutRequestDto req) {
+        authService.logout(req);
+        return ResponseEntity.noContent().build();
     }
 }

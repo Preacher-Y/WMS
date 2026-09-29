@@ -36,6 +36,7 @@ public class SecurityConfig {
                 // ======== PUBLIC ========
                 // .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                 // .requestMatchers(HttpMethod.POST, "/auth/refresh").permitAll()
+                // .requestMatchers(HttpMethod.POST, "/auth/logout").permitAll()
                 // .requestMatchers(HttpMethod.POST, "/users").permitAll()
 
                 // ======== ADMIN — master data ========

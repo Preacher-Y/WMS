@@ -28,4 +28,9 @@ public class WarehouseRepositoryAdapter implements WarehouseRepositoryPort {
     public Warehouse save(Warehouse warehouse) {
         return mapper.toDomain(jpaRepository.save(mapper.toEntity(warehouse)));
     }
+
+    @Override
+    public Optional<Warehouse> findById(Long id) {
+        return jpaRepository.findById(id).map(mapper::toDomain);
+    }
 }

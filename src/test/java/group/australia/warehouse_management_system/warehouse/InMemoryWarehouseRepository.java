@@ -29,4 +29,9 @@ class InMemoryWarehouseRepository implements WarehouseRepositoryPort {
         store.put(saved.getWarehouseNumber(), saved);
         return saved;
     }
+
+    @Override
+    public Optional<Warehouse> findById(Long id) {
+        return Optional.empty();
+    }
 }

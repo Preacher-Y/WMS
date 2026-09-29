@@ -4,7 +4,7 @@ import group.australia.warehouse_management_system.common.exceptions.NotFoundExc
 
 public class UserNotFound extends NotFoundException {
 
-    public UserNotFound(String email) {
-        super("User with email \""+email+"\" not found");
+    public UserNotFound(Long id) {
+        super("User with id \""+id+"\" not found");
     }
 }

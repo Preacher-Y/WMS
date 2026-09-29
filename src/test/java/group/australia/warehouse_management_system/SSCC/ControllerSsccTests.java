@@ -6,6 +6,8 @@ import group.australia.warehouse_management_system.feature.SSCC.dto.CreateSsccDt
 import group.australia.warehouse_management_system.feature.SSCC.dto.ResponseSsccDto;
 import group.australia.warehouse_management_system.feature.SSCC.mapper.SsccMapper;
 import group.australia.warehouse_management_system.feature.SSCC.service.SsccService;
+import group.australia.warehouse_management_system.common.security.JwtService;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import group.australia.warehouse_management_system.feature.cartonHeader.domain.CartonHeader;
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.ResponseCartonHeaderDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +42,12 @@ class ControllerSsccTests {
 
     @MockitoBean
     private SsccMapper ssccMapper;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
 
     @Autowired
     private ObjectMapper objectMapper;

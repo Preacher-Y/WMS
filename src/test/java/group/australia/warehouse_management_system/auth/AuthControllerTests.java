@@ -6,6 +6,8 @@ import group.australia.warehouse_management_system.feature.auth.dto.LoginRespons
 import group.australia.warehouse_management_system.feature.auth.dto.LogoutRequestDto;
 import group.australia.warehouse_management_system.feature.auth.dto.RefreshRequestDto;
 import group.australia.warehouse_management_system.feature.auth.service.AuthService;
+import group.australia.warehouse_management_system.common.security.JwtService;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +37,12 @@ class AuthControllerTests {
 
     @MockitoBean
     private AuthService authService;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
 
     @Autowired
     private ObjectMapper objectMapper;

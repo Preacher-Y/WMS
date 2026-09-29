@@ -8,6 +8,8 @@ import group.australia.warehouse_management_system.feature.user.dto.ResponseUser
 import group.australia.warehouse_management_system.feature.user.dto.UpdateUserDto;
 import group.australia.warehouse_management_system.feature.user.mapper.UserMapper;
 import group.australia.warehouse_management_system.feature.user.service.UserService;
+import group.australia.warehouse_management_system.common.security.JwtService;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,6 +43,12 @@ class UserControllerTests {
 
     @MockitoBean
     private UserMapper userMapper;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
 
     @Autowired
     private ObjectMapper objectMapper;

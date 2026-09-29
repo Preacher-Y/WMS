@@ -8,7 +8,9 @@ import group.australia.warehouse_management_system.feature.warehouse.controller.
 import group.australia.warehouse_management_system.feature.warehouse.dto.ResponseWarehouseDto;
 import group.australia.warehouse_management_system.feature.warehouse.mapper.WarehouseMapper;
 import group.australia.warehouse_management_system.feature.warehouse.service.WarehouseService;
+import group.australia.warehouse_management_system.common.security.JwtService;
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -39,6 +41,12 @@ class WarehouseControllerTests {
 
     @MockitoBean
     private WarehouseMapper warehouseMapper;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
 
     @Autowired
     private ObjectMapper objectMapper;

@@ -7,7 +7,9 @@ import group.australia.warehouse_management_system.feature.cartonHeader.dto.Resp
 import group.australia.warehouse_management_system.feature.cartonHeader.dto.UpdateCartonHeaderDto;
 import group.australia.warehouse_management_system.feature.cartonHeader.mapper.CartonHeaderMapper;
 import group.australia.warehouse_management_system.feature.cartonHeader.service.CartonHeaderService;
+import group.australia.warehouse_management_system.common.security.JwtService;
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -37,6 +39,12 @@ class CartonHeaderControllerTests {
 
     @MockitoBean
     private CartonHeaderMapper cartonHeaderMapper;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
 
     @Autowired
     private MockMvc mockMvc;

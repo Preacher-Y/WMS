@@ -6,7 +6,9 @@ import group.australia.warehouse_management_system.feature.item.dto.ItemRequestD
 import group.australia.warehouse_management_system.feature.item.dto.ResponseItemDto;
 import group.australia.warehouse_management_system.feature.item.mapper.ItemMapper;
 import group.australia.warehouse_management_system.feature.item.service.ItemService;
+import group.australia.warehouse_management_system.common.security.JwtService;
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -39,6 +41,12 @@ class ControllerItemTests {
 
     @MockitoBean
     private ItemMapper itemMapper;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
 
     private Item itemDomain;
     private ResponseItemDto responseDto;

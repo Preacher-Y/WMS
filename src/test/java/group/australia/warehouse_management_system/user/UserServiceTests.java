@@ -35,11 +35,11 @@ class UserServiceTests {
 
     @Test
     void Should_create_user_if_email_does_not_exist_yet() {
-        var dto = new CreateUserDto("john@example.com", "John Doe", "secret");
+        var dto = new CreateUserDto("preacher@gmail.com", "Preacher Y", "secret");
 
         var userDomain = User.builder()
-                .email("john@example.com")
-                .name("John Doe")
+                .email("preacher@gmail.com")
+                .name("Preacher Y")
                 .password("secret")
                 .build();
 
@@ -48,8 +48,8 @@ class UserServiceTests {
         var result = userService.create(dto);
 
         Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.getEmail()).isEqualTo("john@example.com");
-        Assertions.assertThat(result.getName()).isEqualTo("John Doe");
+        Assertions.assertThat(result.getEmail()).isEqualTo("preacher@gmail.com");
+        Assertions.assertThat(result.getName()).isEqualTo("Preacher Y");
         Assertions.assertThat(result.isActive()).isTrue();
         Assertions.assertThat(result.getId()).isGreaterThan(0);
     }
@@ -57,12 +57,12 @@ class UserServiceTests {
     @Test
     void Should_throw_when_email_already_exists() {
         userRepository.save(User.builder()
-                .email("john@example.com")
-                .name("John Doe")
+                .email("preacher@gmail.com")
+                .name("Preacher Y")
                 .password("secret")
                 .build());
 
-        var dto = new CreateUserDto("john@example.com", "John Doe", "secret");
+        var dto = new CreateUserDto("preacher@gmail.com", "Preacher Y", "secret");
 
         Assertions.assertThatThrownBy(() -> userService.create(dto))
                 .isInstanceOf(UserDuplicateException.class);
@@ -71,35 +71,35 @@ class UserServiceTests {
     @Test
     void Should_update_user_when_it_exists() {
         var saved = userRepository.save(User.builder()
-                .email("john@example.com")
-                .name("John Doe")
+                .email("preacher@gmail.com")
+                .name("Preacher Y")
                 .password("secret")
                 .active(true)
                 .version(0)
                 .build());
 
-        var update = new UpdateUserDto("John Updated", false);
+        var update = new UpdateUserDto("Preacher Y Updated", false);
 
         var result = userService.update(saved.getId(), update);
 
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result.getId()).isEqualTo(saved.getId());
-        Assertions.assertThat(result.getName()).isEqualTo("John Updated");
-        Assertions.assertThat(result.getEmail()).isEqualTo("john@example.com");
+        Assertions.assertThat(result.getName()).isEqualTo("Preacher Y Updated");
+        Assertions.assertThat(result.getEmail()).isEqualTo("preacher@gmail.com");
         Assertions.assertThat(result.isActive()).isFalse();
     }
 
     @Test
     void Should_activate_user_on_update() {
         var saved = userRepository.save(User.builder()
-                .email("john@example.com")
-                .name("John Doe")
+                .email("preacher@gmail.com")
+                .name("Preacher Y")
                 .password("secret")
                 .active(false)
                 .version(0)
                 .build());
 
-        var update = new UpdateUserDto("John Doe", true);
+        var update = new UpdateUserDto("Preacher Y", true);
 
         var result = userService.update(saved.getId(), update);
 
@@ -117,8 +117,8 @@ class UserServiceTests {
 
     @Test
     void Should_return_all_users() {
-        userRepository.save(User.builder().email("a@example.com").name("Alice").password("pw").build());
-        userRepository.save(User.builder().email("b@example.com").name("Bob").password("pw").build());
+        userRepository.save(User.builder().email("preacher@gmail.com").name("Preacher Y").password("pw").build());
+        userRepository.save(User.builder().email("second@gmail.com").name("Second User").password("pw").build());
 
         var result = userService.getAll();
 
@@ -128,8 +128,8 @@ class UserServiceTests {
     @Test
     void Should_return_user_by_id() {
         var saved = userRepository.save(User.builder()
-                .email("john@example.com")
-                .name("John Doe")
+                .email("preacher@gmail.com")
+                .name("Preacher Y")
                 .password("secret")
                 .build());
 
@@ -137,7 +137,7 @@ class UserServiceTests {
 
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result.getId()).isEqualTo(saved.getId());
-        Assertions.assertThat(result.getEmail()).isEqualTo("john@example.com");
+        Assertions.assertThat(result.getEmail()).isEqualTo("preacher@gmail.com");
     }
 
     @Test

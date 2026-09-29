@@ -52,19 +52,19 @@ class UserControllerTests {
     void setUp() {
         userDomain = User.builder()
                 .id(1L)
-                .email("john@example.com")
-                .name("John Doe")
+                .email("preacher@gmail.com")
+                .name("Preacher Y")
                 .password("secret")
                 .active(true)
                 .build();
 
-        dto = new ResponseUserDto(1L, "john@example.com", "John Doe", true);
-        updateResDto = new ResponseUserDto(1L, "john@example.com", "John Updated", false);
+        dto = new ResponseUserDto(1L, "preacher@gmail.com", "Preacher Y", true);
+        updateResDto = new ResponseUserDto(1L, "preacher@gmail.com", "Preacher Y Updated", false);
     }
 
     @Test
     void Should_return_201_when_creating_user() throws Exception {
-        var requestDto = new CreateUserDto("john@example.com", "John Doe", "secret");
+        var requestDto = new CreateUserDto("preacher@gmail.com", "Preacher Y", "secret");
 
         given(userService.create(ArgumentMatchers.any())).willReturn(userDomain);
         given(userMapper.toDto(ArgumentMatchers.any(User.class))).willReturn(dto);
@@ -78,7 +78,7 @@ class UserControllerTests {
 
     @Test
     void Should_return_200_when_updating_user() throws Exception {
-        var updateDto = new UpdateUserDto("John Updated", false);
+        var updateDto = new UpdateUserDto("Preacher Y Updated", false);
 
         given(userService.update(
                 ArgumentMatchers.anyLong(),

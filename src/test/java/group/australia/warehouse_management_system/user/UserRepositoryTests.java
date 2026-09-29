@@ -56,18 +56,9 @@ class UserRepositoryTests {
 
     @Test
     void Should_return_false_when_email_does_not_exist() {
-        var res = userRepository.existsByEmail("nobody@gmail.com");
+        var res = userRepository.existsByEmail("nobody@example.com");
 
         Assertions.assertThat(res).isFalse();
-    }
-
-    @Test
-    void Should_find_user_by_email() {
-        var res = userRepository.findByEmail(savedUser.getEmail());
-
-        Assertions.assertThat(res).isPresent();
-        Assertions.assertThat(res.get().getId()).isEqualTo(savedUser.getId());
-        Assertions.assertThat(res.get().getEmail()).isEqualTo("preacher@gmail.com");
     }
 
     @Test

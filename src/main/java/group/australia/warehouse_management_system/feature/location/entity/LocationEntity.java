@@ -1,10 +1,7 @@
 package group.australia.warehouse_management_system.feature.location.entity;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-import group.australia.warehouse_management_system.feature.item.entity.ItemEntity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -16,42 +13,28 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "Locations", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "warehouse_id", "location_code" })
-}
-
-)
+        @UniqueConstraint(columnNames = { "warehouse_id", "`row`", "section", "shelf" })
+})
 @Getter
 @Setter
 @NoArgsConstructor
-public class Location {
+public class LocationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(name = "`row`")
     private Integer row;
-
     private Integer section;
-
     private Integer shelf;
-
     private String locationCode;
-
     @ManyToOne
     @JoinColumn(name = "warehouse_id", nullable = false)
-    private WarehouseEntity warehouse;
-
-    @OneToMany(mappedBy = "location")
-    private List<ItemEntity> items = new ArrayList<>();
-
+    private Warehouse warehouse;
     @Version
     private Integer version;
-
     @CreationTimestamp
-    @Column(updatable = false, nullable = false)
+    @Column(updatable = false)
     private LocalDateTime createdTimestamp;
-
     @UpdateTimestamp
     private LocalDateTime updatedTimestamp;
-
 }

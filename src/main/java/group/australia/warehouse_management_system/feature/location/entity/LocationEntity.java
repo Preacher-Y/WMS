@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import group.australia.warehouse_management_system.feature.warehouse.entity.Warehouse;
+import group.australia.warehouse_management_system.feature.warehouse.entity.WarehouseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,8 +15,6 @@ import lombok.Setter;
 @Table(name = "Locations", uniqueConstraints = {
         @UniqueConstraint(columnNames = { "warehouse_id", "`row`", "section", "shelf" })
 })
-
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -30,7 +28,7 @@ public class LocationEntity {
     private Integer shelf;
     @ManyToOne
     @JoinColumn(name = "warehouse_id", nullable = false)
-    private Warehouse warehouse;
+    private WarehouseEntity warehouse;
     @Version
     private Integer version;
     @CreationTimestamp
@@ -38,5 +36,4 @@ public class LocationEntity {
     private LocalDateTime createdTimestamp;
     @UpdateTimestamp
     private LocalDateTime updatedTimestamp;
-
 }

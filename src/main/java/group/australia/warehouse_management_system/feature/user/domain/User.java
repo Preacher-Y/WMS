@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,6 +23,8 @@ public class User {
 
     @Builder.Default
     private boolean active = true;
+
+    private Role role;
 
     private Integer version;
 

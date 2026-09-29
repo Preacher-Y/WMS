@@ -1,5 +1,6 @@
 package group.australia.warehouse_management_system.feature.user.entity;
 
+import group.australia.warehouse_management_system.feature.user.domain.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -30,6 +31,11 @@ public class UserEntity {
 
     @Column(nullable = false)
     private Boolean active = true;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER;
 
     @Version
     private Integer version;

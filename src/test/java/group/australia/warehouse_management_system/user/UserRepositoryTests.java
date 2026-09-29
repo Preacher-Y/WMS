@@ -1,5 +1,6 @@
 package group.australia.warehouse_management_system.user;
 
+import group.australia.warehouse_management_system.feature.user.domain.Role;
 import group.australia.warehouse_management_system.feature.user.entity.UserEntity;
 import group.australia.warehouse_management_system.feature.user.repository.UserJpaRepository;
 import org.assertj.core.api.Assertions;
@@ -25,8 +26,9 @@ class UserRepositoryTests {
         savedUser = userRepository.save(UserEntity.builder()
                 .email("preacher@gmail.com")
                 .name("Preacher Y")
-                .password("secret")
+                .password("hashed-secret")
                 .active(true)
+                .role(Role.USER)
                 .build());
     }
 
@@ -68,6 +70,7 @@ class UserRepositoryTests {
                 .name("Another Preacher")
                 .password("pass")
                 .active(true)
+                .role(Role.USER)
                 .build();
 
         Assertions.assertThatThrownBy(() -> userRepository.saveAndFlush(duplicate))
@@ -87,6 +90,7 @@ class UserRepositoryTests {
                 .name("Stale Update")
                 .password(savedUser.getPassword())
                 .active(savedUser.getActive())
+                .role(savedUser.getRole())
                 .version(originalVersion)
                 .build();
 

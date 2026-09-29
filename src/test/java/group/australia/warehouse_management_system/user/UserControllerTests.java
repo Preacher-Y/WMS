@@ -1,6 +1,7 @@
 package group.australia.warehouse_management_system.user;
 
 import group.australia.warehouse_management_system.feature.user.controller.UserController;
+import group.australia.warehouse_management_system.feature.user.domain.Role;
 import group.australia.warehouse_management_system.feature.user.domain.User;
 import group.australia.warehouse_management_system.feature.user.dto.CreateUserDto;
 import group.australia.warehouse_management_system.feature.user.dto.ResponseUserDto;
@@ -54,12 +55,13 @@ class UserControllerTests {
                 .id(1L)
                 .email("preacher@gmail.com")
                 .name("Preacher Y")
-                .password("secret")
+                .password("hashed-secret")
                 .active(true)
+                .role(Role.USER)
                 .build();
 
-        dto = new ResponseUserDto(1L, "preacher@gmail.com", "Preacher Y", true);
-        updateResDto = new ResponseUserDto(1L, "preacher@gmail.com", "Preacher Y Updated", false);
+        dto = new ResponseUserDto(1L, "preacher@gmail.com", "Preacher Y", true, Role.USER);
+        updateResDto = new ResponseUserDto(1L, "preacher@gmail.com", "Preacher Y Updated", false, Role.USER);
     }
 
     @Test

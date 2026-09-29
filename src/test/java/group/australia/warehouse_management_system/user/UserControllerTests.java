@@ -81,12 +81,12 @@ class UserControllerTests {
         var updateDto = new UpdateUserDto("John Updated", false);
 
         given(userService.update(
-                ArgumentMatchers.anyString(),
+                ArgumentMatchers.anyLong(),
                 ArgumentMatchers.any(UpdateUserDto.class)
         )).willReturn(userDomain);
         given(userMapper.toDto(ArgumentMatchers.any(User.class))).willReturn(updateResDto);
 
-        ResultActions response = mockMvc.perform(put("/users/john@example.com")
+        ResultActions response = mockMvc.perform(put("/users/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateDto)));
 
@@ -105,11 +105,11 @@ class UserControllerTests {
     }
 
     @Test
-    void Should_return_200_when_getting_user_by_email() throws Exception {
-        given(userService.getByEmail(ArgumentMatchers.anyString())).willReturn(userDomain);
+    void Should_return_200_when_getting_user_by_id() throws Exception {
+        given(userService.getById(ArgumentMatchers.anyLong())).willReturn(userDomain);
         given(userMapper.toDto(ArgumentMatchers.any(User.class))).willReturn(dto);
 
-        ResultActions response = mockMvc.perform(get("/users/john@example.com")
+        ResultActions response = mockMvc.perform(get("/users/1")
                 .contentType(MediaType.APPLICATION_JSON));
 
         response.andExpect(MockMvcResultMatchers.status().isOk());

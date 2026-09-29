@@ -70,7 +70,7 @@ class UserServiceTests {
 
     @Test
     void Should_update_user_when_it_exists() {
-        userRepository.save(User.builder()
+        var saved = userRepository.save(User.builder()
                 .email("john@example.com")
                 .name("John Doe")
                 .password("secret")
@@ -80,10 +80,10 @@ class UserServiceTests {
 
         var update = new UpdateUserDto("John Updated", false);
 
-        var result = userService.update("john@example.com", update);
+        var result = userService.update(saved.getId(), update);
 
         Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.getId()).isGreaterThan(0);
+        Assertions.assertThat(result.getId()).isEqualTo(saved.getId());
         Assertions.assertThat(result.getName()).isEqualTo("John Updated");
         Assertions.assertThat(result.getEmail()).isEqualTo("john@example.com");
         Assertions.assertThat(result.isActive()).isFalse();
@@ -91,7 +91,7 @@ class UserServiceTests {
 
     @Test
     void Should_activate_user_on_update() {
-        userRepository.save(User.builder()
+        var saved = userRepository.save(User.builder()
                 .email("john@example.com")
                 .name("John Doe")
                 .password("secret")
@@ -101,7 +101,7 @@ class UserServiceTests {
 
         var update = new UpdateUserDto("John Doe", true);
 
-        var result = userService.update("john@example.com", update);
+        var result = userService.update(saved.getId(), update);
 
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result.isActive()).isTrue();
@@ -111,7 +111,7 @@ class UserServiceTests {
     void Should_throw_when_updating_non_existent_user() {
         var update = new UpdateUserDto("Any Name", true);
 
-        Assertions.assertThatThrownBy(() -> userService.update("nobody@example.com", update))
+        Assertions.assertThatThrownBy(() -> userService.update(999L, update))
                 .isInstanceOf(UserNotFound.class);
     }
 
@@ -126,22 +126,23 @@ class UserServiceTests {
     }
 
     @Test
-    void Should_return_user_by_email() {
-        userRepository.save(User.builder()
+    void Should_return_user_by_id() {
+        var saved = userRepository.save(User.builder()
                 .email("john@example.com")
                 .name("John Doe")
                 .password("secret")
                 .build());
 
-        var result = userService.getByEmail("john@example.com");
+        var result = userService.getById(saved.getId());
 
         Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result.getId()).isEqualTo(saved.getId());
         Assertions.assertThat(result.getEmail()).isEqualTo("john@example.com");
     }
 
     @Test
-    void Should_throw_when_getting_non_existent_user_by_email() {
-        Assertions.assertThatThrownBy(() -> userService.getByEmail("nobody@example.com"))
+    void Should_throw_when_getting_non_existent_user_by_id() {
+        Assertions.assertThatThrownBy(() -> userService.getById(999L))
                 .isInstanceOf(UserNotFound.class);
     }
 }

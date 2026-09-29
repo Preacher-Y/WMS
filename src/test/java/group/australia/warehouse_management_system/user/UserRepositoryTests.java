@@ -23,8 +23,8 @@ class UserRepositoryTests {
     @BeforeEach
     void setUp() {
         savedUser = userRepository.save(UserEntity.builder()
-                .email("john@example.com")
-                .name("John Doe")
+                .email("preacher@gmail.com")
+                .name("Preacher Y")
                 .password("secret")
                 .active(true)
                 .build());
@@ -34,8 +34,8 @@ class UserRepositoryTests {
     void Should_save_and_return_user() {
         Assertions.assertThat(savedUser).isNotNull();
         Assertions.assertThat(savedUser.getId()).isGreaterThan(0);
-        Assertions.assertThat(savedUser.getEmail()).isEqualTo("john@example.com");
-        Assertions.assertThat(savedUser.getName()).isEqualTo("John Doe");
+        Assertions.assertThat(savedUser.getEmail()).isEqualTo("preacher@gmail.com");
+        Assertions.assertThat(savedUser.getName()).isEqualTo("Preacher Y");
     }
 
     @Test
@@ -44,7 +44,7 @@ class UserRepositoryTests {
 
         Assertions.assertThat(result).isPresent();
         Assertions.assertThat(result.get().getId()).isEqualTo(savedUser.getId());
-        Assertions.assertThat(result.get().getEmail()).isEqualTo("john@example.com");
+        Assertions.assertThat(result.get().getEmail()).isEqualTo("preacher@gmail.com");
     }
 
     @Test
@@ -56,7 +56,7 @@ class UserRepositoryTests {
 
     @Test
     void Should_return_false_when_email_does_not_exist() {
-        var res = userRepository.existsByEmail("nobody@example.com");
+        var res = userRepository.existsByEmail("nobody@gmail.com");
 
         Assertions.assertThat(res).isFalse();
     }
@@ -67,14 +67,14 @@ class UserRepositoryTests {
 
         Assertions.assertThat(res).isPresent();
         Assertions.assertThat(res.get().getId()).isEqualTo(savedUser.getId());
-        Assertions.assertThat(res.get().getEmail()).isEqualTo("john@example.com");
+        Assertions.assertThat(res.get().getEmail()).isEqualTo("preacher@gmail.com");
     }
 
     @Test
     void Should_throw_on_duplicate_email() {
         var duplicate = UserEntity.builder()
-                .email("john@example.com")
-                .name("Another John")
+                .email("preacher@gmail.com")
+                .name("Another Preacher")
                 .password("pass")
                 .active(true)
                 .build();

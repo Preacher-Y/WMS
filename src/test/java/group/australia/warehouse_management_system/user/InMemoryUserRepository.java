@@ -11,24 +11,24 @@ import java.util.Optional;
 
 class InMemoryUserRepository implements UserRepositoryPort {
 
-    private final Map<String, User> store = new HashMap<>();
+    private final Map<Long, User> store = new HashMap<>();
     private long nextId = 1;
 
     @Override
     public boolean existsByEmail(String email) {
-        return store.containsKey(email);
+        return store.values().stream().anyMatch(u -> u.getEmail().equals(email));
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
-        return Optional.ofNullable(store.get(email));
+    public Optional<User> findById(Long id) {
+        return Optional.ofNullable(store.get(id));
     }
 
     @Override
     public User save(User user) {
         var id = user.getId() != null ? user.getId() : nextId++;
         var saved = user.toBuilder().id(id).build();
-        store.put(saved.getEmail(), saved);
+        store.put(id, saved);
         return saved;
     }
 

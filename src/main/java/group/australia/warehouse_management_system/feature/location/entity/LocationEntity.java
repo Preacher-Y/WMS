@@ -13,14 +13,14 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "Locations", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "warehouse_id", "location_code" })
-}
+        @UniqueConstraint(columnNames = { "warehouse_id", "`row`", "section", "shelf" })
+})
 
-)
+
 @Getter
 @Setter
 @NoArgsConstructor
-public class Location {
+public class LocationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,7 +28,6 @@ public class Location {
     private Integer row;
     private Integer section;
     private Integer shelf;
-    private String locationCode;
     @ManyToOne
     @JoinColumn(name = "warehouse_id", nullable = false)
     private Warehouse warehouse;

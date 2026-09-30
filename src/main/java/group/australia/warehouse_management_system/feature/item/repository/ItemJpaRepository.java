@@ -10,4 +10,5 @@ public interface ItemJpaRepository extends JpaRepository<ItemEntity, Long> {
     boolean existsByItemNumberAndLocationId(String itemNumber, Long locationId);
     boolean existsByItemNumber(String itemNumber);
     Optional<ItemEntity> findByItemNumberAndLocation(String itemNumber, LocationEntity location);
+    Optional<ItemEntity> findByItemNumberAndLocationId(String itemNumber, Long locationId);
 }

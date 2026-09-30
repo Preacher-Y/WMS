@@ -6,6 +6,8 @@ import group.australia.warehouse_management_system.feature.location.repository.L
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class ItemRepositoryAdapter implements ItemRepositoryPort {
@@ -17,6 +19,13 @@ public class ItemRepositoryAdapter implements ItemRepositoryPort {
     @Override
     public boolean existsByItemNumberAndLocationId(String itemNumber, Long locationId) {
         return jpaRepository.existsByItemNumberAndLocationId(itemNumber, locationId);
+    }
+
+    @Override
+    public Optional<Item> findByItemNumberAndLocationId(String itemNumber, Long locationId) {
+        return jpaRepository
+                .findByItemNumberAndLocation(itemNumber, locationRepository.getReferenceById(locationId))
+                .map(mapper::toDomain);
     }
 
     @Override

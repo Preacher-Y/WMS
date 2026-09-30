@@ -23,8 +23,7 @@ public class ItemRepositoryAdapter implements ItemRepositoryPort {
 
     @Override
     public Optional<Item> findByItemNumberAndLocationId(String itemNumber, Long locationId) {
-        return jpaRepository
-                .findByItemNumberAndLocation(itemNumber, locationRepository.getReferenceById(locationId))
+        return jpaRepository.findByItemNumberAndLocationId(itemNumber, locationId)
                 .map(mapper::toDomain);
     }
 

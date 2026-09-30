@@ -14,6 +14,7 @@ public class Sscc {
     private Long id;
     private String sscc;
     private CartonHeader cartonHeader;
+    private Integer version;
     private LocalDateTime receivedTimestamp;
     private LocalDateTime createdTimeStamp;
     private LocalDateTime updatedTimeStamp;

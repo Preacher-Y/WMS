@@ -6,6 +6,7 @@ import group.australia.warehouse_management_system.common.exceptions.ConflictExc
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.jspecify.annotations.NonNull;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,6 +24,15 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ErrorDto> handleOptimisticLockingFailure(
+            ObjectOptimisticLockingFailureException exception
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ErrorDto("Concurrent modification conflict. Please retry."));
+    }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorDto> handleNotFoundException(

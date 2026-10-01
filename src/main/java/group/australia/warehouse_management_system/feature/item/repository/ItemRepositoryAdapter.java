@@ -5,6 +5,7 @@ import group.australia.warehouse_management_system.feature.item.mapper.ItemMappe
 import group.australia.warehouse_management_system.feature.location.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -33,10 +34,11 @@ public class ItemRepositoryAdapter implements ItemRepositoryPort {
         entity.setLocation(locationRepository.getReferenceById(item.getLocation().getId()));
         return mapper.toDomain(jpaRepository.save(entity));
     }
+
     @Override
-public List<Item> findAllByWarehouseId(Long warehouseId) {
-    return jpaRepository.findAllByLocation_WarehouseId(warehouseId).stream()
-            .map(mapper::toDomain)
-            .toList();
-}
+    public List<Item> findAllByWarehouseId(Long warehouseId) {
+        return jpaRepository.findAllByLocation_WarehouseId(warehouseId).stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
 }

@@ -4,7 +4,8 @@ import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import group.australia.warehouse_management_system.feature.stockHistory.domain.StockAction;
+import group.australia.warehouse_management_system.feature.stockHistory.service.StockHistoryService;
 import group.australia.warehouse_management_system.common.exceptions.BadRequestException;
 import group.australia.warehouse_management_system.common.exceptions.ConflictException;
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
@@ -27,9 +28,10 @@ public class ReceiveService {
     private final SsccRepositoryPort ssccs;
     private final LocationRepositoryAdapter locations;
     private final ItemRepositoryPort items;
+    private final StockHistoryService historyService;
 
     @Transactional
-     public Item recieve(CreateRecieverDto request) {
+    public Item recieve(CreateRecieverDto request) {
         String warehouseNumber = toWarehouseNumber(request.warehouseNumber());
 
         Warehouse warehouse = warehouses.findByWarehouseNumber(warehouseNumber)
@@ -60,8 +62,15 @@ public class ReceiveService {
                         .cartonHeader(sscc.getCartonHeader())
                         .build());
         Item saved = items.save(item);
+        historyService.record(
+                StockAction.RECEIVE,
+                itemNumber,
+                1,
+                null,
+                request.locationCode(),
+                warehouseNumber,
+                request.sscc());
 
-        
         ssccs.save(sscc.toBuilder()
                 .receivedTimestamp(LocalDateTime.now())
                 .build());
@@ -78,6 +87,6 @@ public class ReceiveService {
     }
 
     private String deriveItemNumber(String barcode) {
-        return barcode; 
+        return barcode;
     }
 }

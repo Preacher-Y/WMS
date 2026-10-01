@@ -12,7 +12,8 @@ import group.australia.warehouse_management_system.feature.warehouse.repository.
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import group.australia.warehouse_management_system.feature.stockHistory.domain.StockAction;
+import group.australia.warehouse_management_system.feature.stockHistory.service.StockHistoryService;
 @Service
 @RequiredArgsConstructor
 public class MoveItemService {
@@ -20,7 +21,7 @@ public class MoveItemService {
     private final WarehouseRepositoryPort warehouseRepository;
     private final LocationRepositoryAdapter locationRepositoryAdapter;
     private final ItemRepositoryPort itemRepository;
-
+    private final StockHistoryService historyService;
     @Transactional
     public void moveItem(RequestMoveItemDto req) {
         var warehouse = warehouseRepository.findByWarehouseNumber(req.warehouseNumber())
@@ -64,5 +65,14 @@ public class MoveItemService {
                     .cartonHeader(sourceItem.getCartonHeader())
                     .build());
         }
+        historyService.record(                           // add
+                StockAction.MOVE,                        // add
+                req.itemNumber(),                        // add
+                req.quantity(),                          // add
+                req.fromLocationCode(),                  // add
+                req.toLocationCode(),                    // add
+                req.warehouseNumber(),                   // add
+                null);                                   // add
     }
-}
+    }
+

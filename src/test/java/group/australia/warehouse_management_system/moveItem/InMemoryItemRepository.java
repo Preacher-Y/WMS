@@ -4,6 +4,7 @@ import group.australia.warehouse_management_system.feature.item.domain.Item;
 import group.australia.warehouse_management_system.feature.item.repository.ItemRepositoryPort;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -25,6 +26,11 @@ class InMemoryItemRepository implements ItemRepositoryPort {
                 .filter(i -> i.getItemNumber().equals(itemNumber)
                         && i.getLocation().getId().equals(locationId))
                 .findFirst();
+    }
+
+    @Override
+    public List<Item> findAllByWarehouseId(Long warehouseId) {
+        return List.of();
     }
 
     @Override

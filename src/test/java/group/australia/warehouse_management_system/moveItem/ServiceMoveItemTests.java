@@ -9,6 +9,7 @@ import group.australia.warehouse_management_system.feature.location.repository.L
 import group.australia.warehouse_management_system.feature.moveItem.dto.RequestMoveItemDto;
 import group.australia.warehouse_management_system.feature.moveItem.exception.MoveItemInsufficientStockException;
 import group.australia.warehouse_management_system.feature.moveItem.service.MoveItemService;
+import group.australia.warehouse_management_system.feature.stockHistory.service.StockHistoryService;
 import group.australia.warehouse_management_system.feature.warehouse.domain.Warehouse;
 import group.australia.warehouse_management_system.feature.warehouse.exception.WarehouseNotFoundException;
 import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepositoryPort;
@@ -34,6 +35,9 @@ class ServiceMoveItemTests {
     @Mock
     private LocationRepositoryAdapter locationRepositoryAdapter;
 
+    @Mock
+    private StockHistoryService stockHistoryService;
+
     private MoveItemService moveItemService;
 
     private static final String WAREHOUSE_NUMBER = "WH-001";
@@ -45,7 +49,7 @@ class ServiceMoveItemTests {
     @BeforeEach
     void setUp() {
         itemRepository = new InMemoryItemRepository();
-        moveItemService = new MoveItemService(warehouseRepository, locationRepositoryAdapter, itemRepository);
+        moveItemService = new MoveItemService(warehouseRepository, locationRepositoryAdapter, itemRepository, stockHistoryService);
     }
 
     @Test

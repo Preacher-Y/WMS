@@ -16,6 +16,7 @@ import group.australia.warehouse_management_system.feature.location.repository.L
 import group.australia.warehouse_management_system.feature.warehouse.domain.Warehouse;
 import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepositoryPort;
 import lombok.RequiredArgsConstructor;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

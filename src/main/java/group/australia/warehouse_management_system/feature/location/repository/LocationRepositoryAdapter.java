@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import group.australia.warehouse_management_system.common.exceptions.BadRequestException;
 import group.australia.warehouse_management_system.feature.location.domain.Location;
 import group.australia.warehouse_management_system.feature.location.mapper.LocationMapper;
-import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepository;
+import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseJpaRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class LocationRepositoryAdapter {
 
     private final LocationRepository locationRepository;
-    private final WarehouseRepository warehouseRepository;
+    private final WarehouseJpaRepository warehouseRepository;
     private final LocationMapper locationMapper;
 
     public Location save(Location location) {

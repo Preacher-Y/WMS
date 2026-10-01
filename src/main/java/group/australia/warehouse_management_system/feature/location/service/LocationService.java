@@ -7,7 +7,7 @@ import group.australia.warehouse_management_system.common.exceptions.ConflictExc
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
 import group.australia.warehouse_management_system.feature.location.domain.Location;
 import group.australia.warehouse_management_system.feature.location.repository.LocationRepositoryAdapter;
-import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepository;
+import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseJpaRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class LocationService {
 
     private final LocationRepositoryAdapter locationRepositoryAdapter;
-    private final WarehouseRepository warehouseRepository;
+    private final WarehouseJpaRepository warehouseRepository;
 
     @Transactional
     public Location insertNewLocation(Long warehouseId, Location location) {

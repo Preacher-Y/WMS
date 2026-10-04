@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 public class Item {
     private Long id;
     private String itemNumber;
-    private Integer quantity;
+    @Setter private Integer quantity;
     private Location location;
     private CartonHeader cartonHeader;
     private Integer version;

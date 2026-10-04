@@ -3,7 +3,7 @@ package group.australia.warehouse_management_system.feature.moveItem.service;
 import group.australia.warehouse_management_system.common.exceptions.BadRequestException;
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
 import group.australia.warehouse_management_system.feature.item.domain.Item;
-import group.australia.warehouse_management_system.feature.item.repository.ItemRepositoryPort;
+import group.australia.warehouse_management_system.feature.item.service.ItemService;
 import group.australia.warehouse_management_system.feature.location.repository.LocationRepositoryAdapter;
 import group.australia.warehouse_management_system.feature.moveItem.dto.RequestMoveItemDto;
 import group.australia.warehouse_management_system.feature.moveItem.exception.MoveItemInsufficientStockException;
@@ -19,7 +19,7 @@ public class MoveItemService {
 
     private final WarehouseRepositoryPort warehouseRepository;
     private final LocationRepositoryAdapter locationRepositoryAdapter;
-    private final ItemRepositoryPort itemRepository;
+    private final ItemService itemService;
 
     @Transactional
     public void moveItem(RequestMoveItemDto req) {
@@ -42,22 +42,22 @@ public class MoveItemService {
                 .orElseThrow(() -> new NotFoundException(
                         "Destination location " + req.toLocationCode() + " not found in warehouse " + req.warehouseNumber()));
 
-        var sourceItem = itemRepository.findByItemNumberAndLocationId(req.itemNumber(), sourceLocation.getId())
-                .orElseThrow(() -> new NotFoundException(
-                        "Item " + req.itemNumber() + " not found at location " + req.fromLocationCode()));
+        var sourceItem = itemService.getByItemNumberAndLocationId(req.itemNumber(), sourceLocation.getId());
 
         if (sourceItem.getQuantity() < req.quantity()) {
             throw new MoveItemInsufficientStockException(req.itemNumber(), sourceItem.getQuantity(), req.quantity());
         }
 
-        itemRepository.save(sourceItem.toBuilder().quantity(sourceItem.getQuantity() - req.quantity()).build());
+        sourceItem.setQuantity(sourceItem.getQuantity() - req.quantity());
+        itemService.save(sourceItem);
 
-        var destItemOpt = itemRepository.findByItemNumberAndLocationId(req.itemNumber(), destLocation.getId());
+        var destItemOpt = itemService.findByItemNumberAndLocationId(req.itemNumber(), destLocation.getId());
         if (destItemOpt.isPresent()) {
             var dest = destItemOpt.get();
-            itemRepository.save(dest.toBuilder().quantity(dest.getQuantity() + req.quantity()).build());
+            dest.setQuantity(dest.getQuantity() + req.quantity());
+            itemService.save(dest);
         } else {
-            itemRepository.save(Item.builder()
+            itemService.save(Item.builder()
                     .itemNumber(req.itemNumber())
                     .quantity(req.quantity())
                     .location(destLocation)

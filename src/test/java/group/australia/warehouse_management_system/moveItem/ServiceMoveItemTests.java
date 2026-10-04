@@ -4,6 +4,7 @@ import group.australia.warehouse_management_system.common.exceptions.BadRequestE
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
 import group.australia.warehouse_management_system.feature.cartonHeader.domain.CartonHeader;
 import group.australia.warehouse_management_system.feature.item.domain.Item;
+import group.australia.warehouse_management_system.feature.item.service.ItemService;
 import group.australia.warehouse_management_system.feature.location.domain.Location;
 import group.australia.warehouse_management_system.feature.location.repository.LocationRepositoryAdapter;
 import group.australia.warehouse_management_system.feature.moveItem.dto.RequestMoveItemDto;
@@ -45,7 +46,7 @@ class ServiceMoveItemTests {
     @BeforeEach
     void setUp() {
         itemRepository = new InMemoryItemRepository();
-        moveItemService = new MoveItemService(warehouseRepository, locationRepositoryAdapter, itemRepository);
+        moveItemService = new MoveItemService(warehouseRepository, locationRepositoryAdapter, new ItemService(itemRepository));
     }
 
     @Test

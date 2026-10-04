@@ -25,6 +25,11 @@ public class CartonHeaderRepositoryAdapter implements CartonHeaderRepositoryPort
     }
 
     @Override
+    public Optional<CartonHeader> findById(Long id) {
+        return jpaRepository.findById(id).map(mapper::toDomain);
+    }
+
+    @Override
     public CartonHeader save(CartonHeader cartonHeader) {
         return mapper.toDomain(jpaRepository.save(mapper.toEntity(cartonHeader)));
     }

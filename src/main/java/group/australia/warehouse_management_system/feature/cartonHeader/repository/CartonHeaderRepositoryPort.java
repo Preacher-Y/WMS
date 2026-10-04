@@ -7,5 +7,6 @@ import java.util.Optional;
 public interface CartonHeaderRepositoryPort {
     boolean existsByBarcode(String barcode);
     Optional<CartonHeader> findByBarcode(String barcode);
+    Optional<CartonHeader> findById(Long id);
     CartonHeader save(CartonHeader cartonHeader);
 }

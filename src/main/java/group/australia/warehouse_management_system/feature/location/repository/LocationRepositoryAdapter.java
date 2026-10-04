@@ -4,59 +4,45 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import group.australia.warehouse_management_system.common.exceptions.BadRequestException;
 import group.australia.warehouse_management_system.feature.location.domain.Location;
+import group.australia.warehouse_management_system.feature.location.domain.LocationCode;
 import group.australia.warehouse_management_system.feature.location.mapper.LocationMapper;
 import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class LocationRepositoryAdapter {
+public class LocationRepositoryAdapter implements LocationRepositoryPort {
 
     private final LocationRepository locationRepository;
     private final WarehouseRepository warehouseRepository;
     private final LocationMapper locationMapper;
 
+    @Override
     public Location save(Location location) {
         var entity = locationMapper.toEntity(location);
         entity.setWarehouse(warehouseRepository.getReferenceById(location.getWarehouseId()));
         return locationMapper.toDomain(locationRepository.save(entity));
     }
 
+    @Override
     public boolean exists(Long warehouseId, Integer row, Integer section, Integer shelf) {
         return locationRepository.existsByWarehouseIdAndRowAndSectionAndShelf(
                 warehouseId, row, section, shelf);
     }
 
+    @Override
     public boolean existsByLocationCode(Long warehouseId, String locationCode) {
-        int[] p = parseLocationCode(locationCode);
+        var code = LocationCode.from(locationCode);
         return locationRepository.existsByWarehouseIdAndRowAndSectionAndShelf(
-                warehouseId, p[0], p[1], p[2]);
+                warehouseId, code.row(), code.section(), code.shelf());
     }
 
+    @Override
     public Optional<Location> findByLocationCode(Long warehouseId, String locationCode) {
-        int[] p = parseLocationCode(locationCode);
+        var code = LocationCode.from(locationCode);
         return locationRepository
-                .findByWarehouseIdAndRowAndSectionAndShelf(warehouseId, p[0], p[1], p[2])
-                .map(entity -> locationMapper.toDomain(entity));
-    }
-
-    private int[] parseLocationCode(String locationCode) {
-        String message = "Invalid location code '" + locationCode
-                + "', expected format row-section-shelf, e.g. 1-2-4";
-        if (locationCode == null || !locationCode.matches("\\d+-\\d+-\\d+")) {
-            throw new BadRequestException(message);
-        }
-        String[] parts = locationCode.split("-");
-        try {
-            return new int[] {
-                Integer.parseInt(parts[0]),
-                Integer.parseInt(parts[1]),
-                Integer.parseInt(parts[2])
-            };
-        } catch (NumberFormatException e) {
-            throw new BadRequestException(message);
-        }
+                .findByWarehouseIdAndRowAndSectionAndShelf(warehouseId, code.row(), code.section(), code.shelf())
+                .map(locationMapper::toDomain);
     }
 }

@@ -29,6 +29,9 @@ public class SsccEntity {
 
     private LocalDateTime receivedTimestamp;
 
+    @Version
+    private Integer version;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdTimeStamp;

@@ -22,18 +22,25 @@ public class LocationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "`row`")
     private Integer row;
+
     private Integer section;
+
     private Integer shelf;
+
     @ManyToOne
     @JoinColumn(name = "warehouse_id", nullable = false)
     private WarehouseEntity warehouse;
+
     @Version
     private Integer version;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdTimestamp;
+
     @UpdateTimestamp
     private LocalDateTime updatedTimestamp;
 }

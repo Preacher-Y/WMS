@@ -4,12 +4,12 @@ import group.australia.warehouse_management_system.common.exceptions.BadRequestE
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
 import group.australia.warehouse_management_system.feature.cartonHeader.domain.CartonHeader;
 import group.australia.warehouse_management_system.feature.item.domain.Item;
+import group.australia.warehouse_management_system.feature.item.service.ItemService;
 import group.australia.warehouse_management_system.feature.location.domain.Location;
 import group.australia.warehouse_management_system.feature.location.repository.LocationRepositoryAdapter;
 import group.australia.warehouse_management_system.feature.moveItem.dto.RequestMoveItemDto;
 import group.australia.warehouse_management_system.feature.moveItem.exception.MoveItemInsufficientStockException;
 import group.australia.warehouse_management_system.feature.moveItem.service.MoveItemService;
-import group.australia.warehouse_management_system.feature.stockHistory.service.StockHistoryService;
 import group.australia.warehouse_management_system.feature.warehouse.domain.Warehouse;
 import group.australia.warehouse_management_system.feature.warehouse.exception.WarehouseNotFoundException;
 import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepositoryPort;
@@ -35,9 +35,6 @@ class ServiceMoveItemTests {
     @Mock
     private LocationRepositoryAdapter locationRepositoryAdapter;
 
-    @Mock
-    private StockHistoryService stockHistoryService;
-
     private MoveItemService moveItemService;
 
     private static final String WAREHOUSE_NUMBER = "WH-001";
@@ -49,7 +46,7 @@ class ServiceMoveItemTests {
     @BeforeEach
     void setUp() {
         itemRepository = new InMemoryItemRepository();
-        moveItemService = new MoveItemService(warehouseRepository, locationRepositoryAdapter, itemRepository, stockHistoryService);
+        moveItemService = new MoveItemService(warehouseRepository, locationRepositoryAdapter, new ItemService(itemRepository));
     }
 
     @Test

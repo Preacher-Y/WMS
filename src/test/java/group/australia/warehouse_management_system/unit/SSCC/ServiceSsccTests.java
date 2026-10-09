@@ -1,4 +1,4 @@
-package group.australia.warehouse_management_system.SSCC;
+package group.australia.warehouse_management_system.unit.SSCC;
 
 import group.australia.warehouse_management_system.feature.SSCC.domain.Sscc;
 import group.australia.warehouse_management_system.feature.SSCC.dto.CreateSsccDto;

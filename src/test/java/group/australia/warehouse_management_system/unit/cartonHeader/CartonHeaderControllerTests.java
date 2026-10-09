@@ -1,4 +1,4 @@
-package group.australia.warehouse_management_system.cartonHeader;
+package group.australia.warehouse_management_system.unit.cartonHeader;
 
 import group.australia.warehouse_management_system.feature.cartonHeader.controller.CartonHeaderController;
 import group.australia.warehouse_management_system.feature.cartonHeader.domain.CartonHeader;

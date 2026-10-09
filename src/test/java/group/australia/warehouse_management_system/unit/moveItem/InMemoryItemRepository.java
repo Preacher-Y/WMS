@@ -1,4 +1,4 @@
-package group.australia.warehouse_management_system.moveItem;
+package group.australia.warehouse_management_system.unit.moveItem;
 
 import group.australia.warehouse_management_system.feature.item.domain.Item;
 import group.australia.warehouse_management_system.feature.item.repository.ItemRepositoryPort;

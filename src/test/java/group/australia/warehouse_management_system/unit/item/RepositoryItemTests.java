@@ -1,4 +1,4 @@
-package group.australia.warehouse_management_system.item;
+package group.australia.warehouse_management_system.unit.item;
 
 import group.australia.warehouse_management_system.feature.cartonHeader.entity.CartonHeaderEntity;
 import group.australia.warehouse_management_system.feature.cartonHeader.repository.CartonHeaderJpaRepository;

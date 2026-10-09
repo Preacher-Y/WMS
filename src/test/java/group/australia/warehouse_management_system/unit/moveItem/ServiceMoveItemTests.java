@@ -1,4 +1,4 @@
-package group.australia.warehouse_management_system.moveItem;
+package group.australia.warehouse_management_system.unit.moveItem;
 
 import group.australia.warehouse_management_system.common.exceptions.BadRequestException;
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;

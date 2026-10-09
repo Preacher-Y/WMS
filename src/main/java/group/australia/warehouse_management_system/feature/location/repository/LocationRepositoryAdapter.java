@@ -2,12 +2,12 @@ package group.australia.warehouse_management_system.feature.location.repository;
 
 import java.util.Optional;
 
+import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseJpaRepository;
 import org.springframework.stereotype.Component;
 
 import group.australia.warehouse_management_system.feature.location.domain.Location;
 import group.australia.warehouse_management_system.feature.location.domain.LocationCode;
 import group.australia.warehouse_management_system.feature.location.mapper.LocationMapper;
-import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class LocationRepositoryAdapter implements LocationRepositoryPort {
 
     private final LocationRepository locationRepository;
-    private final WarehouseRepository warehouseRepository;
+    private final WarehouseJpaRepository warehouseRepository;
     private final LocationMapper locationMapper;
 
     @Override

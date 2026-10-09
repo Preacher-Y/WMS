@@ -10,3 +10,9 @@ spring:
       ddl-auto: create-drop
     database-platform: org.hibernate.dialect.H2Dialect
     show-sql: false
+
+app:
+  jwt:
+    secret: dGVzdC1zZWNyZXQta2V5LWZvci10ZXN0aW5nLW9ubHk=
+    access-token-expiration-ms: 900000
+    refresh-token-expiration-ms: 604800000

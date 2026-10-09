@@ -1,4 +1,4 @@
-package group.australia.warehouse_management_system.auth;
+package group.australia.warehouse_management_system.unit.auth;
 
 import group.australia.warehouse_management_system.feature.auth.controller.AuthController;
 import group.australia.warehouse_management_system.feature.auth.dto.LoginRequestDto;

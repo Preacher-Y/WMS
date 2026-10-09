@@ -1,4 +1,4 @@
-package group.australia.warehouse_management_system.warehouse;
+package group.australia.warehouse_management_system.unit.warehouse;
 
 import group.australia.warehouse_management_system.feature.warehouse.domain.Warehouse;
 import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepositoryPort;

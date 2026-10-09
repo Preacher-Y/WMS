@@ -1,4 +1,4 @@
-package group.australia.warehouse_management_system.user;
+package group.australia.warehouse_management_system.unit.user;
 
 import group.australia.warehouse_management_system.feature.user.domain.User;
 import group.australia.warehouse_management_system.feature.user.repository.UserRepositoryPort;

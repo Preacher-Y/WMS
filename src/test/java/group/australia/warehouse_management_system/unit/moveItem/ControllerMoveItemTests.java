@@ -1,11 +1,13 @@
-package group.australia.warehouse_management_system.moveItem;
+package group.australia.warehouse_management_system.unit.moveItem;
 
 import group.australia.warehouse_management_system.feature.moveItem.controller.MoveItemController;
 import group.australia.warehouse_management_system.feature.moveItem.dto.RequestMoveItemDto;
 import group.australia.warehouse_management_system.feature.moveItem.exception.MoveItemInsufficientStockException;
 import group.australia.warehouse_management_system.feature.moveItem.service.MoveItemService;
 import group.australia.warehouse_management_system.feature.warehouse.exception.WarehouseNotFoundException;
+import group.australia.warehouse_management_system.common.security.JwtService;
 import tools.jackson.databind.ObjectMapper;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +36,12 @@ class ControllerMoveItemTests {
 
     @MockitoBean
     private MoveItemService moveItemService;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
 
     @Autowired
     private ObjectMapper objectMapper;

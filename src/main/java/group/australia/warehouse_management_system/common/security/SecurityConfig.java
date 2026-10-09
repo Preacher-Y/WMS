@@ -3,6 +3,7 @@ package group.australia.warehouse_management_system.common.security;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -16,6 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
@@ -34,28 +37,43 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
 
                 // ======== PUBLIC ========
-                // .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                // .requestMatchers(HttpMethod.POST, "/auth/refresh").permitAll()
-                // .requestMatchers(HttpMethod.POST, "/auth/logout").permitAll()
-                // .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/refresh").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/logout").permitAll()
+                .requestMatchers(HttpMethod.POST, "/users").permitAll()
 
                 // ======== ADMIN — master data ========
-                // .requestMatchers(HttpMethod.POST,  "/warehouses").hasRole("ADMIN")
-                // .requestMatchers(HttpMethod.PUT,   "/warehouses/**").hasRole("ADMIN")
-                // .requestMatchers(HttpMethod.POST,  "/warehouses/*/locations").hasRole("ADMIN")
-                // .requestMatchers(HttpMethod.POST,  "/carton-headers").hasRole("ADMIN")
-                // .requestMatchers(HttpMethod.PUT,   "/carton-headers/**").hasRole("ADMIN")
-                // .requestMatchers(HttpMethod.POST,  "/carton-headers/*/ssccs").hasRole("ADMIN")
-                // .requestMatchers(HttpMethod.GET,   "/users").hasRole("ADMIN")
-                // .requestMatchers(HttpMethod.PUT,   "/users/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST,  "/warehouses").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT,   "/warehouses/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST,  "/warehouses/*/locations").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST,  "/carton-headers").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT,   "/carton-headers/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST,  "/carton-headers/*/ssccs").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET,   "/users").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT,   "/users/**").hasRole("ADMIN")
 
-                // ======== USER — operational ========
-                // .requestMatchers(HttpMethod.POST, "/items").hasRole("USER")
-                // .requestMatchers(HttpMethod.GET,  "/users/**").authenticated()
+                // ======== AUTHENTICATED — operational & read ========
+                .requestMatchers(HttpMethod.POST, "/receive").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/move").authenticated()
+                .requestMatchers(HttpMethod.GET,  "/warehouses/*/items/*").authenticated()
+                .requestMatchers(HttpMethod.GET,  "/warehouses/*/items").authenticated()
+                .requestMatchers(HttpMethod.GET,  "/api/history").authenticated()
+                .requestMatchers(HttpMethod.GET,  "/users/**").authenticated()
 
                 // ======== DEFAULT ========
-                // .anyRequest().authenticated()
-                .anyRequest().permitAll()   // temporary: all public during development
+                .anyRequest().authenticated()
+            )
+            .exceptionHandling(e -> e
+                .authenticationEntryPoint((req, res, ex) -> {
+                    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    res.setContentType("application/json");
+                    res.getWriter().write("{\"error\":\"Unauthorized\",\"message\":\"" + ex.getMessage() + "\"}");
+                })
+                .accessDeniedHandler((req, res, ex) -> {
+                    res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    res.setContentType("application/json");
+                    res.getWriter().write("{\"error\":\"Forbidden\",\"message\":\"" + ex.getMessage() + "\"}");
+                })
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

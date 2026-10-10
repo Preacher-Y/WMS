@@ -218,8 +218,15 @@ pre{margin:0;padding:14px 16px;border-radius:4px;background:var(--rack-ink);colo
 .bubble{font:600 16px/1 var(--mono);padding:5px 9px;border-radius:3px;background:#fff;color:var(--ink);translate:-50% 0;opacity:0;transition:opacity .2s}
 .bubble.show{opacity:1}
 .bubble.ok{background:var(--ok);color:#fff}.bubble.err{background:var(--err);color:#fff}
-#truck{transition:transform .9s cubic-bezier(.65,0,.35,1)}
-#truck .bob{position:absolute;transform-style:preserve-3d}
+#truck,#clerk{transition:transform .9s cubic-bezier(.65,0,.35,1)}
+#truck .bob,#clerk .bob{position:absolute;transform-style:preserve-3d}
+#clerk.moving .bob{animation:step .225s ease-in-out infinite}
+@keyframes step{50%{transform:translateZ(1.5px)}}
+.leg{transform-origin:4.5px 0 14px}
+#clerk.moving .leg{animation:stride .45s ease-in-out infinite}
+#clerk.moving .leg.b{animation-delay:-.225s}
+@keyframes stride{0%,100%{transform:rotateY(24deg)}50%{transform:rotateY(-24deg)}}
+#drawer{transition:transform .45s ease}
 #truck.moving .bob{animation:rumble .18s linear infinite}
 @keyframes rumble{50%{transform:translateZ(1px)}}
 .lift{left:0;top:0;transition:transform .5s ease}
@@ -738,7 +745,18 @@ const boxes=[],rackKids=[];
   [6,44].forEach(x=>{rackKids.push(cube(x,6,32,32,4,WOOD,z+(lv?5:0)));const b=cube(x+2,8,28,28,22,CARD,z+(lv?9:4),"box");rackKids.push(b);boxes.push(b)});
 });
 rackKids.push(bill(41,22,146,"Database"));
-floor.append(grp(ST.rack-41,170,rackKids));
+const rackG=grp(ST.rack-41,170,rackKids);floor.append(rackG);
+
+// filing cabinet standing in for account records; the middle drawer slides out towards the lane
+const FILE_TONES=["#e8c872","#d9b65a","#e8c872","#cfa94e"],files=[];
+const drawer=grp(0,0,[cube(5,8,40,30,2,"#3a3c40",40),cube(3,38,44,4,26,"#6a6d72",36),cube(17,42,16,2,3,"#d3d4cf",50)],"drawer");
+FILE_TONES.forEach((c,i)=>{const f=cube(9+i*9,11,3,24,18,c,42,"box");drawer.append(f);files.push(f)});
+const cabinetG=grp(ST.rack-25,178,[cube(0,0,50,40,100,"#4a4c50"),
+  cube(3,38,44,4,26,"#6a6d72",6),cube(17,42,16,2,3,"#d3d4cf",20),
+  drawer,
+  cube(3,38,44,4,26,"#6a6d72",68),cube(17,42,16,2,3,"#d3d4cf",82),
+  bill(25,20,134,"File storage")]);
+floor.append(cabinetG);
 
 // forklift with a driver; the forks point along +x
 const lift=document.createElement("div");lift.className="lift";
@@ -757,24 +775,49 @@ bob.append(
   lift);
 const bubble=bill(20,13,72,"","bubble");bob.append(bubble);
 const truck=grp(0,0,[bob],"truck");floor.append(truck);
+
+// office clerk who carries account records; walks along +x like the forklift
+const SHIRT="#f4f3ee";
+const legA=grp(0,0,[cube(2,4,5,4,14,DARK)]),legB=grp(0,0,[cube(2,10,5,4,14,DARK)]);
+legA.classList.add("leg");legB.classList.add("leg","b");
+const folder=grp(0,0,[cube(0,19,10,2,12,"#e8c872",15)]);   // tucked under the near arm so the camera sees it
+const walker=document.createElement("div");walker.className="bob";
+walker.append(legA,legB,cube(0,2,9,14,16,SHIRT,14),cube(2,-1,5,3,13,SHIRT,16),cube(2,16,5,3,13,SHIRT,16),
+  cube(1,5,7,8,8,SKIN,30),cube(.5,4.5,8,9,3,"#3a2a1e",37),folder);
+const clerk=grp(0,0,[walker],"clerk");floor.append(clerk);
 const bubbleEl=bubble.querySelector(".bubble");
 
-function truckTo(x,instant){truck.style.transition=instant?"none":"";truck.style.transform=`translate(${x-28}px,256px)`}
-async function drive(x){truck.classList.add("moving");truckTo(x);trail.style.width=Math.max(0,x-24)+"px";await sleep(950);truck.classList.remove("moving")}
-const setLoad=v=>load.style.visibility=v?"visible":"hidden";
+let actor=truck;
+function moverTo(x,instant){const t=actor===truck;actor.style.transition=instant?"none":"";actor.style.transform=`translate(${x-(t?28:6)}px,${t?256:262}px)`}
+async function drive(x){actor.classList.add("moving");moverTo(x);trail.style.width=Math.max(0,x-24)+"px";await sleep(950);actor.classList.remove("moving")}
+const setLoad=v=>(actor===truck?load:folder).style.visibility=v?"visible":"hidden";
+// Account endpoints get the clerk and the filing cabinet; everything else the forklift and the rack.
+function setMode(people){
+  truck.hidden=rackG.hidden=people;clerk.hidden=cabinetG.hidden=!people;
+  actor=people?clerk:truck;actor.querySelector(".bob").append(bubble);
+}
+// Drawer slots, left to right. At rest slot 1 is empty; writes fill it, reads take slot 2.
+const PUT_FILE=1,TAKE_FILE=2;
+const showFile=(i,v)=>files[i].style.visibility=v?"visible":"hidden";
+function resetFiles(){drawer.style.transform="";files.forEach((f,i)=>{f.classList.remove("on");showFile(i,i!==PUT_FILE)})}
+// Rack slots: [level0 near, level0 far, level1 near, level1 far, level2 near, level2 far].
+// At rest the near middle slot is empty; writes fill it, reads and moves take the far middle carton.
+const PUT_SLOT=2,TAKE_SLOT=3;
+const showBox=(i,v)=>boxes[i].style.visibility=v?"visible":"hidden";
+function resetRack(){boxes.forEach((b,i)=>{b.classList.remove("on");showBox(i,i!==PUT_SLOT)})}
 const raise=z=>lift.style.transform=`translateZ(${z}px)`;
 function setGate(s){const c={closed:"#c4162a",check:FORK,open:"#23824f"}[s];gateLed.querySelectorAll(".f").forEach((f,i)=>f.style.background=shade(c,[1.1,.9,.7][i]));arm.classList.toggle("open",s==="open")}
 const turnGuard=on=>guard.style.transform=on?"rotateZ(-60deg)":"";
 function showBubble(t,ok){bubbleEl.textContent=t;bubbleEl.className="bubble show "+(ok?"ok":"err")}
 const setLeds=m=>leds.forEach(l=>l.className="ledbar"+(m?" "+m:""));
-truckTo(ST.client,true);setGate("closed");setLoad(false);
+setMode(false);moverTo(ST.client,true);setGate("closed");setLoad(false);resetRack();resetFiles();folder.style.visibility="hidden";
 
 // Scale and centre the scene on its real projected bounds (slab plus signs).
 function fit(){
   const v=$("#viewport"),sc=$("#scaler");if(!v.clientWidth)return;
   sc.style.transform="none";
   const vr=v.getBoundingClientRect();let l=1e9,t=1e9,r=-1e9,b=-1e9;
-  [$(".slabbg"),...$$("#floor .sign")].forEach(el=>{const q=el.getBoundingClientRect();l=Math.min(l,q.left);t=Math.min(t,q.top);r=Math.max(r,q.right);b=Math.max(b,q.bottom)});
+  [$(".slabbg"),...$$("#floor .sign")].forEach(el=>{const q=el.getBoundingClientRect();if(!q.width)return;l=Math.min(l,q.left);t=Math.min(t,q.top);r=Math.max(r,q.right);b=Math.max(b,q.bottom)});
   const s=Math.min(vr.width*.94/(r-l),vr.height*.9/(b-t)),sr=sc.getBoundingClientRect();
   const dx=vr.left+vr.width/2-(l+r)/2,dy=vr.top+vr.height/2-(t+b)/2;
   sc.style.transformOrigin=`${(l+r)/2-sr.left}px ${(t+b)/2-sr.top}px`;
@@ -802,10 +845,11 @@ async function play(e,resultP,live){
   const id=++run,alive=()=>id===run;
   if($("#dock").classList.contains("min"))$("#collapse").click();
   const who=live?(session.access?jwtSub(session.access):"a guest"):["a guest","a user","an admin"][persona];
-  const write=e.db==="write";
+  const put=e.db==="write"&&e.id!=="move";   // brings a carton/file in; everything else takes one away
+  const people=e.group==="users"||e.group==="auth";
   $("#now").innerHTML=`<b>${e.method} ${esc(e.path)}</b> ${live?"sent":"simulated"} as ${esc(who)}`;
-  bubbleEl.className="bubble";setGate("closed");turnGuard(false);setLeds("");boxes.forEach(b=>b.classList.remove("on"));raise(0);
-  truckTo(ST.client,true);trail.style.width="0";setLoad(write);
+  bubbleEl.className="bubble";setGate("closed");turnGuard(false);setLeds("");resetRack();resetFiles();raise(0);
+  setMode(people);moverTo(ST.client,true);trail.style.width="0";setLoad(put);
   log(`<span class="${e.method}">${e.method}</span> ${esc(e.path)} (${live?"live":"simulated"}, ${esc(who)})`);
   await sleep(200);if(!alive())return;
 
@@ -827,17 +871,31 @@ async function play(e,resultP,live){
   if(s===400){setLeds("bad");log("API server: the request was rejected. 400 Bad Request.","err")}
   else{
     setLeds("");
+    if(people){
+      await drive(ST.rack-4);if(!alive())return;
+      const slot=put?PUT_FILE:TAKE_FILE;
+      drawer.style.transform="translateY(30px)";await sleep(500);if(!alive())return;
+      for(const st of e.story){log(`File storage: ${esc(st)}.`);files[slot].classList.toggle("on");await sleep(380);if(!alive())return}
+      files[slot].classList.remove("on");
+      if(!ok)log(s===404?"File storage: no such record.":s===409?"File storage: record already exists.":"File storage: failed.","err");
+      else if(put){setLoad(false);showFile(slot,true);log("File storage: filed.","ok")}
+      else{showFile(slot,false);setLoad(true);log("File storage: record pulled.","ok")}
+      await sleep(300);drawer.style.transform="";await sleep(450);if(!alive())return;
+    }else{
     await drive(ST.rack-62);if(!alive())return;
-    raise(write?38:0);await sleep(450);if(!alive())return;
-    for(const st of e.story){log(`Database: ${esc(st)}.`);boxes[(Math.random()*boxes.length)|0].classList.add("on");await sleep(380);if(!alive())return}
+    const slot=put?PUT_SLOT:TAKE_SLOT;
+    raise(38);await sleep(450);if(!alive())return;
+    for(const st of e.story){log(`Database: ${esc(st)}.`);boxes[slot].classList.toggle("on");await sleep(380);if(!alive())return}
+    boxes[slot].classList.remove("on");
     if(!ok)log(s===404?"Database: not found.":s===409?"Database: conflict.":"Database: failed.","err");
-    else if(write){setLoad(false);log("Database: saved.","ok")}
-    else setLoad(true);
-    raise(0);await sleep(400);if(!alive())return;
+    else if(put){setLoad(false);showBox(slot,true);log("Database: saved.","ok")}
+    else{showBox(slot,false);setLoad(true);log(e.id==="move"?"Database: stock moved.":"Database: read.","ok")}
+    await sleep(300);raise(0);await sleep(400);if(!alive())return;
+    }
   }
   setLeds(s===400?"bad":"");showBubble(s,ok);
   await drive(ST.client);if(!alive())return;
-  boxes.forEach(b=>b.classList.remove("on"));setLoad(false);setGate("closed");setLeds("");
+  setGate("closed");setLeds("");
   log(`Back at the dock with ${s}${res.ms?` after ${res.ms} ms`:""}.`,ok?"ok":"err");
   $("#now").innerHTML=`<b>${e.method} ${esc(e.path)}</b> returned ${s}`;
 }

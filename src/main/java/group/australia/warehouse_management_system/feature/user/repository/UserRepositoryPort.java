@@ -1,0 +1,17 @@
+package group.australia.warehouse_management_system.feature.user.repository;
+
+import group.australia.warehouse_management_system.feature.user.domain.User;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface UserRepositoryPort {
+
+    boolean existsByEmail(String email);
+
+    Optional<User> findById(Long id);
+
+    User save(User user);
+
+    List<User> findAll();
+}

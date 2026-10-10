@@ -1,3 +1,9 @@
+app:
+  jwt:
+    secret: dGVzdC1zZWNyZXQta2V5LWZvci10ZXN0aW5nLW9ubHk=
+    access-token-expiration-ms: 900000
+    refresh-token-expiration-ms: 604800000
+
 spring:
   datasource:
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE

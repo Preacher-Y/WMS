@@ -23,7 +23,7 @@ public class SsccEntity {
     @Column(unique = true, nullable = false)
     private String sscc;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "cartonHeaderId")
     private CartonHeaderEntity cartonHeader;
 

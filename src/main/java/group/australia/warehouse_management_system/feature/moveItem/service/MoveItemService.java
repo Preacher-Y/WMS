@@ -7,6 +7,8 @@ import group.australia.warehouse_management_system.feature.item.service.ItemServ
 import group.australia.warehouse_management_system.feature.location.repository.LocationRepositoryAdapter;
 import group.australia.warehouse_management_system.feature.moveItem.dto.RequestMoveItemDto;
 import group.australia.warehouse_management_system.feature.moveItem.exception.MoveItemInsufficientStockException;
+import group.australia.warehouse_management_system.feature.stockHistory.domain.StockAction;
+import group.australia.warehouse_management_system.feature.stockHistory.service.StockHistoryService;
 import group.australia.warehouse_management_system.feature.warehouse.exception.WarehouseNotFoundException;
 import group.australia.warehouse_management_system.feature.warehouse.repository.WarehouseRepositoryPort;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ public class MoveItemService {
     private final WarehouseRepositoryPort warehouseRepository;
     private final LocationRepositoryAdapter locationRepositoryAdapter;
     private final ItemService itemService;
+    private final StockHistoryService historyService;
 
     @Transactional
     public void moveItem(RequestMoveItemDto req) {
@@ -64,5 +67,8 @@ public class MoveItemService {
                     .cartonHeader(sourceItem.getCartonHeader())
                     .build());
         }
+
+        historyService.record(StockAction.MOVE, req.itemNumber(), req.quantity(),
+                req.fromLocationCode(), req.toLocationCode(), req.warehouseNumber(), null);
     }
 }

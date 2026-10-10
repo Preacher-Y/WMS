@@ -11,4 +11,6 @@ public interface WarehouseRepositoryPort {
     Optional<Warehouse> findByWarehouseNumber(String warehouseNumber);
 
     Warehouse save(Warehouse warehouse);
+
+    Optional<Warehouse> findById(Long id);
 }

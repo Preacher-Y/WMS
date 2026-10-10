@@ -4,6 +4,7 @@ import group.australia.warehouse_management_system.common.dtos.ErrorDto;
 import group.australia.warehouse_management_system.common.exceptions.BadRequestException;
 import group.australia.warehouse_management_system.common.exceptions.ConflictException;
 import group.australia.warehouse_management_system.common.exceptions.NotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.jspecify.annotations.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
@@ -57,6 +58,13 @@ public class GlobalExceptionHandler {
     ) {
         return  ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorDto(ex.getMessage()));
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorDto> handleBadCredentialsException(BadCredentialsException ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
                 .body(new ErrorDto(ex.getMessage()));
     }
 

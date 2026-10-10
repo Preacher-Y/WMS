@@ -1,0 +1,7 @@
+# Production (Docker / Render): URL built from DB_HOST, DB_PORT, DB_NAME; TLS required.
+# Set DB_URL instead to point at any other database.
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://${DB_HOST}:${DB_PORT:3306}/${DB_NAME}?sslMode=REQUIRED}
+  jpa:
+    show-sql: false

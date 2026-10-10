@@ -1,0 +1,7 @@
+# Local development: MySQL on your machine, no TLS.
+# DB_URL from .env wins; otherwise localhost:3306/wms.
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/wms?allowPublicKeyRetrieval=true&useSSL=false}
+  jpa:
+    show-sql: true

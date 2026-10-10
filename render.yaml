@@ -1,0 +1,46 @@
+# Render Blueprint: Dashboard -> New -> Blueprint -> pick this repo.
+# Creates the API (Docker) and a private MySQL service with a persistent disk.
+services:
+  - type: web
+    name: wms-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/docs
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: SERVER_PORT
+        value: 8000
+      - key: DB_HOST
+        fromService: { type: pserv, name: wms-mysql, property: host }
+      - key: DB_NAME
+        fromService: { type: pserv, name: wms-mysql, envVarKey: MYSQL_DATABASE }
+      - key: DB_USERNAME
+        fromService: { type: pserv, name: wms-mysql, envVarKey: MYSQL_USER }
+      - key: DB_PASSWORD
+        fromService: { type: pserv, name: wms-mysql, envVarKey: MYSQL_PASSWORD }
+      - key: JWT_SECRET
+        generateValue: true   # random base64 256-bit, what JwtService expects
+
+  - type: pserv
+    name: wms-mysql
+    runtime: image
+    image:
+      url: docker.io/library/mysql:8.4
+    plan: starter            # private services + disks need a paid plan
+    # Data lives in a subfolder: a fresh disk root has lost+found, which MySQL refuses to initialise over.
+    dockerCommand: docker-entrypoint.sh mysqld --datadir=/var/lib/mysql-disk/data
+    disk:
+      name: mysql-data
+      mountPath: /var/lib/mysql-disk
+      sizeGB: 5
+    envVars:
+      - key: MYSQL_DATABASE
+        value: wms
+      - key: MYSQL_USER
+        value: wms
+      - key: MYSQL_PASSWORD
+        generateValue: true
+      - key: MYSQL_ROOT_PASSWORD
+        generateValue: true

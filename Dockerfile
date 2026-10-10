@@ -8,8 +8,12 @@ RUN mvn -q -B package -DskipTests
 
 # ---- run ----
 FROM eclipse-temurin:21-jre
+RUN apt-get update && apt-get install -y --no-install-recommends mariadb-server \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
+COPY docker-entrypoint.sh /entrypoint.sh
+RUN sed -i 's/\r$//' /entrypoint.sh && chmod +x /entrypoint.sh
 ENV SPRING_PROFILES_ACTIVE=prod
 EXPOSE 8000
-ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75", "-jar", "app.jar"]
+ENTRYPOINT ["/entrypoint.sh"]

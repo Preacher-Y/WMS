@@ -20,9 +20,11 @@ The project demonstrates correct business rules, database transactions, concurre
 | Security | Spring Security + JWT (JJWT) | 0.12.6 |
 | Mapping | MapStruct | 1.6.3 |
 | Boilerplate | Lombok | 1.18.48 |
-| API Docs | Springdoc OpenAPI | 3.1.0 |
+| API Docs | Custom interactive docs page (`/api/docs`) | — |
 | Build | Maven | — |
 | Env config | springboot4-dotenv | 5.1.0 |
+| Containers | Docker + Docker Compose | — |
+| Hosting | Render (Blueprint) | — |
 
 ---
 
@@ -33,6 +35,7 @@ The codebase is organized by **feature package** (vertical slice), not by layer.
 ```
 src/main/java/.../
 ├── common/
+│   ├── docs/               # Serves the public /docs page
 │   ├── exceptions/         # Base exception hierarchy (NotFoundException, ConflictException, …)
 │   ├── security/           # JWT filter, SecurityConfig, UserDetailsServiceImpl
 │   └── utils/              # GlobalExceptionHandler
@@ -75,11 +78,37 @@ Unit tests (`ServiceTests`) inject a `InMemory*Repository` — a `HashMap`-backe
 
 ---
 
+## API Docs Page
+
+Open **`http://localhost:{SERVER_PORT}/api/docs`**. No login is needed to view it.
+
+It's a hand-built reference for every endpoint (it replaces Swagger UI, which is disabled):
+
+- **Endpoint reference**: each endpoint has a plain-language description, its parameters and body fields, every response code with an example, and who can call it (**Open**, **Sign-in** or **Admin only**).
+- **Live requests**: *Send* calls the running API. Sign in from the sidebar or the `/auth/login` panel and your token is attached to protected calls automatically. *Copy as cURL* gives you the equivalent command.
+- **Floor view**: an animated 3D warehouse that shows the request's journey. A forklift (or an office clerk, for account endpoints) passes the security gate, which checks the token and role and turns away 401/403. It then goes to the API server and on to the pallet rack (or the filing cabinet), and returns with the status code. Use *Simulate as Guest / User / Admin* to see how each role is treated without calling the server.
+
+The page is a single static file, `src/main/resources/static/docs.html`. Its endpoint list is written by hand, so **update it when you add or change an endpoint**.
+
+---
+
 ## Requirements
 
 - Java 21
 - Maven 3.9+
-- MySQL 8+ (running on port 3306 by default)
+- MySQL 8+ (running on port 3306 by default), **or** Docker
+
+---
+
+## Configuration Profiles
+
+| File | Active when | Database URL | SQL logging |
+|---|---|---|---|
+| `application.yaml` | Always (shared settings) | none here | n/a |
+| `application-dev.yaml` | Default, e.g. running from the IDE | `DB_URL` from `.env`, else `localhost:3306/wms` (no TLS) | On |
+| `application-prod.yaml` | `SPRING_PROFILES_ACTIVE=prod` (set by the Docker image) | Built from `DB_HOST` / `DB_PORT` / `DB_NAME`, TLS required | Off |
+
+In either profile, setting `DB_URL` overrides the default.
 
 ---
 
@@ -117,7 +146,10 @@ DB_URL=jdbc:mysql://localhost:3306/wms_db
 DB_USERNAME=your_mysql_username
 DB_PASSWORD=your_mysql_password
 SERVER_PORT=8080
+JWT_SECRET=<base64-encoded 256-bit key>
 ```
+
+Generate a JWT secret with `openssl rand -base64 32`.
 
 > **Do not commit `.env`** — it is listed in `.gitignore`.
 
@@ -129,8 +161,45 @@ SERVER_PORT=8080
 
 Or open `WarehouseManagementSystemApplication.java` in IntelliJ and use the pre-configured **Run WMS** run configuration (loads `.env` automatically via the dotenv plugin).
 
-The API is available at `http://localhost:{SERVER_PORT}`.  
-Swagger UI: `http://localhost:{SERVER_PORT}/swagger-ui.html`
+The API is served under the `/api` context path: `http://localhost:{SERVER_PORT}/api`.
+Docs page: `http://localhost:{SERVER_PORT}/api/docs`
+
+---
+
+## Running with Docker
+
+`docker-compose.yml` runs MySQL 8.4 with a persistent volume and the API built from the `Dockerfile`, which uses the `prod` profile. It reads `JWT_SECRET` from your `.env`.
+
+```bash
+docker compose up --build
+```
+
+- Docs page: `http://localhost:8000/api/docs`
+- Stop with `docker compose down`. Add `-v` to also delete the database volume.
+- The database user and password default to `wms` / `wms`. Override them with `MYSQL_PASSWORD` and `MYSQL_ROOT_PASSWORD` in `.env`.
+
+---
+
+## Deploying to Render
+
+Render doesn't run docker-compose files. It uses the **Blueprint** in `render.yaml` instead, which creates:
+
+| Service | Type | Plan | Notes |
+|---|---|---|---|
+| `wms-api` | Web service (Docker) | Free | Health check on `/api/docs`; `JWT_SECRET` is generated automatically |
+| `wms-mysql` | Private service (`mysql:8.4`) | Starter (paid) | 5 GB persistent disk; passwords generated automatically |
+
+The app reaches MySQL over Render's private network with TLS. The connection details are passed to it automatically.
+
+1. Push the repository to GitHub or GitLab.
+2. In the Render dashboard, go to **New → Blueprint**, select the repository, and click **Apply**.
+3. When it's live, open `https://<your-service>.onrender.com/api/docs`.
+4. Register your account, then promote it to admin from the **Shell** tab of `wms-mysql`:
+   ```bash
+   mysql -uroot -p"$MYSQL_ROOT_PASSWORD" wms -e "UPDATE users SET role='ADMIN' WHERE email='you@example.com';"
+   ```
+
+> Free web services sleep when idle, so the first request after a pause takes 30–60 seconds. Private services and disks need a paid plan; Render has no free MySQL.
 
 ---
 
@@ -138,19 +207,22 @@ Swagger UI: `http://localhost:{SERVER_PORT}/swagger-ui.html`
 
 | Variable | Description | Example |
 |---|---|---|
-| `DB_URL` | JDBC connection string for MySQL | `jdbc:mysql://localhost:3306/wms_db` |
+| `DB_URL` | Full JDBC URL. Overrides the profile default | `jdbc:mysql://localhost:3306/wms_db` |
+| `DB_HOST` / `DB_PORT` / `DB_NAME` | Used to build the URL in the `prod` profile | `db` / `3306` / `wms` |
 | `DB_USERNAME` | MySQL user | `root` |
 | `DB_PASSWORD` | MySQL password | `secret` |
 | `SERVER_PORT` | Port the server binds to | `8080` |
-
-JWT configuration lives in `src/main/resources/application.yaml` (non-sensitive defaults). Override via environment variables or `application-local.yaml` if needed.
+| `JWT_SECRET` | Base64-encoded HMAC key, at least 256 bits | `openssl rand -base64 32` |
+| `JWT_ACCESS_EXPIRATION_MS` | Access token lifetime (default 15 min) | `900000` |
+| `JWT_REFRESH_EXPIRATION_MS` | Refresh token lifetime (default 7 days) | `604800000` |
+| `SPRING_PROFILES_ACTIVE` | `dev` (default) or `prod` | `prod` |
 
 ---
 
 ## Running Tests
 
 ```bash
-# Full suite (90 tests: unit + integration)
+# Full suite (91 tests: unit + integration)
 ./mvnw test
 
 # Integration tests only
@@ -175,7 +247,11 @@ Tests use an **H2 in-memory database** with `ddl-auto: create-drop` — no MySQL
 
 ## API Reference
 
-All endpoints except the four public ones require a JWT Bearer token:
+> The interactive version of this reference, with live requests, is at **`/api/docs`**.
+
+All paths below are relative to the `/api` context path (for example `POST /auth/login` is `http://localhost:{SERVER_PORT}/api/auth/login`). The move and history controllers have their own `/api` prefix, so their full URLs are `/api/api/move` and `/api/api/history`.
+
+All endpoints except the four public ones (and the docs page) require a JWT Bearer token:
 
 ```
 Authorization: Bearer <accessToken>
@@ -191,7 +267,7 @@ Tokens are obtained from `POST /auth/login`.
 { "email": "user@example.com", "name": "Alice", "password": "secret123" }
 
 // Response 201
-{ "id": 1, "email": "user@example.com", "name": "Alice", "active": true }
+{ "id": 1, "email": "user@example.com", "name": "Alice", "active": true, "role": "USER" }
 ```
 
 #### `POST /auth/login` — Login (public)
@@ -326,7 +402,7 @@ Moves `quantity` units of an item from one location to another within the same w
 
 Errors:
 - `404` — warehouse, source location, destination location, or source item not found
-- `400` — warehouse inactive, source = destination, or insufficient stock (`409` for insufficient stock)
+- `400` — warehouse inactive, source = destination, or insufficient stock
 
 ---
 
@@ -474,11 +550,20 @@ All errors are returned as JSON via `GlobalExceptionHandler`.
 | Concurrent modification (`@Version` conflict) | `409 Conflict` |
 | Business rule violation (inactive warehouse, insufficient stock) | `400 Bad Request` |
 | Invalid credentials | `401 Unauthorized` |
+| Missing or expired token | `401 Unauthorized` |
+| Signed in without the required role | `403 Forbidden` |
 | Missing or malformed request body / field validation | `400 Bad Request` |
 
-Error response shape:
+Error response shapes:
 ```json
-{ "error": "Not Found", "message": "Warehouse with number WH-999 not found" }
+// Business errors (404, 409, 400 rule violations, bad credentials)
+{ "error": "Warehouse WH-009 not found" }
+
+// Field validation (400): one entry per invalid field
+{ "email": "Email must be valid", "name": "Name must be at least 3 characters" }
+
+// Security (401 / 403), written by SecurityConfig
+{ "error": "Unauthorized", "message": "Full authentication is required to access this resource" }
 ```
 
 ---

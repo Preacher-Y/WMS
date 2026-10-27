@@ -3,396 +3,413 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>WMS API reference</title>
+<title>WMS API Reference</title>
 <link rel="icon" type="image/png" href="/api/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
 <style>
 :root{
-  --concrete:#d3d4cf; --slab:#ecede8; --slab2:#f6f6f3; --joint:#bfc1bb;
-  --rack:#16171a; --rack-dk:#0b0b0c; --rack-ink:#111214;
-  --beam:#e8601c; --fork:#f2c200; --ink:#1b1d21; --ink2:#4a4e55; --ink3:#767a80;
-  --ok:#23824f; --err:#c4162a;
-  --hazard:repeating-linear-gradient(-45deg,var(--fork) 0 7px,var(--ink) 7px 14px);
-  --cond:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
-  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
-  --rail:236px; --dock:460px;
+  --bg:#f1f1ee; --panel:#fff; --panel-2:#f7f7f5; --hover:#f2f2ef;
+  --line:#ebebe7; --line-2:#dfdfda;
+  --ink:#121214; --ink-2:#55565c; --ink-3:#8b8c92;
+  --accent:#f59e0b; --accent-2:#e38a00; --accent-ink:#1c1300; --accent-soft:#fff6e3;
+  --ok:#0b8a4c; --ok-soft:#e7f6ee; --err:#d42020; --err-soft:#fdeded;
+  --get:#4f46e5; --get-soft:#eef0ff; --post:#c2570c; --post-soft:#fff0e2; --put:#047857; --put-soft:#e4f5ee;
+  --code:#0f1013;
+  --sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+  --r-lg:18px; --r:12px;
+  --sh-1:0 0 0 1px rgba(18,18,20,.05),0 1px 2px rgba(18,18,20,.04);
+  --sh-2:0 0 0 1px rgba(18,18,20,.05),0 2px 4px rgba(18,18,20,.03),0 12px 32px -12px rgba(18,18,20,.14);
+  --sh-3:0 0 0 1px rgba(18,18,20,.06),0 28px 70px -18px rgba(18,18,20,.32);
+  --side:264px; --dock:500px; --gap:10px;
+  --ease:cubic-bezier(.2,.8,.2,1);
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--concrete);color:var(--ink);font:16px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--sans);letter-spacing:-.005em;-webkit-font-smoothing:antialiased}
 a{color:inherit}
 button,input,textarea{font:inherit;color:inherit}
-code{white-space:nowrap;font-family:var(--mono);font-size:.86em;background:var(--slab2);padding:1px 5px;border-radius:3px;border:1px solid var(--joint)}
-:focus-visible{outline:3px solid var(--beam);outline-offset:2px}
+svg{flex:none}
+code{font-family:var(--mono);font-size:.84em;background:var(--panel-2);padding:1px 6px;border-radius:6px;box-shadow:inset 0 0 0 1px var(--line);white-space:nowrap}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+::selection{background:#ffe2a8}
 
-/* ================= layout ================= */
-.app{display:grid;grid-template-columns:var(--rail) minmax(0,1fr) var(--dock);min-height:100vh}
+/* ================= shell ================= */
+.app{display:grid;grid-template-columns:var(--side) minmax(0,1fr) var(--dock);gap:var(--gap);padding:var(--gap);min-height:100vh}
+.panel{background:var(--panel);border-radius:var(--r-lg);box-shadow:var(--sh-1)}
 
-/* ---------- rail (pallet-rack upright) ---------- */
-.rail{position:sticky;top:0;height:100vh;background:var(--rack);color:#fff;display:flex;flex-direction:column;z-index:30;
-  box-shadow:inset -6px 0 0 var(--rack-dk)}
-.rail::before{content:"";position:absolute;right:14px;top:0;bottom:0;width:8px;opacity:.35;pointer-events:none;
-  background:radial-gradient(circle,#000000 2.2px,transparent 2.6px) 0 0/8px 22px}
-.brand{display:flex;align-items:center;gap:10px;padding:22px 22px 20px;text-decoration:none}
-.brand .brand-mark{width:30px;height:30px;display:grid;grid-template-rows:repeat(3,1fr);gap:3px}
-.brand-mark i{display:block;background:var(--beam);border-radius:1px}
-.brand-mark i:nth-child(2){background:#fff}
-.brand b{font:700 22px/1 var(--cond);letter-spacing:.01em}
-.brand span{display:block;font:500 13px/1.2 var(--body);color:#a9aba6}
-.groups{list-style:none;margin:0;padding:6px 0;flex:1}
-.g{position:relative}
-.g>a{display:flex;align-items:baseline;gap:8px;padding:9px 22px;text-decoration:none;font:600 19px/1.15 var(--cond);color:#e4e4e1;
-  border-left:5px solid transparent}
-.g>a small{margin-left:auto;margin-right:12px;font:500 13px var(--body);color:#80827d}
-.g:hover>a,.g:focus-within>a{background:var(--rack-dk);color:#fff}
-.g.active>a{border-left-color:var(--beam);color:#fff}
-.fly{position:absolute;left:100%;top:-6px;padding-left:10px;display:none;z-index:40}
-.g:hover .fly,.g:focus-within .fly{display:block}
-.fly-in{width:340px;background:var(--slab2);color:var(--ink);border-radius:4px;box-shadow:0 18px 40px rgba(0,0,0,.28),0 0 0 1px var(--joint);padding:8px;
-  border-top:5px solid var(--beam)}
-.fly-in p{margin:4px 8px 8px;font-size:13.5px;color:var(--ink2)}
-.fly a{display:grid;grid-template-columns:52px 1fr 12px;column-gap:10px;align-items:center;padding:7px 8px;border-radius:3px;text-decoration:none;font-size:14.5px}
-.fly a:hover,.fly a:focus{background:#e3e5df;outline:none}
-.fly a .p{grid-column:2;font:12px var(--mono);color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fly a .mth{grid-row:1/span 2}
-.fly a .ac{grid-row:1/span 2;grid-column:3}
-.session{padding:16px 22px 22px;border-top:1px solid rgba(255,255,255,.14);font-size:14px}
-.session .who{color:#a9aba6;margin-bottom:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.session .who b{color:#fff;font-weight:600}
+/* ---------- sidebar ---------- */
+.side{position:sticky;top:var(--gap);height:calc(100vh - 2*var(--gap));display:flex;flex-direction:column;overflow:hidden;z-index:30}
+.brand{display:flex;align-items:center;gap:11px;padding:18px 18px 12px;text-decoration:none}
+.logo{width:30px;height:30px;border-radius:9px;background:var(--ink);display:grid;place-items:center}
+.brand b{display:block;font:650 15px/1.1 var(--sans);letter-spacing:-.02em}
+.brand span span{display:block;font-size:12px;color:var(--ink-3);line-height:1.3}
+.nav{flex:1;overflow:auto;padding:2px 10px 10px;scrollbar-width:thin}
+.nav-label{font:500 11px/1 var(--sans);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);padding:16px 8px 8px}
+.nav ul{list-style:none;margin:0;padding:0}
+.item{display:flex;align-items:center;gap:10px;padding:7px 9px;border-radius:9px;text-decoration:none;font:500 13.5px/1.3 var(--sans);color:var(--ink-2);transition:background .15s,color .15s}
+.item svg{color:var(--ink-3)}
+.item small{margin-left:auto;font:500 11.5px var(--mono);color:var(--ink-3)}
+.item:hover{background:var(--hover);color:var(--ink)}
+.g.active>.item{background:var(--panel-2);color:var(--ink);box-shadow:var(--sh-1)}
+.g.active>.item svg{color:var(--ink)}
+.sub{display:none;margin:4px 0 8px 17px;padding-left:9px;border-left:1px solid var(--line)}
+.g.active .sub{display:block}
+.sub a{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:7px;font-size:12.5px;color:var(--ink-2);text-decoration:none;white-space:nowrap;overflow:hidden}
+.sub a span:last-child{overflow:hidden;text-overflow:ellipsis}
+.sub a:hover{background:var(--hover);color:var(--ink)}
+.sub .m{font:600 9.5px var(--mono);width:30px;flex:none;letter-spacing:.02em}
+.m.GET{color:var(--get)}.m.POST{color:var(--post)}.m.PUT{color:var(--put)}
+.session{margin:10px;padding:12px;border-radius:14px;background:var(--panel-2);box-shadow:inset 0 0 0 1px var(--line)}
+.who{display:flex;align-items:center;gap:10px;margin-bottom:10px;min-width:0}
+.avatar{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;flex:none;font:600 13px var(--sans);background:var(--line);color:var(--ink-2)}
+.avatar.on{background:var(--accent);color:var(--accent-ink)}
+.who div{min-width:0}
+.who b{display:block;font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.who div span{display:block;font-size:12px;color:var(--ink-3)}
 
-/* ---------- method + access marks ---------- */
-.mth{font:600 12px/1 var(--mono);text-align:center;padding:5px 0;border-radius:3px;width:52px;color:#fff}
-.mth.GET{background:var(--rack)}
-.mth.POST{background:var(--beam)}
-.mth.PUT{background:var(--fork);color:var(--ink)}
-.ac{display:inline-flex;align-items:center;font:600 14px/1 var(--cond);letter-spacing:.02em;padding:4px 8px;border-radius:3px;white-space:nowrap}
-.ac.public{border:1.5px solid var(--ink3);color:var(--ink2);padding:2.5px 7px}
-.ac.user{background:var(--rack);color:#fff}
-.ac.admin{background:var(--hazard);padding:3px}
-.ac.admin span{background:var(--fork);color:var(--ink);padding:2px 6px;border-radius:2px}
-.ac.dot{width:11px;height:11px;padding:0;border-radius:2px}
-.ac.dot.public{border:1.5px solid var(--ink3)}
+/* ---------- badges ---------- */
+.mth{display:inline-block;font:600 11px/1 var(--mono);letter-spacing:.02em;text-align:center;padding:6px 0;border-radius:7px;width:52px}
+.mth.GET{background:var(--get-soft);color:var(--get)}
+.mth.POST{background:var(--post-soft);color:var(--post)}
+.mth.PUT{background:var(--put-soft);color:var(--put)}
+.ac{display:inline-flex;align-items:center;gap:5px;font:500 12px/1 var(--sans);padding:5px 9px;border-radius:999px;white-space:nowrap}
+.ac.public{box-shadow:inset 0 0 0 1px var(--line-2);color:var(--ink-2)}
+.ac.user{background:var(--panel-2);box-shadow:inset 0 0 0 1px var(--line);color:var(--ink)}
+.ac.admin{background:var(--ink);color:#fff}
+.ac.admin svg{color:var(--accent)}
 
-/* ---------- buttons ---------- */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:4px;border:2px solid var(--rack);background:transparent;
-  color:var(--rack);font:600 15px var(--body);cursor:pointer}
-.btn:hover{background:#e2e3de}
-.btn.go{background:var(--beam);border-color:var(--beam);color:#fff}
-.btn.go:hover{background:#cf5212;border-color:#cf5212}
-.btn.light{border-color:#fff;color:#fff}
-.btn.light:hover{background:rgba(255,255,255,.12)}
-.btn.text{border-color:transparent;color:var(--ink2);padding-inline:8px}
-.btn.text:hover{background:transparent;color:var(--ink);text-decoration:underline}
-.btn:disabled{opacity:.55;cursor:wait}
+/* ---------- buttons + segmented ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:34px;padding:0 14px;border-radius:10px;border:0;background:var(--panel);color:var(--ink);
+  font:500 13.5px var(--sans);cursor:pointer;white-space:nowrap;box-shadow:0 0 0 1px var(--line-2),0 1px 2px rgba(18,18,20,.05);transition:background .15s,box-shadow .15s,transform .1s}
+.btn:hover{background:var(--panel-2)}
+.btn:active{transform:translateY(1px)}
+.btn.go{background:var(--accent);color:var(--accent-ink);box-shadow:inset 0 -1px 0 rgba(0,0,0,.14),0 1px 2px rgba(180,110,0,.25)}
+.btn.go:hover{background:var(--accent-2)}
+.btn.dark{background:var(--ink);color:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.btn.dark:hover{background:#2a2a2e}
+.btn.ghost{background:transparent;box-shadow:none;color:var(--ink-2)}
+.btn.ghost:hover{background:var(--hover);color:var(--ink)}
+.btn.wide{width:100%}
+.btn.icon{width:34px;padding:0}
+.btn:disabled{opacity:.6;cursor:progress}
+.seg{display:inline-flex;padding:3px;gap:2px;border-radius:11px;background:var(--panel-2);box-shadow:inset 0 0 0 1px var(--line)}
+.seg button{border:0;background:transparent;padding:5px 11px;border-radius:8px;font:500 13px/1.4 var(--sans);color:var(--ink-2);cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;transition:background .15s,color .15s,box-shadow .15s}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed=true]{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(18,18,20,.08),0 0 0 1px rgba(18,18,20,.05)}
+.seg.sm button{padding:4px 9px;font-size:12.5px}
 
 /* ---------- main ---------- */
-main{min-width:0;padding:0 40px 120px}
-.toolbar{position:sticky;top:0;z-index:20;display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:14px 0;background:var(--concrete);border-bottom:2px solid var(--joint)}
-.search{flex:1;min-width:180px;padding:9px 12px;border:2px solid var(--joint);border-radius:4px;background:var(--slab2)}
-.search:focus{border-color:var(--rack);outline:none}
-.seg{display:flex;border:2px solid var(--joint);border-radius:4px;overflow:hidden;background:var(--slab2)}
-.seg button{border:0;background:transparent;padding:7px 12px;font:600 15px var(--cond);cursor:pointer;color:var(--ink2)}
-.seg button+button{border-left:2px solid var(--joint)}
-.seg button[aria-pressed=true]{background:var(--ink);color:#fff}
+main{min-width:0;padding:0 14px 140px}
+.toolbar{position:sticky;top:var(--gap);z-index:20;display:flex;gap:8px;align-items:center;padding:6px;border-radius:15px;
+  background:rgba(255,255,255,.82);backdrop-filter:blur(18px) saturate(1.6);-webkit-backdrop-filter:blur(18px) saturate(1.6);box-shadow:var(--sh-2)}
+.search{position:relative;flex:1;min-width:140px}
+.search svg{position:absolute;left:11px;top:50%;translate:0 -50%;color:var(--ink-3);pointer-events:none}
+.search input{width:100%;height:34px;padding:0 40px 0 34px;border:0;border-radius:10px;background:var(--panel-2);box-shadow:inset 0 0 0 1px var(--line);font-size:13.5px;transition:box-shadow .15s,background .15s}
+.search input:focus{outline:none;background:#fff;box-shadow:inset 0 0 0 1px var(--accent),0 0 0 4px rgba(245,158,11,.14)}
+.search kbd{position:absolute;right:8px;top:50%;translate:0 -50%;font:500 11px var(--mono);color:var(--ink-3);padding:2px 7px;border-radius:6px;background:#fff;box-shadow:0 0 0 1px var(--line-2)}
 .menu-btn{display:none}
 
-.intro{max-width:760px;padding:44px 0 8px}
-.intro h1{font:700 52px/1 var(--cond);letter-spacing:-.01em;margin:0 0 14px}
-.intro p{font-size:18px;color:var(--ink2);margin:0 0 12px}
-.base{font-family:var(--mono);font-size:14px;background:var(--slab2);border:1px solid var(--joint);padding:2px 7px;border-radius:3px;color:var(--ink)}
+.hero{max-width:860px;padding:64px 8px 8px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:5px 11px 5px 9px;border-radius:999px;background:var(--panel);box-shadow:var(--sh-1);font:500 12.5px var(--sans);color:var(--ink-2)}
+.pulse{width:7px;height:7px;border-radius:50%;background:#16a34a;box-shadow:0 0 0 0 rgba(22,163,74,.5);animation:pulse 2.2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 7px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}}
+.hero h1{font:650 clamp(34px,4.4vw,52px)/1.03 var(--sans);letter-spacing:-.04em;margin:22px 0 16px}
+.hero h1 span{color:var(--ink-3)}
+.hero p{font-size:17px;line-height:1.65;color:var(--ink-2);margin:0;max-width:62ch}
+.hero-row{display:flex;flex-wrap:wrap;align-items:center;gap:14px 28px;margin-top:28px}
+.base{display:inline-flex;align-items:center;gap:10px;height:40px;padding:0 6px 0 14px;border-radius:12px;background:var(--panel);box-shadow:var(--sh-1);font:500 13px var(--mono);max-width:100%}
+.base small{font:500 11px var(--sans);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3)}
+.base span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.base .btn{height:28px;width:28px;border-radius:8px}
+.stats{display:flex;gap:28px}
+.stats div{font-size:12.5px;color:var(--ink-3);line-height:1.3}
+.stats b{display:block;font:600 22px/1.1 var(--sans);letter-spacing:-.03em;color:var(--ink)}
 
-.basics{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:36px;margin:32px 0 8px;max-width:1000px}
-.basics h3{font:700 24px/1.1 var(--cond);margin:0 0 12px}
-.basics ol{margin:0;padding-left:22px}
-.basics li{margin-bottom:8px;color:var(--ink2)}
-.basics li::marker{font:700 17px var(--cond);color:var(--beam)}
-.codes{width:100%;border-collapse:collapse;font-size:15px}
-.codes td{padding:7px 0;border-bottom:1px solid var(--joint);vertical-align:top;color:var(--ink2)}
-.codes td:first-child{font:600 15px var(--mono);color:var(--ink);width:56px}
-.levels{display:flex;flex-direction:column;gap:10px;margin-top:18px}
-.levels div{display:flex;gap:12px;align-items:center;color:var(--ink2);font-size:15px}
-.levels .ac{width:100px;justify-content:center}
-.levels .ac.admin span{width:100%;text-align:center}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--gap);margin-top:44px;scroll-margin-top:80px}
+.card{padding:22px 22px 18px}
+.card h3{display:flex;align-items:center;gap:10px;font:600 15px var(--sans);letter-spacing:-.01em;margin:0 0 16px}
+.tile{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--panel-2);box-shadow:inset 0 0 0 1px var(--line);color:var(--ink-2)}
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{counter-increment:s;position:relative;padding:0 0 14px 36px;color:var(--ink-2);font-size:14px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:600 11.5px var(--mono);background:var(--panel-2);box-shadow:inset 0 0 0 1px var(--line-2);color:var(--ink)}
+.steps li:not(:last-child)::after{content:"";position:absolute;left:11.5px;top:28px;bottom:4px;width:1px;background:var(--line-2)}
+.levels{display:grid;gap:8px;margin-top:6px;padding-top:14px;border-top:1px solid var(--line)}
+.levels div{display:flex;gap:12px;align-items:center;color:var(--ink-2);font-size:13.5px}
+.levels .ac{min-width:96px;justify-content:center}
+.codes{width:100%;border-collapse:collapse;font-size:13.5px}
+.codes td{padding:10px 0;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-2)}
+.codes tr:last-child td{border-bottom:0}
+.codes td:first-child{width:62px}
+.code{display:inline-block;font:600 12px var(--mono);padding:3px 7px;border-radius:6px;background:var(--err-soft);color:var(--err)}
 
-/* lifecycle as a taped route on the floor */
-.route{margin:44px 0 0;max-width:1000px}
-.route h3{font:700 24px var(--cond);margin:0 0 4px}
-.route>p{margin:0 0 16px;color:var(--ink2)}
-.route ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;counter-reset:r}
-.route li{counter-increment:r;flex:1 1 120px;padding:12px 12px 12px;border-top:6px solid var(--fork);background:var(--slab)}
-.route li+li{border-left:2px dashed var(--joint)}
-.route li::before{content:counter(r);font:700 30px/1 var(--cond);color:var(--rack);display:block;margin-bottom:4px}
-.route a{font:600 18px/1.15 var(--cond);text-decoration:none;display:block}
-.route a:hover{color:var(--beam)}
-.route span{font-size:13.5px;color:var(--ink3);display:block;margin-top:2px}
+.route{margin-top:var(--gap);padding:22px;scroll-margin-top:80px}
+.route>p{margin:-8px 0 18px;color:var(--ink-2);font-size:14px}
+.route ol{list-style:none;margin:0;padding:0 0 4px;display:grid;grid-template-columns:repeat(7,minmax(118px,1fr));gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;counter-reset:r}
+.route li{counter-increment:r;scroll-snap-align:start;position:relative}
+.route li:not(:last-child)::after{content:"";position:absolute;top:26px;right:-8px;width:8px;height:1px;background:var(--line-2)}
+.route a{display:block;height:100%;padding:12px 12px 14px;border-radius:13px;background:var(--panel-2);box-shadow:inset 0 0 0 1px var(--line);text-decoration:none;transition:background .2s,box-shadow .2s,transform .2s var(--ease)}
+.route a::before{content:counter(r,decimal-leading-zero);display:block;font:500 11.5px var(--mono);color:var(--ink-3);margin-bottom:14px}
+.route a:hover{background:#fff;box-shadow:var(--sh-2);transform:translateY(-2px)}
+.route b{display:block;font:600 13.5px/1.3 var(--sans);letter-spacing:-.01em}
+.route span{display:block;font-size:12px;color:var(--ink-3);margin-top:3px}
 
-.section{padding-top:56px;scroll-margin-top:60px}
-.section h2{font:700 36px/1 var(--cond);margin:0 0 8px}
-.section>p{color:var(--ink2);margin:0 0 18px;max-width:68ch}
-.bay{background:var(--slab);border-radius:4px;box-shadow:0 0 0 1px var(--joint)}
+.section{padding-top:52px;scroll-margin-top:70px}
+.sec-head{display:flex;gap:14px;align-items:flex-start;margin:0 0 16px;padding:0 6px}
+.sec-head .tile{width:38px;height:38px;border-radius:11px;background:var(--panel);box-shadow:var(--sh-1);color:var(--ink)}
+.sec-head h2{font:600 22px/1.2 var(--sans);letter-spacing:-.025em;margin:2px 0 4px}
+.sec-head p{margin:0;color:var(--ink-2);font-size:14px;max-width:70ch}
+.bay{overflow:clip}
 
 /* endpoint row */
-.ep{border-top:1px solid var(--joint);scroll-margin-top:72px}
+.ep{border-top:1px solid var(--line);scroll-margin-top:76px}
 .ep:first-child{border-top:0}
-.ep-head{display:grid;grid-template-columns:52px minmax(0,auto) 1fr auto 14px;gap:14px;align-items:center;width:100%;padding:14px 18px;border:0;background:transparent;text-align:left;cursor:pointer}
-.ep-head:hover{background:var(--slab2)}
-.path{font:500 15px var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.path i{font-style:normal;color:var(--beam)}
-.ttl{color:var(--ink2);font-size:15px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chev{transition:transform .2s;color:var(--ink3)}
+.ep-head{display:grid;grid-template-columns:52px minmax(0,auto) 1fr auto 16px;gap:14px;align-items:center;width:100%;padding:13px 16px;border:0;background:transparent;text-align:left;cursor:pointer;transition:background .15s}
+.ep-head:hover{background:var(--panel-2)}
+.path{font:500 13.5px var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.path i{font-style:normal;color:var(--accent-2)}
+.ttl{color:var(--ink-3);font-size:13.5px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chev{transition:transform .25s var(--ease);color:var(--ink-3)}
 .ep.open .chev{transform:rotate(90deg)}
-.ep.open,.ep.open .ep-head{background:var(--slab2)}
-.ep-body{display:none;padding:6px 18px 26px 84px;gap:28px;grid-template-columns:minmax(0,1fr)}
-.ep.open .ep-body{display:grid}
+.ep-body{display:none;padding:4px 18px 26px 82px;gap:24px;grid-template-columns:minmax(0,1fr)}
+.ep.open .ep-body{display:grid;animation:reveal .3s var(--ease)}
+@keyframes reveal{from{opacity:0;transform:translateY(-4px)}}
 @media (min-width:1760px){.ep-body{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.ep-body>.try{position:sticky;top:76px;align-self:start}}
-.ep-body h4{font:700 19px/1.1 var(--cond);margin:22px 0 8px}
-.ep-body h4:first-child{margin-top:4px}
-.desc{color:var(--ink2);font-size:15.5px;max-width:68ch}
+.ep-body h4{font:600 11.5px/1 var(--sans);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin:26px 0 10px}
+.ep-body>div>h4:first-child{margin-top:10px}
+.desc{color:var(--ink-2);font-size:14.5px;max-width:68ch}
 .desc p{margin:0 0 10px}
-.note{border-left:5px solid var(--fork);background:#fbf3cf;padding:9px 12px;margin:12px 0;font-size:14.5px;color:#4a3e00;border-radius:0 3px 3px 0;max-width:68ch}
-.note.info{border-left-color:var(--rack);background:#e6e6e2;color:var(--rack-ink)}
-table.fields{width:100%;border-collapse:collapse;font-size:14.5px}
-table.fields td{padding:8px 10px 8px 0;border-bottom:1px solid var(--joint);vertical-align:top}
-table.fields td:first-child{font:500 13.5px var(--mono);white-space:nowrap}
-table.fields .req{display:block;font:600 12px var(--body);color:var(--beam)}
-table.fields .ty{font:13px var(--mono);color:var(--ink3);white-space:nowrap}
-table.fields .ds{color:var(--ink2)}
-.tabs{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
-.tabs button{font:600 13px var(--mono);padding:4px 10px;border:1.5px solid var(--joint);border-radius:3px;background:transparent;cursor:pointer}
-.tabs button.c2{color:var(--ok)}.tabs button.c4{color:var(--err)}
-.tabs button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
-.resp-desc{font-size:14.5px;color:var(--ink2);margin-bottom:8px}
-pre{margin:0;padding:14px 16px;border-radius:4px;background:var(--rack-ink);color:#e4e4e1;overflow:auto;font:13px/1.6 var(--mono);max-height:360px}
-.j-k{color:#f2c200}.j-s{color:#c3e88d}.j-n{color:#ffb070}.j-b{color:#ff9eb5}
+.note{display:flex;gap:10px;padding:11px 13px;margin:12px 0;border-radius:11px;font-size:13.5px;max-width:68ch;background:var(--accent-soft);color:#734400;box-shadow:inset 0 0 0 1px #fbe2b0}
+.note svg{margin-top:2px}
+.note.info{background:var(--panel-2);color:var(--ink-2);box-shadow:inset 0 0 0 1px var(--line)}
+table.fields{width:100%;border-collapse:collapse;font-size:13.5px}
+table.fields td{padding:10px 12px 10px 0;border-bottom:1px solid var(--line);vertical-align:top}
+table.fields tr:last-child td{border-bottom:0}
+table.fields td:first-child{font:500 13px var(--mono);white-space:nowrap}
+table.fields .req{display:block;font:500 11px var(--sans);color:var(--accent-2);margin-top:2px}
+table.fields .ty{font:12.5px var(--mono);color:var(--ink-3);white-space:nowrap}
+table.fields .ds{color:var(--ink-2)}
+.tabs{margin-bottom:10px;flex-wrap:wrap}
+.tabs i{width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.tabs .c4 i,.tabs .c5 i{background:var(--err)}
+.tabs button{font-family:var(--mono);font-size:12px}
+.resp-desc{font-size:13.5px;color:var(--ink-2);margin-bottom:8px}
+pre{margin:0;padding:16px 18px;border-radius:13px;background:var(--code);color:#e6e6e2;overflow:auto;font:12.5px/1.7 var(--mono);max-height:380px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.2)}
+.j-k{color:#f7c56b}.j-s{color:#a6dba0}.j-n{color:#ff9f7a}.j-b{color:#c6a8ff}
 
-.try{background:var(--slab);border-radius:4px;padding:16px;box-shadow:0 0 0 1px var(--joint)}
-.try h4{margin-top:0!important}
-.try label{display:block;font-size:13.5px;font-weight:600;margin:0 0 4px;color:var(--ink2)}
-.try label em{font-style:normal;font-weight:400;color:var(--ink3)}
-.try input,.try textarea{width:100%;padding:8px 10px;border:2px solid var(--joint);border-radius:4px;background:#fff;font:13.5px/1.5 var(--mono)}
-.try input:focus,.try textarea:focus{outline:none;border-color:var(--rack)}
-.try textarea{min-height:190px;resize:vertical}
-.try .row{margin-bottom:12px}
+.try{padding:18px;border-radius:15px;background:var(--panel-2);box-shadow:inset 0 0 0 1px var(--line)}
+.try h4{display:flex;align-items:center;gap:8px;margin-top:0!important}
+.try label{display:block;font-size:12.5px;font-weight:500;margin:0 0 6px;color:var(--ink)}
+.try label em{font-style:normal;color:var(--ink-3);font-family:var(--mono);font-size:11.5px;margin-left:4px}
+.field{width:100%;padding:9px 12px;border:0;border-radius:10px;background:#fff;box-shadow:inset 0 0 0 1px var(--line-2);font:13px/1.55 var(--mono);transition:box-shadow .15s}
+.field:focus{outline:none;box-shadow:inset 0 0 0 1px var(--accent),0 0 0 4px rgba(245,158,11,.14)}
+textarea.field{min-height:180px;resize:vertical}
+.try .row{margin-bottom:14px}
 .try .actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.try .hint{font-size:13.5px;color:var(--ink3)}
-.result{margin-top:14px}
-.result .meta{display:flex;gap:10px;align-items:center;margin-bottom:6px;font-size:14px;color:var(--ink3)}
-.pill{font:600 13px var(--mono);padding:3px 8px;border-radius:3px;color:#fff}
-.pill.ok{background:var(--ok)}.pill.err{background:var(--err)}
+.try .hint{font-size:12.5px;color:var(--ink-3)}
+.result{margin-top:16px}
+.result .meta{display:flex;gap:10px;align-items:center;margin-bottom:8px;font:12.5px var(--mono);color:var(--ink-3)}
+.pill{font:600 12px var(--mono);padding:4px 9px;border-radius:7px}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.err{background:var(--err-soft);color:var(--err)}
 .curl{position:relative}
-.copy{position:absolute;right:8px;top:8px;border:1px solid #55575c;background:#2a2c30;color:#fff;border-radius:3px;font-size:12px;padding:3px 8px;cursor:pointer}
-.empty{padding:28px;text-align:center;color:var(--ink2)}
+.copy{position:absolute;right:10px;top:10px;border:0;background:rgba(255,255,255,.08);color:#fff;border-radius:7px;font:500 12px var(--sans);padding:5px 10px;cursor:pointer}
+.copy:hover{background:rgba(255,255,255,.16)}
+.empty{padding:40px;text-align:center;color:var(--ink-2)}
 
 /* ================= floor view dock ================= */
-.dock{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;background:var(--rack-ink);color:#e4e4e1;z-index:25}
-.dock-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid #2a2c30}
-.dock-head h2{font:700 22px var(--cond);margin:0;color:#fff;white-space:nowrap}
+.dock{position:sticky;top:var(--gap);height:calc(100vh - 2*var(--gap));display:flex;flex-direction:column;overflow:hidden;z-index:25}
+.dock-head{display:flex;align-items:center;gap:10px;padding:12px 12px 10px 16px}
+.dock-head h2{display:flex;align-items:center;gap:8px;font:600 14px var(--sans);letter-spacing:-.01em;margin:0;white-space:nowrap}
 .dock-head .sp{flex:1}
-.persona{display:flex;align-items:center;gap:8px;font-size:13px;color:#80827d}
-.persona div{display:flex;border:1.5px solid #44464b;border-radius:4px;overflow:hidden}
-.persona button{border:0;background:transparent;color:#a9aba6;padding:4px 10px;font:600 14px var(--cond);cursor:pointer}
-.persona button+button{border-left:1.5px solid #44464b}
-.persona button[aria-pressed=true]{background:#fff;color:var(--rack-ink)}
-.collapse{display:none;border:0;background:transparent;color:#fff;font:600 14px var(--body);cursor:pointer;padding:4px 6px}
-.now{padding:10px 16px;font:500 14.5px var(--body);color:#a9aba6;border-bottom:1px solid #2a2c30;min-height:44px}
-.now b{color:#fff;font-family:var(--mono);font-weight:500;font-size:13px}
-.viewport{position:relative;flex:1;min-height:200px;overflow:hidden;background:radial-gradient(90% 80% at 50% 45%,#26282c,var(--rack-ink) 75%)}
-.scaler{position:absolute;left:50%;top:50%;width:720px;height:420px;margin:-210px 0 0 -360px;transform-origin:50% 50%}
-.world{position:absolute;left:80px;top:40px;width:560px;height:340px;transform-style:preserve-3d;transform:rotateX(58deg) rotateZ(-45deg) translate(10px,-10px)}
-.floor{position:absolute;inset:0;transform-style:preserve-3d}
-.slabbg{position:absolute;left:0;right:0;top:150px;bottom:20px;border-radius:3px;
-  background:linear-gradient(var(--joint) 1.5px,transparent 1.5px) 0 0/112px 113px,linear-gradient(90deg,var(--joint) 1.5px,transparent 1.5px) 0 0/112px 113px,#cdcec9;
-  box-shadow:0 0 0 6px #b4b6b0,0 50px 80px rgba(0,0,0,.45)}
-.tape{position:absolute;left:24px;right:24px;height:4px;background:var(--fork)}
-.trail{position:absolute;left:24px;top:252px;height:38px;width:0;background:rgba(232,96,28,.22);transition:width .9s cubic-bezier(.65,0,.35,1)}
-.hz{position:absolute;background:var(--hazard)}
-.obj,.cube,.lift{position:absolute;transform-style:preserve-3d}
-.cube>.f{position:absolute;left:0;top:0;backface-visibility:hidden}
-.bill{position:absolute;transform-style:preserve-3d;pointer-events:none}
-.bill>div{transform:rotateZ(45deg) rotateX(-58deg);transform-origin:50% 100%;white-space:nowrap}
-.sign{font:700 14px/1 var(--cond);letter-spacing:.02em;padding:4px 8px;background:var(--fork);color:var(--ink);border:2px solid var(--ink);border-radius:2px;translate:-50% 0}
-.bubble{font:600 16px/1 var(--mono);padding:5px 9px;border-radius:3px;background:#fff;color:var(--ink);translate:-50% 0;opacity:0;transition:opacity .2s}
-.bubble.show{opacity:1}
-.bubble.ok{background:var(--ok);color:#fff}.bubble.err{background:var(--err);color:#fff}
-#truck,#clerk{transition:transform .9s cubic-bezier(.65,0,.35,1)}
-#truck .bob,#clerk .bob{position:absolute;transform-style:preserve-3d}
-#clerk.moving .bob{animation:step .225s ease-in-out infinite}
-@keyframes step{50%{transform:translateZ(1.5px)}}
-.leg{transform-origin:4.5px 0 14px}
-#clerk.moving .leg{animation:stride .45s ease-in-out infinite}
-#clerk.moving .leg.b{animation-delay:-.225s}
-@keyframes stride{0%,100%{transform:rotateY(24deg)}50%{transform:rotateY(-24deg)}}
-#drawer{transition:transform .45s ease}
-#truck.moving .bob{animation:rumble .18s linear infinite}
-@keyframes rumble{50%{transform:translateZ(1px)}}
-.lift{left:0;top:0;transition:transform .5s ease}
-#guard{transition:transform .35s ease;transform-origin:4px 3px}
-#arm{transform-origin:50% 0;transition:transform .5s cubic-bezier(.5,1.5,.5,1)}
-#arm.open{transform:translateZ(36px) rotateX(80deg)!important}
-.box.on .f{filter:brightness(1.25) saturate(1.4)}
-.leds{position:absolute;transform-style:preserve-3d}
-.ledbar{position:absolute;width:6px;height:4px;border-radius:1px;background:#2a5a3a}
-.ledbar.run{background:#5fe08a;animation:led .22s steps(2) infinite}
-.ledbar.bad{background:#ff5a6a}
-@keyframes led{50%{opacity:.25}}
+.collapse{display:none}
+.dock-sub{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px 10px 16px}
+.now{font-size:12.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.now b{color:var(--ink);font:500 12px var(--mono)}
+.viewport{position:relative;flex:1;min-height:220px;margin:0 10px;border-radius:14px;overflow:hidden;background:#eceeec;box-shadow:inset 0 0 0 1px var(--line)}
+.viewport canvas{position:absolute;inset:0;display:block;cursor:grab;touch-action:none}
+.viewport canvas:active{cursor:grabbing}
+.labels{position:absolute!important;inset:0;pointer-events:none}
+.vp-msg{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-3);font-size:13px}
+.vp-legend{position:absolute;right:10px;bottom:10px;z-index:2;display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;pointer-events:none}
+.vp-legend span,.vp-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.88);backdrop-filter:blur(8px);box-shadow:var(--sh-1);font:500 11.5px var(--sans);color:var(--ink-2)}
+.vp-legend i{width:8px;height:8px;border-radius:2px;background:var(--c)}
+.vp-tag{position:absolute;left:10px;top:10px;z-index:2;pointer-events:none}
+.lbl{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 8px;border-radius:999px;background:rgba(255,255,255,.94);box-shadow:var(--sh-2);font:500 11.5px var(--sans);color:var(--ink);white-space:nowrap}
+.lbl i{width:7px;height:7px;border-radius:2px}
+.bub{font:600 13px/1 var(--mono);padding:6px 10px;border-radius:9px;box-shadow:var(--sh-2);opacity:0;transform:translateY(6px) scale(.9);transition:opacity .25s,transform .35s var(--ease)}
+.bub.show{opacity:1;transform:none}
+.bub.ok{background:#fff;color:var(--ok)}.bub.err{background:var(--err);color:#fff}
+.log{height:200px;overflow:auto;padding:12px 16px 14px;font:12px/1.8 var(--mono);color:var(--ink-2);scrollbar-width:thin}
+.log p{margin:0;display:flex;gap:10px}
+.log .t{color:var(--ink-3);flex:none}
+.log .ok{color:var(--ok)}.log .err{color:var(--err)}.log .hi{color:var(--accent-2)}
+.log .GET{color:var(--get)}.log .POST{color:var(--post)}.log .PUT{color:var(--put)}
 
-.log{height:200px;overflow:auto;padding:10px 16px;border-top:1px solid #2a2c30;font:12.5px/1.75 var(--mono);color:#b8bab4;background:#0b0b0c}
-.log p{margin:0}
-.log .t{color:#6c6e69;margin-right:8px}
-.log .ok{color:#7be0a0}.log .err{color:#ff8592}.log .hi{color:var(--fork)}
-.log .GET{color:#e4e4e1}.log .POST{color:#ffa06b}.log .PUT{color:var(--fork)}
-
-dialog{border:0;border-radius:4px;padding:0;width:min(420px,calc(100vw - 32px));box-shadow:0 30px 80px rgba(0,0,0,.35);border-top:6px solid var(--beam)}
-dialog::backdrop{background:rgba(0,0,0,.55)}
-.modal{padding:24px;background:var(--slab2)}
-.modal h3{font:700 30px var(--cond);margin:0 0 4px}
-.modal p{margin:0 0 16px;color:var(--ink2);font-size:15px}
-.modal label{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
-.modal input{width:100%;padding:9px 11px;border:2px solid var(--joint);border-radius:4px;background:#fff;margin-bottom:12px}
-.modal input:focus{outline:none;border-color:var(--rack)}
-.modal .err{color:var(--err);font-size:14px;min-height:20px;margin-bottom:6px}
+dialog{border:0;border-radius:20px;padding:0;width:min(400px,calc(100vw - 32px));box-shadow:var(--sh-3);background:var(--panel)}
+dialog[open]{animation:pop .3s var(--ease)}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}}
+dialog::backdrop{background:rgba(18,18,20,.32);backdrop-filter:blur(6px)}
+.modal{padding:26px}
+.modal .logo{margin-bottom:18px}
+.modal h3{font:600 20px var(--sans);letter-spacing:-.025em;margin:0 0 6px}
+.modal p{margin:0 0 20px;color:var(--ink-2);font-size:14px}
+.modal label{display:block;font-weight:500;font-size:13px;margin-bottom:6px}
+.modal .field{font-family:var(--sans);font-size:14px;margin-bottom:14px;padding:10px 12px}
+.modal .err{color:var(--err);font-size:13px;min-height:20px;margin-bottom:8px}
 .modal .actions{display:flex;justify-content:flex-end;gap:8px}
-.toast{position:fixed;left:50%;bottom:24px;translate:-50% 0;z-index:100;padding:10px 16px;border-radius:4px;background:var(--ink);color:#fff;font-size:15px;opacity:0;transition:opacity .2s;pointer-events:none}
-.toast.show{opacity:1}
+.toast{position:fixed;left:50%;bottom:24px;translate:-50% 8px;z-index:100;padding:10px 16px;border-radius:12px;background:var(--ink);color:#fff;font-size:13.5px;box-shadow:var(--sh-3);opacity:0;transition:opacity .2s,translate .3s var(--ease);pointer-events:none}
+.toast.show{opacity:1;translate:-50% 0}
+
+.rise{animation:rise .7s var(--ease) both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
 
 /* ---------- responsive ---------- */
-@media (max-width:1280px){
-  .app{grid-template-columns:var(--rail) minmax(0,1fr)}
-  .dock{position:fixed;right:16px;bottom:16px;top:auto;width:min(400px,calc(100vw - 32px));height:430px;border-radius:6px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.45)}
-  .dock .log{height:110px}
+@media (max-width:1320px){
+  .app{grid-template-columns:var(--side) minmax(0,1fr)}
+  .dock{position:fixed;right:16px;bottom:16px;top:auto;width:min(440px,calc(100vw - 32px));height:470px;box-shadow:var(--sh-3)}
+  .dock .log{height:96px}
   .dock.min{height:auto}
-  .dock.min .now,.dock.min .viewport,.dock.min .log,.dock.min .persona{display:none}
-  .collapse{display:inline-block}
-  .persona span{display:none}
-  .dock .log{font-size:12px}
-  main{padding-bottom:470px}
+  .dock.min .dock-sub,.dock.min .viewport,.dock.min .log,.dock.min .cams{display:none}
+  .collapse{display:inline-flex}
+  main{padding-bottom:520px}
 }
 @media (max-width:900px){
   .app{grid-template-columns:1fr}
-  .rail{position:fixed;left:0;top:0;bottom:0;width:300px;transform:translateX(-100%);transition:transform .2s;overflow:auto}
-  .rail.open{transform:none;box-shadow:20px 0 60px rgba(0,0,0,.35)}
-  .fly{position:static;display:block;padding:0 12px 8px}
-  .fly-in{width:auto;box-shadow:none;border-top:0}
-  .fly-in p{display:none}
+  .side{position:fixed;left:var(--gap);top:var(--gap);bottom:var(--gap);height:auto;width:290px;transform:translateX(calc(-100% - 20px));transition:transform .3s var(--ease);box-shadow:var(--sh-3)}
+  .side.open{transform:none}
   .menu-btn{display:inline-flex}
-  main{padding:0 16px 380px}
-  .intro h1{font-size:40px}
-  .basics{grid-template-columns:1fr}
-  .ep-head{grid-template-columns:52px minmax(0,1fr) auto 14px;gap:10px;padding:12px}
-  .ttl{display:none}
-  .ep-body{padding:6px 12px 20px}
-  .dock{height:380px}
-  .dock .log{height:72px}
-  .now{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:0}
-  .viewport{min-height:0}
-  .persona span{display:none}
+  main{padding:0 0 420px}
+  .hero{padding-top:40px}
+  .grid2{grid-template-columns:1fr}
+  .ep-head{grid-template-columns:52px minmax(0,1fr) auto 16px;gap:10px;padding:12px}
+  .ttl,.toolbar .seg{display:none}
+  .ep-body{padding:4px 12px 20px}
+  .dock{height:400px}
+  .dock .log{height:64px}
 }
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
 <div class="app">
 
-<aside class="rail" id="rail" aria-label="Endpoint groups">
-  <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span><b>WMS API</b><span>Reference</span></span></a>
-  <ul class="groups" id="groups"></ul>
+<aside class="side panel" id="side" aria-label="Navigation">
+  <a class="brand" href="#top"><span class="logo" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="3" rx="1" fill="#f59e0b"/><rect x="1" y="6.5" width="14" height="3" rx="1" fill="#fff"/><rect x="1" y="11" width="9" height="3" rx="1" fill="#fff" opacity=".5"/></svg></span><span><b>WMS</b><span>API reference</span></span></a>
+  <nav class="nav">
+    <div class="nav-label">Overview</div>
+    <ul id="overview"></ul>
+    <div class="nav-label">Endpoints</div>
+    <ul id="groups"></ul>
+  </nav>
   <div class="session">
-    <div class="who" id="who">Not signed in</div>
-    <button class="btn light" id="authBtn">Sign in</button>
+    <div class="who"><span class="avatar" id="avatar">?</span><div><b id="whoName">Guest</b><span id="whoSub">Not signed in</span></div></div>
+    <button class="btn dark wide" id="authBtn">Sign in</button>
   </div>
 </aside>
 
 <main id="top">
   <div class="toolbar">
-    <button class="btn menu-btn" id="menuBtn" aria-label="Open endpoint groups">Menu</button>
-    <input class="search" id="search" type="search" placeholder="Find an endpoint (press /)" aria-label="Find an endpoint">
+    <button class="btn icon ghost menu-btn" id="menuBtn" aria-label="Open navigation"></button>
+    <label class="search"><span id="searchIcon"></span><input id="search" type="search" placeholder="Search endpoints" aria-label="Search endpoints" autocomplete="off"><kbd>/</kbd></label>
     <div class="seg" role="group" aria-label="Filter by access">
       <button data-f="all" aria-pressed="true">All</button>
       <button data-f="public" aria-pressed="false">Open</button>
       <button data-f="user" aria-pressed="false">Sign-in</button>
-      <button data-f="admin" aria-pressed="false">Admin only</button>
+      <button data-f="admin" aria-pressed="false">Admin</button>
     </div>
   </div>
 
-  <section class="intro">
-    <h1>Warehouse Management API</h1>
-    <p>Set up warehouses, shelf locations and cartons, then receive stock at the dock, move it between shelves and look up where everything is. Every endpoint below can be run against the live server, and the floor view shows what happens to the request on its way through.</p>
-    <p>All paths are relative to <span class="base" id="base"></span></p>
+  <section class="hero">
+    <span class="eyebrow rise"><span class="pulse"></span>REST · JSON · JWT bearer auth</span>
+    <h1 class="rise" style="animation-delay:.06s">Warehouse Management <span>API</span></h1>
+    <p class="rise" style="animation-delay:.12s">Set up warehouses, shelf locations and cartons, then receive stock at the dock, move it between shelves and look up where everything is. Every endpoint can be run against the live server, and the floor view shows each request travelling through the building.</p>
+    <div class="hero-row rise" style="animation-delay:.18s">
+      <div class="base"><small>Base URL</small><span id="base"></span><button class="btn ghost" id="copyBase" aria-label="Copy base URL"></button></div>
+      <div class="stats" id="stats"></div>
+    </div>
   </section>
 
-  <div class="basics">
-    <div>
-      <h3>Signing in</h3>
-      <ol>
+  <div class="grid2" id="basics">
+    <div class="card panel">
+      <h3><span class="tile" data-i="key"></span>Signing in</h3>
+      <ol class="steps">
         <li>Create an account with <code>POST /users</code>. New accounts get the USER role.</li>
         <li>Sign in with <code>POST /auth/login</code>. You get an access token that lasts about 15 minutes and a refresh token that lasts about 7 days.</li>
         <li>Send <code>Authorization: Bearer &lt;accessToken&gt;</code> with every protected call. When it expires, swap the refresh token for a new pair at <code>POST /auth/refresh</code>.</li>
       </ol>
-      <div class="levels">
-        <div><span class="ac public">Open</span>No token needed.</div>
-        <div><span class="ac user">Sign-in</span>Any valid access token.</div>
-        <div><span class="ac admin"><span>Admin only</span></span>A token belonging to an ADMIN account.</div>
-      </div>
+      <div class="levels" id="levels"></div>
     </div>
-    <div>
-      <h3>When a call fails</h3>
+    <div class="card panel">
+      <h3><span class="tile" data-i="alert"></span>When a call fails</h3>
       <table class="codes">
-        <tr><td>400</td><td>The request is invalid. Field errors come back as <code>{"field": "message"}</code>, broken business rules as <code>{"error": "…"}</code>.</td></tr>
-        <tr><td>401</td><td>No token, or it has expired. Sign in again or refresh.</td></tr>
-        <tr><td>403</td><td>Your account doesn't have the ADMIN role.</td></tr>
-        <tr><td>404</td><td>Something the request refers to doesn't exist.</td></tr>
-        <tr><td>409</td><td>A duplicate, an SSCC that was already received, or someone else saved the record first. Reload and try again.</td></tr>
+        <tr><td><span class="code">400</span></td><td>The request is invalid. Field errors come back as <code>{"field": "message"}</code>, broken business rules as <code>{"error": "…"}</code>.</td></tr>
+        <tr><td><span class="code">401</span></td><td>No token, or it has expired. Sign in again or refresh.</td></tr>
+        <tr><td><span class="code">403</span></td><td>Your account doesn't have the ADMIN role.</td></tr>
+        <tr><td><span class="code">404</span></td><td>Something the request refers to doesn't exist.</td></tr>
+        <tr><td><span class="code">409</span></td><td>A duplicate, an SSCC that was already received, or someone else saved the record first. Reload and try again.</td></tr>
       </table>
     </div>
   </div>
 
-  <div class="route">
-    <h3>From an empty warehouse to stock on the shelf</h3>
+  <div class="route panel" id="route">
+    <div class="card" style="padding:0"><h3><span class="tile" data-i="route"></span>From an empty warehouse to stock on the shelf</h3></div>
     <p>The order things need to exist in. An admin sets up steps 1 to 4; anyone signed in can do the rest.</p>
     <ol>
-      <li><a href="#ep-createWh" data-open="createWh">Create a warehouse</a><span>WH-001</span></li>
-      <li><a href="#ep-createLoc" data-open="createLoc">Add locations</a><span>row-section-shelf</span></li>
-      <li><a href="#ep-createCarton" data-open="createCarton">Register a carton</a><span>the product barcode</span></li>
-      <li><a href="#ep-createSscc" data-open="createSscc">Label boxes</a><span>one SSCC per box</span></li>
-      <li><a href="#ep-receive" data-open="receive">Receive</a><span>scan in at the dock</span></li>
-      <li><a href="#ep-move" data-open="move">Move</a><span>shelf to shelf</span></li>
-      <li><a href="#ep-history" data-open="history">Trace</a><span>stock history</span></li>
+      <li><a href="#ep-createWh" data-open="createWh"><b>Create a warehouse</b><span>WH-001</span></a></li>
+      <li><a href="#ep-createLoc" data-open="createLoc"><b>Add locations</b><span>row-section-shelf</span></a></li>
+      <li><a href="#ep-createCarton" data-open="createCarton"><b>Register a carton</b><span>the product barcode</span></a></li>
+      <li><a href="#ep-createSscc" data-open="createSscc"><b>Label boxes</b><span>one SSCC per box</span></a></li>
+      <li><a href="#ep-receive" data-open="receive"><b>Receive</b><span>scan in at the dock</span></a></li>
+      <li><a href="#ep-move" data-open="move"><b>Move</b><span>shelf to shelf</span></a></li>
+      <li><a href="#ep-history" data-open="history"><b>Trace</b><span>stock history</span></a></li>
     </ol>
   </div>
 
   <div id="sections"></div>
 </main>
 
-<aside class="dock" id="dock" aria-label="Floor view">
+<aside class="dock panel" id="dock" aria-label="Floor view">
   <div class="dock-head">
-    <h2>Floor view</h2>
+    <h2><span class="pulse"></span>Floor view</h2>
     <span class="sp"></span>
-    <div class="persona"><span>Simulate as</span><div role="group" aria-label="Simulate as">
+    <div class="seg sm cams" role="group" aria-label="Camera">
+      <button data-v="3d" aria-pressed="true">3D</button>
+      <button data-v="side" aria-pressed="false">Side</button>
+      <button data-v="top" aria-pressed="false">Top</button>
+    </div>
+    <button class="btn ghost collapse" id="collapse" aria-expanded="true">Hide</button>
+  </div>
+  <div class="dock-sub">
+    <div class="now" id="now">Press Simulate or Send on any endpoint.</div>
+    <div class="seg sm" role="group" aria-label="Simulate as">
       <button data-p="0" aria-pressed="false">Guest</button>
       <button data-p="1" aria-pressed="true">User</button>
       <button data-p="2" aria-pressed="false">Admin</button>
-    </div></div>
-    <button class="collapse" id="collapse" aria-expanded="true">Hide</button>
+    </div>
   </div>
-  <div class="now" id="now">Press Simulate or Send on any endpoint to watch it run.</div>
-  <div class="viewport" id="viewport"><div class="scaler" id="scaler"><div class="world"><div class="floor" id="floor"></div></div></div></div>
+  <div class="viewport" id="viewport">
+    <div class="vp-msg" id="vpMsg">Loading the 3D floor…</div>
+    <span class="vp-tag" id="vpTag">Drag to orbit · scroll to zoom</span>
+    <div class="vp-legend"><span><i style="--c:#f59e0b"></i>Client</span><span><i style="--c:#ef4444"></i>Security</span><span><i style="--c:#6366f1"></i>API</span><span><i style="--c:#10b981"></i>Storage</span></div>
+  </div>
   <div class="log" id="log" aria-live="polite"></div>
 </aside>
 </div>
 
 <dialog id="loginDlg">
   <form class="modal" id="loginForm">
+    <span class="logo" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="3" rx="1" fill="#f59e0b"/><rect x="1" y="6.5" width="14" height="3" rx="1" fill="#fff"/><rect x="1" y="11" width="9" height="3" rx="1" fill="#fff" opacity=".5"/></svg></span>
     <h3>Sign in</h3>
     <p>The token stays in this browser tab and is added to every protected call you send.</p>
-    <label for="lgEmail">Email</label><input id="lgEmail" type="email" autocomplete="username" required>
-    <label for="lgPass">Password</label><input id="lgPass" type="password" autocomplete="current-password" required>
+    <label for="lgEmail">Email</label><input class="field" id="lgEmail" type="email" autocomplete="username" required>
+    <label for="lgPass">Password</label><input class="field" id="lgPass" type="password" autocomplete="current-password" required>
     <div class="err" id="lgErr" role="alert"></div>
     <div class="actions">
-      <button class="btn text" type="button" id="lgCancel">Cancel</button>
+      <button class="btn ghost" type="button" id="lgCancel">Cancel</button>
       <button class="btn go" type="submit" id="lgSubmit">Sign in</button>
     </div>
   </form>
@@ -551,17 +568,59 @@ const hl=t=>esc(t).replace(/("(?:\\.|[^"\\])*")(\s*:)?|\b(true|false|null)\b|-?\
 const pretty=v=>v==null?"(no body)":typeof v==="string"?v:JSON.stringify(v,null,2);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const toast=m=>{const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),2200)};
-const acTag=a=>a==="admin"?`<span class="ac admin"><span>${LABEL.admin}</span></span>`:`<span class="ac ${a}">${LABEL[a]}</span>`;
+
+/* lucide-style icons */
+const ICON={
+  key:'<circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/>',
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  building:'<path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"/><path d="M6 18h12"/><path d="M6 14h12"/><rect x="6" y="10" width="12" height="12"/>',
+  grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>',
+  package:'<path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
+  truck:'<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>',
+  layers:'<path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
+  lock:'<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  shield:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
+  globe:'<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
+  search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  chev:'<path d="m9 18 6-6-6-6"/>',
+  copy:'<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+  book:'<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>',
+  alert:'<circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+  info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+  route:'<circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/>',
+  play:'<path d="M6 3 20 12 6 21Z"/>',
+  send:'<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',
+  term:'<path d="m4 17 6-6-6-6"/><path d="M12 19h8"/>',
+  menu:'<path d="M4 12h16"/><path d="M4 6h16"/><path d="M4 18h16"/>',
+  flask:'<path d="M10 2v7.53a2 2 0 0 1-.21.9L4.72 20.55A1 1 0 0 0 5.6 22h12.8a1 1 0 0 0 .88-1.45l-5.07-10.12a2 2 0 0 1-.21-.9V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/>',
+};
+const svg=(n,s=16)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]}</svg>`;
+const GICON={auth:"key",users:"users",warehouses:"building",locations:"grid",cartons:"package",ops:"truck",inventory:"layers"};
+const acTag=a=>`<span class="ac ${a}">${svg(a==="admin"?"shield":a==="user"?"lock":"globe",12)}${LABEL[a]}</span>`;
+
+$$("[data-i]").forEach(el=>el.innerHTML=svg(el.dataset.i));
+$("#searchIcon").outerHTML=svg("search",15);
+$("#menuBtn").innerHTML=svg("menu",18);
+$("#copyBase").innerHTML=svg("copy",14);
 $("#base").textContent=location.origin+BASE;
+$("#copyBase").onclick=()=>navigator.clipboard?.writeText(location.origin+BASE).then(()=>toast("Base URL copied"));
+$("#stats").innerHTML=`<div><b>${EPS.length}</b>endpoints</div><div><b>${GROUPS.length}</b>groups</div><div><b>3</b>access levels</div>`;
+$("#levels").innerHTML=[["public","No token needed."],["user","Any valid access token."],["admin","A token belonging to an ADMIN account."]].map(([a,t])=>`<div>${acTag(a)}${t}</div>`).join("");
 
 /* ---------- session ---------- */
 const store={get(k){try{return sessionStorage.getItem(k)}catch{return null}},set(k,v){try{v==null?sessionStorage.removeItem(k):sessionStorage.setItem(k,v)}catch{}}};
 let session={access:store.get("wms.access"),refresh:store.get("wms.refresh")};
-const jwtSub=t=>{try{return JSON.parse(atob(t.split(".")[1].replace(/-/g,"+").replace(/_/g,"/"))).sub}catch{return null}};
+const jwt=t=>{try{return JSON.parse(atob(t.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")))}catch{return {}}};
+const jwtSub=t=>jwt(t).sub||null;
 function setSession(a,r){session={access:a,refresh:r};store.set("wms.access",a);store.set("wms.refresh",r);renderWho();refreshHints()}
 function renderWho(){
-  $("#who").innerHTML=session.access?`Signed in as <b>${esc(jwtSub(session.access)||"unknown")}</b>`:"Not signed in";
+  const sub=session.access&&jwtSub(session.access),p=session.access?jwt(session.access):{};
+  const role=[p.role,p.roles,p.authorities].flat().filter(Boolean).join(", ").replace(/ROLE_/g,"");
+  $("#avatar").textContent=sub?sub[0].toUpperCase():"?";$("#avatar").classList.toggle("on",!!sub);
+  $("#whoName").textContent=sub||"Guest";
+  $("#whoSub").textContent=sub?(role||"Signed in"):"Not signed in";
   $("#authBtn").textContent=session.access?"Sign out":"Sign in";
+  $("#authBtn").className="btn wide "+(session.access?"":"dark");
 }
 $("#authBtn").onclick=()=>{
   if(!session.access){$("#lgErr").textContent="";$("#loginDlg").showModal();return}
@@ -580,10 +639,12 @@ $("#loginForm").onsubmit=async ev=>{
   finally{$("#lgSubmit").disabled=false}
 };
 
-/* ---------- rail with hover flyouts ---------- */
+/* ---------- sidebar ---------- */
+$("#overview").innerHTML=[["#top","book","Introduction"],["#basics","key","Signing in and errors"],["#route","route","Lifecycle"]]
+  .map(([h,i,t])=>`<li><a class="item" href="${h}">${svg(i)}${t}</a></li>`).join("");
 $("#groups").innerHTML=GROUPS.map(g=>{const eps=EPS.filter(e=>e.group===g.id);return `<li class="g" data-g="${g.id}">
-  <a href="#g-${g.id}">${g.name}<small>${eps.length}</small></a>
-  <div class="fly"><div class="fly-in"><p>${g.blurb}</p>${eps.map(e=>`<a href="#ep-${e.id}" data-open="${e.id}"><span class="mth ${e.method}">${e.method}</span><span>${esc(e.title)}</span><span class="p">${esc(e.path)}</span><span class="ac dot ${e.access}" title="${LABEL[e.access]}"${e.access==="admin"?' style="background:var(--hazard)"':""}></span></a>`).join("")}</div></div></li>`}).join("");
+  <a class="item" href="#g-${g.id}">${svg(GICON[g.id])}${g.name}<small>${eps.length}</small></a>
+  <div class="sub">${eps.map(e=>`<a href="#ep-${e.id}" data-open="${e.id}" title="${e.method} ${esc(e.path)}"><span class="m ${e.method}">${e.method}</span><span>${esc(e.title)}</span></a>`).join("")}</div></li>`}).join("");
 
 /* ---------- endpoint sections ---------- */
 const pathHtml=p=>esc(p).replace(/\{(\w+)\}/g,"<i>{$1}</i>");
@@ -594,35 +655,35 @@ function epHtml(e){
   <button class="ep-head" aria-expanded="false">
     <span class="mth ${e.method}">${e.method}</span><span class="path">${pathHtml(e.path)}</span>
     <span class="ttl">${esc(e.title)}</span>${acTag(e.access)}
-    <svg class="chev" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 3 5 5-5 5"/></svg>
+    <span class="chev">${svg("chev",16)}</span>
   </button>
   <div class="ep-body">
     <div>
       <h4>What it does</h4><div class="desc">${e.desc}</div>
-      ${e.warn?`<div class="note">${e.warn}</div>`:""}${e.tip?`<div class="note info">${e.tip}</div>`:""}
+      ${e.warn?`<div class="note">${svg("alert",15)}<div>${e.warn}</div></div>`:""}${e.tip?`<div class="note info">${svg("info",15)}<div>${e.tip}</div></div>`:""}
       <h4>Who can call it</h4>
       <div class="desc">${e.access==="public"?"Anyone. No token needed.":e.access==="user"?"Anyone signed in. Without a valid token you get 401.":"Admins only. Without a token you get 401; with a USER token you get 403."}</div>
       ${ps.length?`<h4>Parameters</h4>${table(ps.map(([n,w,t,r,d])=>[n,`${t} in ${w}`,r,d]))}`:""}
       ${e.fields?`<h4>Request body</h4>${table(e.fields)}`:""}
       <h4>Responses</h4>
-      <div class="tabs">${e.res.map(([c],i)=>`<button type="button" class="c${String(c)[0]}" data-i="${i}" aria-pressed="${!i}">${c}</button>`).join("")}</div>
+      <div class="seg sm tabs">${e.res.map(([c],i)=>`<button type="button" class="c${String(c)[0]}" data-i="${i}" aria-pressed="${!i}"><i></i>${c}</button>`).join("")}</div>
       <div class="resp-desc"></div><pre class="resp"></pre>
     </div>
     <form class="try" novalidate>
-      <h4>Try it</h4>
-      ${ps.map(([n,w,,r])=>`<div class="row"><label>${esc(n)} <em>${w}${r?"":", optional"}</em></label><input name="${w}:${n}"></div>`).join("")}
-      ${e.body?`<div class="row"><label>Body <em>JSON</em></label><textarea name="body" spellcheck="false">${esc(JSON.stringify(e.body,null,2))}</textarea></div>`:""}
+      <h4>${svg("flask",14)}Try it</h4>
+      ${ps.map(([n,w,,r])=>`<div class="row"><label>${esc(n)}<em>${w}${r?"":", optional"}</em></label><input class="field" name="${w}:${n}"></div>`).join("")}
+      ${e.body?`<div class="row"><label>Body<em>application/json</em></label><textarea class="field" name="body" spellcheck="false">${esc(JSON.stringify(e.body,null,2))}</textarea></div>`:""}
       <div class="actions">
-        <button class="btn go" type="submit">Send</button>
-        <button class="btn" type="button" data-act="sim">Simulate</button>
-        <button class="btn text" type="button" data-act="curl">Copy as cURL</button>
+        <button class="btn go" type="submit">${svg("send",14)}Send</button>
+        <button class="btn" type="button" data-act="sim">${svg("play",13)}Simulate</button>
+        <button class="btn ghost" type="button" data-act="curl">${svg("term",14)}cURL</button>
         <span class="hint"></span>
       </div>
       <div class="result" hidden></div>
     </form>
   </div></article>`;
 }
-$("#sections").innerHTML=GROUPS.map(g=>`<section class="section" id="g-${g.id}" data-g="${g.id}"><h2>${g.name}</h2><p>${g.blurb}</p><div class="bay">${EPS.filter(e=>e.group===g.id).map(epHtml).join("")}</div></section>`).join("")+`<p class="empty" id="noMatch" hidden>Nothing matches. Try a path like <code>/receive</code> or a word like “move”.</p>`;
+$("#sections").innerHTML=GROUPS.map(g=>`<section class="section" id="g-${g.id}" data-g="${g.id}"><div class="sec-head"><span class="tile">${svg(GICON[g.id],18)}</span><div><h2>${g.name}</h2><p>${g.blurb}</p></div></div><div class="bay panel">${EPS.filter(e=>e.group===g.id).map(epHtml).join("")}</div></section>`).join("")+`<p class="empty" id="noMatch" hidden>Nothing matches. Try a path like <code>/receive</code> or a word like “move”.</p>`;
 
 $$(".ep").forEach(el=>{
   const e=EPS.find(x=>x.id===el.dataset.ep);
@@ -637,11 +698,11 @@ $$(".ep").forEach(el=>{
   form.querySelector("[data-act=curl]").onclick=()=>curl(e,form);
 });
 function toggle(el,force){const o=force??!el.classList.contains("open");el.classList.toggle("open",o);el.querySelector(".ep-head").setAttribute("aria-expanded",o)}
-function refreshHints(){$$(".ep").forEach(el=>{const e=EPS.find(x=>x.id===el.dataset.ep);el.querySelector(".hint").textContent=e.access!=="public"&&!session.access?"Sign in first to send this for real.":""})}
-document.addEventListener("click",ev=>{const a=ev.target.closest("[data-open]");if(!a)return;toggle($("#ep-"+a.dataset.open),true);$("#rail").classList.remove("open");a.blur()});
+function refreshHints(){$$(".ep").forEach(el=>{const e=EPS.find(x=>x.id===el.dataset.ep);el.querySelector(".hint").textContent=e.access!=="public"&&!session.access?"Sign in to send this for real.":""})}
+document.addEventListener("click",ev=>{const a=ev.target.closest("[data-open]");if(!a)return;toggle($("#ep-"+a.dataset.open),true);$("#side").classList.remove("open");a.blur()});
 renderWho();refreshHints();
 
-/* highlight the group you're reading in the rail */
+/* highlight the group you're reading in the sidebar */
 const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting)$$(".g").forEach(g=>g.classList.toggle("active",g.dataset.g===en.target.dataset.g))}),{rootMargin:"-30% 0px -60% 0px"});
 $$(".section").forEach(s=>io.observe(s));
 
@@ -654,9 +715,12 @@ function applyFilter(){
   $("#noMatch").hidden=any;
 }
 $("#search").oninput=applyFilter;
-$$(".seg button").forEach(b=>b.onclick=()=>{filt=b.dataset.f;$$(".seg button").forEach(x=>x.setAttribute("aria-pressed",x===b));applyFilter()});
-document.addEventListener("keydown",ev=>{if(ev.key==="/"&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){ev.preventDefault();$("#search").focus()}});
-$("#menuBtn").onclick=()=>$("#rail").classList.toggle("open");
+$$(".toolbar .seg button").forEach(b=>b.onclick=()=>{filt=b.dataset.f;$$(".toolbar .seg button").forEach(x=>x.setAttribute("aria-pressed",x===b));applyFilter()});
+document.addEventListener("keydown",ev=>{
+  if(ev.key==="/"&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){ev.preventDefault();$("#search").focus()}
+  if(ev.key==="Escape")$("#side").classList.remove("open");
+});
+$("#menuBtn").onclick=()=>$("#side").classList.toggle("open");
 
 /* ---------- requests ---------- */
 function build(e,form){
@@ -696,142 +760,20 @@ async function send(e,form){
 }
 
 /* =====================================================================
-   Floor view: pure CSS 3D. x runs along the lane, y towards the viewer, z up.
-   Only the south (+y) and west (-x) faces are visible from this camera.
-   Never put opacity or filter on a 3D wrapper: it flattens its children.
+   Floor view. The 3D scene (module below) replaces this stub with
+   window.FLOOR once three.js loads; until then the story still logs.
    ===================================================================== */
-const SKIN="#d9a77c",RACK="#202226",BEAM="#e8601c",FORK="#f2c200",DARK="#2b2f36",STEEL="#8a8f96",WOOD="#b58a57",CARD="#c49a6c";
-function shade(hex,f){const n=parseInt(hex.slice(1),16);return `rgb(${[n>>16,n>>8&255,n&255].map(v=>Math.min(255,Math.round(v*f)))})`}
-function cube(x,y,w,d,h,color,z=0,cls="",bg){
-  const el=document.createElement("div");el.className="cube "+cls;
-  el.style.cssText=`left:${x}px;top:${y}px;width:${w}px;height:${d}px;transform:translateZ(${z}px)`;
-  const c=f=>bg||shade(color,f);
-  el.innerHTML=`<div class="f" style="width:${w}px;height:${d}px;background:${c(1.08)};transform:translateZ(${h}px)"></div>`+
-    `<div class="f" style="width:${w}px;height:${h}px;top:${d-h}px;background:${c(.86)};transform-origin:50% 100%;transform:rotateX(-90deg)"></div>`+
-    `<div class="f" style="width:${h}px;height:${d}px;background:${c(.7)};transform-origin:0 50%;transform:rotateY(-90deg)"></div>`;
-  return el;
-}
-function bill(x,y,z,text,cls="sign"){const el=document.createElement("div");el.className="bill";el.style.cssText=`left:${x}px;top:${y}px;transform:translateZ(${z}px)`;el.innerHTML=`<div><div class="${cls}">${text}</div></div>`;return el}
-function grp(x,y,kids,id){const g=document.createElement("div");g.className="obj";if(id)g.id=id;g.style.cssText=`left:${x}px;top:${y}px`;g.append(...kids);return g}
-const person=(vest,hat,z=0)=>[cube(1,1,3,3,9,DARK,z),cube(4,1,3,3,9,DARK,z),cube(0,0,8,5,9,vest,z+9),cube(1.5,.5,5,4,5,SKIN,z+18),cube(1,0,6,5,2,hat,z+23)];
-
-const floor=$("#floor");
-floor.append(Object.assign(document.createElement("div"),{className:"slabbg"}));
-const ST={client:70,gate:205,server:330,rack:470};
-[248,290].forEach(y=>{const t=document.createElement("div");t.className="tape";t.style.top=y+"px";floor.append(t)});
-const trail=document.createElement("div");trail.className="trail";floor.append(trail);
-const hz=document.createElement("div");hz.className="hz";hz.style.cssText=`left:${ST.gate-10}px;top:206px;width:22px;height:96px`;floor.append(hz);
-
-// dock terminal
-floor.append(grp(ST.client-32,196,[cube(0,0,64,34,24,"#5c5e62"),cube(10,6,40,6,30,DARK,24),cube(12,12,36,1,24,"#d8f0c8",27),cube(42,24,10,6,3,"#3a3f47",24),bill(32,17,92,"Dock terminal")]));
-
-// security gate with a guard
-const gateLed=cube(1,1,10,10,8,"#c4162a",54);
-const arm=cube(3,12,6,66,6,"",36,"",`repeating-linear-gradient(0deg,${FORK} 0 9px,${DARK} 9px 18px)`);arm.id="arm";
-floor.append(grp(ST.gate-6,232,[cube(0,0,12,12,54,"#5c5e62"),gateLed,arm,cube(0,78,12,12,30,"#5c5e62"),bill(6,0,112,"Security")]));
-const guard=grp(ST.gate-34,218,person(BEAM,"#ffffff"),"guard");floor.append(guard);
-
-// API server cabinet with status lights on its front face
-const leds=[];
-const ledWrap=document.createElement("div");ledWrap.className="leds";ledWrap.style.cssText="left:0;top:42px;width:58px;height:96px;transform-origin:50% 0;transform:translateY(0.5px) rotateX(-90deg)";
-for(let i=0;i<12;i++){const l=document.createElement("div");l.className="ledbar";l.style.cssText=`left:${10+(i%4)*11}px;top:${-84+Math.floor(i/4)*16}px`;ledWrap.append(l);leds.push(l)}
-floor.append(grp(ST.server-29,180,[cube(0,0,58,42,96,"#3a3c40"),ledWrap,bill(29,21,132,"API server")]));
-
-// pallet rack standing in for the database
-const boxes=[],rackKids=[];
-[[0,0],[78,0],[0,40],[78,40]].forEach(([x,y])=>rackKids.push(cube(x,y,4,4,112,RACK)));
-[0,38,76].forEach((z,lv)=>{
-  if(lv)rackKids.push(cube(0,40,82,4,5,BEAM,z),cube(0,0,82,4,5,BEAM,z));
-  [6,44].forEach(x=>{rackKids.push(cube(x,6,32,32,4,WOOD,z+(lv?5:0)));const b=cube(x+2,8,28,28,22,CARD,z+(lv?9:4),"box");rackKids.push(b);boxes.push(b)});
-});
-rackKids.push(bill(41,22,146,"Database"));
-const rackG=grp(ST.rack-41,170,rackKids);floor.append(rackG);
-
-// filing cabinet standing in for account records; the middle drawer slides out towards the lane
-const FILE_TONES=["#e8c872","#d9b65a","#e8c872","#cfa94e"],files=[];
-const drawer=grp(0,0,[cube(5,8,40,30,2,"#3a3c40",40),cube(3,38,44,4,26,"#6a6d72",36),cube(17,42,16,2,3,"#d3d4cf",50)],"drawer");
-FILE_TONES.forEach((c,i)=>{const f=cube(9+i*9,11,3,24,18,c,42,"box");drawer.append(f);files.push(f)});
-const cabinetG=grp(ST.rack-25,178,[cube(0,0,50,40,100,"#4a4c50"),
-  cube(3,38,44,4,26,"#6a6d72",6),cube(17,42,16,2,3,"#d3d4cf",20),
-  drawer,
-  cube(3,38,44,4,26,"#6a6d72",68),cube(17,42,16,2,3,"#d3d4cf",82),
-  bill(25,20,134,"File storage")]);
-floor.append(cabinetG);
-
-// forklift with a driver; the forks point along +x
-const lift=document.createElement("div");lift.className="lift";
-const load=grp(0,0,[cube(34,3,18,20,4,WOOD),cube(36,5,14,16,14,CARD,4)]);
-lift.append(cube(32,5,22,3,2,STEEL),cube(32,18,22,3,2,STEEL),load);
-const bob=document.createElement("div");bob.className="bob";
-bob.append(
-  cube(-5,2,6,22,16,DARK,2),
-  cube(0,0,30,26,12,FORK,2),
-  cube(3,-1,8,2,8,"#222",0),cube(19,-1,8,2,8,"#222",0),cube(3,25,8,2,8,"#222",0),cube(19,25,8,2,8,"#222",0),
-  cube(6,9,10,9,6,DARK,14),
-  grp(8,10,person(RACK,FORK,12)),
-  cube(2,1,2,2,30,DARK,14),cube(2,23,2,2,30,DARK,14),cube(22,1,2,2,30,DARK,14),cube(22,23,2,2,30,DARK,14),
-  cube(2,1,22,2,2,DARK,44),cube(2,23,22,2,2,DARK,44),cube(2,1,2,24,2,DARK,44),cube(22,1,2,24,2,DARK,44),
-  cube(30,3,3,3,44,STEEL,2),cube(30,20,3,3,44,STEEL,2),cube(30,3,3,20,3,STEEL,44),
-  lift);
-const bubble=bill(20,13,72,"","bubble");bob.append(bubble);
-const truck=grp(0,0,[bob],"truck");floor.append(truck);
-
-// office clerk who carries account records; walks along +x like the forklift
-const SHIRT="#f4f3ee";
-const legA=grp(0,0,[cube(2,4,5,4,14,DARK)]),legB=grp(0,0,[cube(2,10,5,4,14,DARK)]);
-legA.classList.add("leg");legB.classList.add("leg","b");
-const folder=grp(0,0,[cube(0,19,10,2,12,"#e8c872",15)]);   // tucked under the near arm so the camera sees it
-const walker=document.createElement("div");walker.className="bob";
-walker.append(legA,legB,cube(0,2,9,14,16,SHIRT,14),cube(2,-1,5,3,13,SHIRT,16),cube(2,16,5,3,13,SHIRT,16),
-  cube(1,5,7,8,8,SKIN,30),cube(.5,4.5,8,9,3,"#3a2a1e",37),folder);
-const clerk=grp(0,0,[walker],"clerk");floor.append(clerk);
-const bubbleEl=bubble.querySelector(".bubble");
-
-let actor=truck;
-function moverTo(x,instant){const t=actor===truck;actor.style.transition=instant?"none":"";actor.style.transform=`translate(${x-(t?28:6)}px,${t?256:262}px)`}
-async function drive(x){actor.classList.add("moving");moverTo(x);trail.style.width=Math.max(0,x-24)+"px";await sleep(950);actor.classList.remove("moving")}
-const setLoad=v=>(actor===truck?load:folder).style.visibility=v?"visible":"hidden";
-// Account endpoints get the clerk and the filing cabinet; everything else the forklift and the rack.
-function setMode(people){
-  truck.hidden=rackG.hidden=people;clerk.hidden=cabinetG.hidden=!people;
-  actor=people?clerk:truck;actor.querySelector(".bob").append(bubble);
-}
-// Drawer slots, left to right. At rest slot 1 is empty; writes fill it, reads take slot 2.
-const PUT_FILE=1,TAKE_FILE=2;
-const showFile=(i,v)=>files[i].style.visibility=v?"visible":"hidden";
-function resetFiles(){drawer.style.transform="";files.forEach((f,i)=>{f.classList.remove("on");showFile(i,i!==PUT_FILE)})}
-// Rack slots: [level0 near, level0 far, level1 near, level1 far, level2 near, level2 far].
-// At rest the near middle slot is empty; writes fill it, reads and moves take the far middle carton.
-const PUT_SLOT=2,TAKE_SLOT=3;
-const showBox=(i,v)=>boxes[i].style.visibility=v?"visible":"hidden";
-function resetRack(){boxes.forEach((b,i)=>{b.classList.remove("on");showBox(i,i!==PUT_SLOT)})}
-const raise=z=>lift.style.transform=`translateZ(${z}px)`;
-function setGate(s){const c={closed:"#c4162a",check:FORK,open:"#23824f"}[s];gateLed.querySelectorAll(".f").forEach((f,i)=>f.style.background=shade(c,[1.1,.9,.7][i]));arm.classList.toggle("open",s==="open")}
-const turnGuard=on=>guard.style.transform=on?"rotateZ(-60deg)":"";
-function showBubble(t,ok){bubbleEl.textContent=t;bubbleEl.className="bubble show "+(ok?"ok":"err")}
-const setLeds=m=>leds.forEach(l=>l.className="ledbar"+(m?" "+m:""));
-setMode(false);moverTo(ST.client,true);setGate("closed");setLoad(false);resetRack();resetFiles();folder.style.visibility="hidden";
-
-// Scale and centre the scene on its real projected bounds (slab plus signs).
-function fit(){
-  const v=$("#viewport"),sc=$("#scaler");if(!v.clientWidth)return;
-  sc.style.transform="none";
-  const vr=v.getBoundingClientRect();let l=1e9,t=1e9,r=-1e9,b=-1e9;
-  [$(".slabbg"),...$$("#floor .sign")].forEach(el=>{const q=el.getBoundingClientRect();if(!q.width)return;l=Math.min(l,q.left);t=Math.min(t,q.top);r=Math.max(r,q.right);b=Math.max(b,q.bottom)});
-  const s=Math.min(vr.width*.94/(r-l),vr.height*.9/(b-t)),sr=sc.getBoundingClientRect();
-  const dx=vr.left+vr.width/2-(l+r)/2,dy=vr.top+vr.height/2-(t+b)/2;
-  sc.style.transformOrigin=`${(l+r)/2-sr.left}px ${(t+b)/2-sr.top}px`;
-  sc.style.transform=`translate(${dx}px,${dy}px) scale(${s})`;
-}
-new ResizeObserver(fit).observe($("#viewport"));
-document.fonts?.ready.then(fit);
+window.FLOOR||={reset(){},drive:()=>sleep(600),gate(){},guard(){},leds(){},reach:()=>sleep(300),blink(){},settle(){},carry(){},bubble(){},view(){}};
+const F=()=>window.FLOOR;
+setTimeout(()=>{if(!window.FLOOR.ready)$("#vpMsg").textContent="3D view unavailable. The log below still follows each request."},12000);
 
 const logEl=$("#log");
 function log(m,c=""){const p=document.createElement("p");p.innerHTML=`<span class="t">${new Date().toLocaleTimeString([],{hour12:false})}</span><span class="${c}">${m}</span>`;logEl.append(p);logEl.scrollTop=logEl.scrollHeight;while(logEl.children.length>80)logEl.firstChild.remove()}
 log("Forklift parked at the dock, waiting for a request.","hi");
 
 let persona=1;
-$$(".persona button").forEach(b=>b.onclick=()=>{persona=+b.dataset.p;$$(".persona button").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+$$("[data-p]").forEach(b=>b.onclick=()=>{persona=+b.dataset.p;$$("[data-p]").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+$$("[data-v]").forEach(b=>b.onclick=()=>{F().view(b.dataset.v);$$("[data-v]").forEach(x=>x.setAttribute("aria-pressed",x===b))});
 $("#collapse").onclick=()=>{const m=$("#dock").classList.toggle("min");$("#collapse").textContent=m?"Show":"Hide";$("#collapse").setAttribute("aria-expanded",!m)};
 if(matchMedia("(max-width:900px)").matches)$("#collapse").click();
 
@@ -847,60 +789,369 @@ async function play(e,resultP,live){
   const who=live?(session.access?jwtSub(session.access):"a guest"):["a guest","a user","an admin"][persona];
   const put=e.db==="write"&&e.id!=="move";   // brings a carton/file in; everything else takes one away
   const people=e.group==="users"||e.group==="auth";
-  $("#now").innerHTML=`<b>${e.method} ${esc(e.path)}</b> ${live?"sent":"simulated"} as ${esc(who)}`;
-  bubbleEl.className="bubble";setGate("closed");turnGuard(false);setLeds("");resetRack();resetFiles();raise(0);
-  setMode(people);moverTo(ST.client,true);trail.style.width="0";setLoad(put);
+  const where=people?"File storage":"Database";
+  $("#now").innerHTML=`<b>${e.method} ${esc(e.path)}</b> · ${live?"sent":"simulated"} as ${esc(who)}`;
+  $("#vpTag").textContent=`${people?"Clerk":"Forklift"} · ${e.title}`;
+  F().reset({people,put});
   log(`<span class="${e.method}">${e.method}</span> ${esc(e.path)} (${live?"live":"simulated"}, ${esc(who)})`);
   await sleep(200);if(!alive())return;
 
-  await drive(ST.gate-46);if(!alive())return;
-  setGate("check");turnGuard(true);
+  await F().drive("gate");if(!alive())return;
+  F().gate("check");F().guard(true);
   log(e.access==="public"?"Security: open route, waved through.":`Security: checking the bearer token${e.access==="admin"?" for the ADMIN role":""}.`);
   const res=await resultP;await sleep(450);if(!alive())return;
-  const s=res.status;turnGuard(false);
+  const s=res.status;F().guard(false);
   if(s===401||s===403||s===0){
-    setGate("closed");
+    F().gate("closed");
     log(s===0?"Security: the server didn't answer.":s===401?"Security: no valid token. 401 Unauthorized.":"Security: not an admin. 403 Forbidden.","err");
-    showBubble(s||"No reply",false);await sleep(700);if(!alive())return;
-    await drive(ST.client);setLoad(false);return;
+    F().bubble(s||"No reply",false);await sleep(700);if(!alive())return;
+    await F().drive("dock");F().carry(false);return;
   }
-  setGate("open");log("Security: let through.","ok");
-  await drive(ST.server-34);if(!alive())return;
-  setLeds("run");log("API server: checking the request.");await sleep(550);if(!alive())return;
+  F().gate("open");log("Security: let through.","ok");
+  await F().drive("server");if(!alive())return;
+  F().leds("run");log("API server: checking the request.");await sleep(650);if(!alive())return;
   const ok=s>=200&&s<300;
-  if(s===400){setLeds("bad");log("API server: the request was rejected. 400 Bad Request.","err")}
+  if(s===400){F().leds("bad");log("API server: the request was rejected. 400 Bad Request.","err")}
   else{
-    setLeds("");
-    if(people){
-      await drive(ST.rack-4);if(!alive())return;
-      const slot=put?PUT_FILE:TAKE_FILE;
-      drawer.style.transform="translateY(30px)";await sleep(500);if(!alive())return;
-      for(const st of e.story){log(`File storage: ${esc(st)}.`);files[slot].classList.toggle("on");await sleep(380);if(!alive())return}
-      files[slot].classList.remove("on");
-      if(!ok)log(s===404?"File storage: no such record.":s===409?"File storage: record already exists.":"File storage: failed.","err");
-      else if(put){setLoad(false);showFile(slot,true);log("File storage: filed.","ok")}
-      else{showFile(slot,false);setLoad(true);log("File storage: record pulled.","ok")}
-      await sleep(300);drawer.style.transform="";await sleep(450);if(!alive())return;
-    }else{
-    await drive(ST.rack-62);if(!alive())return;
-    const slot=put?PUT_SLOT:TAKE_SLOT;
-    raise(38);await sleep(450);if(!alive())return;
-    for(const st of e.story){log(`Database: ${esc(st)}.`);boxes[slot].classList.toggle("on");await sleep(380);if(!alive())return}
-    boxes[slot].classList.remove("on");
-    if(!ok)log(s===404?"Database: not found.":s===409?"Database: conflict.":"Database: failed.","err");
-    else if(put){setLoad(false);showBox(slot,true);log("Database: saved.","ok")}
-    else{showBox(slot,false);setLoad(true);log(e.id==="move"?"Database: stock moved.":"Database: read.","ok")}
-    await sleep(300);raise(0);await sleep(400);if(!alive())return;
-    }
+    F().leds("");
+    await F().drive("store");if(!alive())return;
+    await F().reach(true);if(!alive())return;
+    for(const st of e.story){log(`${where}: ${esc(st)}.`);F().blink();await sleep(380);if(!alive())return}
+    F().blink(false);
+    if(!ok)log(s===404?`${where}: not found.`:s===409?`${where}: conflict.`:`${where}: failed.`,"err");
+    else{F().settle();log(put?`${where}: saved.`:e.id==="move"?"Database: stock moved.":`${where}: read.`,"ok")}
+    await sleep(300);await F().reach(false);if(!alive())return;
   }
-  setLeds(s===400?"bad":"");showBubble(s,ok);
-  await drive(ST.client);if(!alive())return;
-  setGate("closed");setLeds("");
+  F().leds(s===400?"bad":"");F().bubble(s,ok);
+  await F().drive("dock");if(!alive())return;
+  F().gate("closed");F().leds("");
   log(`Back at the dock with ${s}${res.ms?` after ${res.ms} ms`:""}.`,ok?"ok":"err");
-  $("#now").innerHTML=`<b>${e.method} ${esc(e.path)}</b> returned ${s}`;
+  $("#now").innerHTML=`<b>${e.method} ${esc(e.path)}</b> · returned ${s}`;
 }
 
 if(location.hash.startsWith("#ep-")){const el=$(location.hash);el&&toggle(el,true)}
+</script>
+
+<script type="module">
+/* =====================================================================
+   Floor view in three.js. x runs along the lane (dock → storage), y is up,
+   +z points at the camera. Everything is built from primitives; no assets.
+   ===================================================================== */
+import * as THREE from "three";
+import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+import {RoundedBoxGeometry} from "three/addons/geometries/RoundedBoxGeometry.js";
+import {RoomEnvironment} from "three/addons/environments/RoomEnvironment.js";
+import {CSS2DRenderer,CSS2DObject} from "three/addons/renderers/CSS2DRenderer.js";
+
+const vp=document.getElementById("viewport");
+const SPEED=matchMedia("(prefers-reduced-motion:reduce)").matches?.3:1;
+
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.toneMapping=THREE.NeutralToneMapping;
+vp.prepend(renderer.domElement);
+const css=new CSS2DRenderer();css.domElement.className="labels";vp.append(css.domElement);
+document.getElementById("vpMsg").remove();
+
+const scene=new THREE.Scene();
+const BG=0xeceeec;scene.background=new THREE.Color(BG);scene.fog=new THREE.Fog(BG,40,80);
+scene.environment=new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(),.04).texture;
+scene.environmentIntensity=.5;
+scene.add(new THREE.HemisphereLight(0xffffff,0xd9d6cc,.9));
+const sun=new THREE.DirectionalLight(0xfffaf2,2.4);
+sun.position.set(7,16,9);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);
+Object.assign(sun.shadow.camera,{left:-16,right:16,top:12,bottom:-12,near:1,far:50});
+sun.shadow.bias=-.0004;sun.shadow.normalBias=.03;
+scene.add(sun);
+
+/* ---------- primitives ---------- */
+const C={floor:0xe3e4e0,wall:0xf5f5f2,tape:0xf2c200,orange:0xf59a23,dark:0x2b2e35,steel:0xa3a8b0,tire:0x1d1e21,hub:0xd0d3d8,
+  wood:0xc9a26c,wood2:0xa9824f,kraft:0xc79762,white:0xf7f7f4,blue:0x2f55b5,beam:0xf07a1a,skin:0xe2b48f,cab:0xf4f4f1};
+const COL={dock:0xf59e0b,sec:0xef4444,api:0x6366f1,store:0x10b981};
+const mats=new Map(),geos=new Map();
+const M=(c,o={})=>{const k=c+JSON.stringify(o);if(!mats.has(k))mats.set(k,new THREE.MeshStandardMaterial({color:c,roughness:.62,...o}));return mats.get(k)};
+const RB=(w,h,d,r)=>{const k=[w,h,d,r]+"";if(!geos.has(k))geos.set(k,r?new RoundedBoxGeometry(w,h,d,3,Math.min(r,w/2,h/2,d/2)*.999):new THREE.BoxGeometry(w,h,d));return geos.get(k)};
+// box sitting on y (its bottom), centred on x/z
+function box(w,h,d,c,x=0,y=0,z=0,{r=.03,mat,shadow=true}={}){
+  const m=new THREE.Mesh(RB(w,h,d,r),mat||M(c));m.position.set(x,y+h/2,z);m.castShadow=shadow;m.receiveShadow=true;return m;
+}
+function cyl(rad,len,c,x,y,z,axis="y",{mat,seg=28}={}){
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(rad,rad,len,seg),mat||M(c));m.position.set(x,y,z);
+  if(axis==="z")m.rotation.x=Math.PI/2;if(axis==="x")m.rotation.z=Math.PI/2;m.castShadow=m.receiveShadow=true;return m;
+}
+const G=(...k)=>{const g=new THREE.Group();k.length&&g.add(...k);return g};
+const at=(o,x,y,z,ry=0)=>{o.position.set(x,y,z);o.rotation.y=ry;return o};
+function wheel(r,w,x,y,z){const g=G(cyl(r,w,C.tire,0,0,0,"z",{mat:M(C.tire,{roughness:.9})}),cyl(r*.55,w+.02,C.hub,0,0,0,"z",{mat:M(C.hub,{metalness:.6,roughness:.35})}));return at(g,x,y,z)}
+function label(text,color,parent,y){
+  const el=document.createElement("div");el.className="lbl";el.innerHTML=`<i style="background:#${color.toString(16).padStart(6,"0")}"></i>${text}`;
+  const o=new CSS2DObject(el);o.position.set(0,y,0);parent.add(o);return el;
+}
+
+/* pallet + carton stacks: one instanced mesh per stack keeps draw calls low */
+function pallet(){
+  const g=G(box(1.2,.05,1,C.wood,0,.1,0,{r:.01}));
+  [-.44,0,.44].forEach(z=>g.add(box(1.2,.1,.12,C.wood2,0,0,z,{r:.01})));
+  return g;
+}
+const CW=.38,CH=.3,CD=.32;
+function stack(cols,rows,layers,{color=C.kraft,band=0xe9d3ad,mat,wrap=false}={}){
+  const n=cols*rows*layers,g=pallet(),q=new THREE.Object3D(),tint=new THREE.Color();
+  const body=new THREE.InstancedMesh(RB(CW-.02,CH-.01,CD-.02,.025),mat||M(0xffffff,{roughness:.8}),n);
+  const tape=new THREE.InstancedMesh(RB(.08,.006,CD-.015,0),M(band,{roughness:.5}),n);
+  let i=0;
+  for(let l=0;l<layers;l++)for(let c=0;c<cols;c++)for(let r=0;r<rows;r++,i++){
+    const x=(c-(cols-1)/2)*CW,z=(r-(rows-1)/2)*CD,y=.15+l*CH+CH/2;
+    q.position.set(x,y,z);q.updateMatrix();body.setMatrixAt(i,q.matrix);
+    body.setColorAt(i,tint.set(color).offsetHSL(0,0,(Math.sin(i*12.9898)*43758.5453%1)*.035));
+    q.position.y=y+CH/2-.003;q.updateMatrix();tape.setMatrixAt(i,q.matrix);
+  }
+  body.castShadow=body.receiveShadow=true;tape.receiveShadow=true;g.add(body,tape);
+  if(wrap)g.add(box(cols*CW+.04,layers*CH+.03,rows*CD+.04,0,0,.15,0,{r:.04,shadow:false,mat:WRAP}));
+  return g;
+}
+const WRAP=new THREE.MeshPhysicalMaterial({color:0xffffff,transparent:true,opacity:.32,roughness:.18,clearcoat:1,depthWrite:false});
+const STACKS={kraft:{color:C.kraft},green:{color:0xe7efe6,band:0x22a35a},white:{color:0xf4f1ee,band:0xe2587b},blue:{color:0xdfe7f3,band:0x3b6fd8}};
+
+/* ---------- building ---------- */
+const floorMesh=new THREE.Mesh(new THREE.PlaneGeometry(160,160),M(C.floor,{roughness:.88}));
+floorMesh.rotation.x=-Math.PI/2;floorMesh.receiveShadow=true;scene.add(floorMesh);
+function paint(w,d,c,x,z){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,d),M(c,{roughness:.6}));m.rotation.x=-Math.PI/2;m.position.set(x,.003,z);m.receiveShadow=true;scene.add(m)}
+function zone(x,z,w,d,c,t=.07){paint(w,t,c,x,z-d/2);paint(w,t,c,x,z+d/2);paint(t,d,c,x-w/2,z);paint(t,d,c,x+w/2,z)}
+paint(16.4,.1,C.tape,-.6,-1.15);paint(16.4,.1,C.tape,-.6,1.15);
+for(let x=-8.4;x<7.6;x+=.9)paint(.45,.06,0xffffff,x,0);   // dashed centre line
+
+// back wall with a skirting and two roll-up dock doors
+scene.add(box(34,6,.3,C.wall,0,0,-5.6,{r:0}),box(34,.18,.32,0x9a9ea5,0,0,-5.44,{r:0}));
+const slats=document.createElement("canvas");slats.width=8;slats.height=64;{const c=slats.getContext("2d");c.fillStyle="#cfd2d6";c.fillRect(0,0,8,64);c.fillStyle="#b4b8bd";for(let y=0;y<64;y+=8)c.fillRect(0,y,8,2)}
+const slatTex=new THREE.CanvasTexture(slats);slatTex.wrapT=THREE.RepeatWrapping;slatTex.repeat.set(1,6);slatTex.colorSpace=THREE.SRGBColorSpace;
+[-9,-4.6].forEach(x=>{
+  scene.add(box(2.9,3.4,.06,0,x,0,-5.42,{r:0,mat:new THREE.MeshStandardMaterial({map:slatTex,roughness:.5,metalness:.3})}));
+  scene.add(box(.18,3.6,.24,0x3a3d44,x-1.54,0,-5.36,{r:.02}),box(.18,3.6,.24,0x3a3d44,x+1.54,0,-5.36,{r:.02}),box(3.26,.3,.3,0x3a3d44,x,3.4,-5.36,{r:.03}));
+  scene.add(box(.22,.4,.16,0x1d1e21,x-1.2,.6,-5.32),box(.22,.4,.16,0x1d1e21,x+1.2,.6,-5.32));
+});
+// bollards
+[[-7.6,1.6],[-3.9,1.6],[0,1.6],[4.1,1.6]].forEach(([x,z])=>scene.add(cyl(.09,1,C.tape,x,.5,z,"y",{mat:M(C.tape,{roughness:.35})}),cyl(.095,.08,0x1d1e21,x,.75,z)));
+
+/* ---------- client: box truck backed up to the dock ---------- */
+const truck=G();
+{
+  const L=4,W=2.2,H=2.3,bx=.5,fy=.9;
+  truck.add(box(5.7,.22,1.6,0x1d1e21,-.35,.6,0,{r:.02}));
+  truck.add(box(L,.1,W,C.wood,bx,fy,0,{r:.01}));                                      // plywood floor
+  truck.add(box(L,.08,W,C.white,bx,fy+H,0,{r:.02}));                                   // roof
+  truck.add(box(L,H,.06,C.white,bx,fy,-W/2+.03,{r:.01}));                              // far wall
+  truck.add(box(L,H,.06,0,bx,fy,W/2-.03,{r:.01,shadow:false,mat:new THREE.MeshPhysicalMaterial({color:0xffffff,transparent:true,opacity:.18,roughness:.1,depthWrite:false})})); // near wall, see-through
+  truck.add(box(.06,H,W,C.white,bx-L/2+.03,fy,0,{r:.01}));                             // front wall
+  [-1,1].forEach(s=>truck.add(box(.14,H+.1,.12,0x3a3d44,bx+L/2-.07,fy,s*(W/2-.06),{r:.02})));
+  truck.add(box(.14,.14,W,0x3a3d44,bx+L/2-.07,fy+H-.06,0,{r:.02}));
+  truck.add(box(.3,.16,W-.2,0x3a3d44,bx+L/2-.1,.62,0,{r:.02}));                        // rear bumper
+  // cab
+  truck.add(box(1.55,1.95,2.1,C.cab,-2.4,.65,0,{r:.2}));
+  truck.add(box(.6,.5,2.06,C.cab,-3.05,.65,0,{r:.12}));
+  const glass=M(0x9fb4c4,{roughness:.08,metalness:.6});
+  truck.add(box(.04,.72,1.8,0,-3.18,1.7,0,{r:.01,mat:glass}),box(.7,.55,.04,0,-2.35,1.82,1.06,{r:.01,mat:glass}));
+  truck.add(box(.12,.3,2.14,0x2b2e35,-3.2,.5,0,{r:.04}));
+  [[-2.5,0],[.9,0],[1.75,0]].forEach(([x])=>[-1,1].forEach(s=>truck.add(wheel(.46,.36,x,.46,s*.9))));
+  // cargo already inside
+  truck.add(at(stack(3,3,4,STACKS.white),-.7,fy+.1,0),at(stack(3,3,3,{...STACKS.kraft,wrap:true}),.55,fy+.1,0));
+}
+at(truck,-9.9,0,0);scene.add(truck);
+scene.add(box(.9,.05,2,0x6b6f76,-6.95,0,0,{r:.01,mat:M(0x6b6f76,{metalness:.5,roughness:.45})})); // dock leveller
+label("Client · dock",COL.dock,truck,3.6);
+zone(-5.9,0,2.2,2.4,COL.dock);
+
+/* ---------- security: booth, guard and barrier ---------- */
+const GX=-2.6;
+const booth=G(box(1.5,2.3,1.3,C.white,0,0,0,{r:.08}),box(1.7,.12,1.5,0x2b2e35,0,2.3,0,{r:.04}),
+  box(1.1,.7,.04,0,0,1.2,.66,{r:.02,mat:M(0x9fb4c4,{roughness:.08,metalness:.6})}),box(.04,.7,.8,0,.76,1.2,0,{r:.02,mat:M(0x9fb4c4,{roughness:.08,metalness:.6})}));
+at(booth,GX-1.4,0,-2.9);scene.add(booth);
+const post=G(box(.3,1.05,.3,0x2b2e35,0,0,0,{r:.04}),box(.32,.18,.32,C.tape,0,.75,0,{r:.03}));
+const lamp=new THREE.Mesh(new THREE.SphereGeometry(.11,24,16),new THREE.MeshStandardMaterial({color:0x330000,emissive:0xef4444,emissiveIntensity:1.5,roughness:.3}));
+lamp.position.y=1.16;post.add(lamp);
+at(post,GX,0,-1.6);scene.add(post);
+const arm=G();
+for(let i=0;i<8;i++)arm.add(box(.09,.09,.4,i%2?C.white:0xe2363b,0,-.045,.2+i*.4,{r:.02}));
+at(arm,GX,.92,-1.5);scene.add(arm);
+scene.add(at(box(.14,.75,.14,0x2b2e35,0,0,0,{r:.03}),GX,0,1.75));
+label("Security",COL.sec,post,1.75);
+zone(GX-1.4,-2.9,2.2,2,COL.sec);
+
+function person(top,hat,trousers=0x2d3340){
+  const g=G(),legs=[];
+  [-.11,.11].forEach(z=>{const hip=G(at(new THREE.Mesh(new THREE.CapsuleGeometry(.075,.6,6,12),M(trousers)),0,-.42,0));hip.position.set(0,.88,z);hip.children[0].castShadow=true;legs.push(hip);g.add(hip)});
+  const torso=new THREE.Mesh(new THREE.CapsuleGeometry(.2,.38,8,16),M(top));torso.scale.set(.75,1,1);torso.position.y=1.2;
+  const arms=[-.27,.27].map(z=>at(new THREE.Mesh(new THREE.CapsuleGeometry(.06,.46,6,10),M(top)),0,1.18,z));
+  const head=new THREE.Mesh(new THREE.SphereGeometry(.14,24,18),M(C.skin,{roughness:.7}));head.position.y=1.66;
+  const cap=new THREE.Mesh(new THREE.SphereGeometry(.155,24,12,0,Math.PI*2,0,Math.PI/2),M(hat,{roughness:.4}));cap.position.y=1.69;
+  [torso,...arms,head,cap].forEach(m=>{m.castShadow=true;g.add(m)});
+  return {g,legs};
+}
+const guard=person(0xff8a1f,0xffffff);at(guard.g,GX-.5,0,-2.05,-Math.PI/2);scene.add(guard.g);
+
+/* ---------- API server ---------- */
+const SX=1.6,leds=[];
+const server=G();
+[-0.62,0.62].forEach((x,k)=>{
+  server.add(box(1.15,2.4,.95,0x2a2d34,x,0,0,{r:.06}));
+  server.add(box(.95,2.1,.02,0x16181c,x,.15,.48,{r:.01}));
+  if(!k)for(let r=0;r<9;r++)for(let c=0;c<4;c++){
+    const m=new THREE.Mesh(RB(.16,.05,.02,0),new THREE.MeshStandardMaterial({color:0x0c140f,emissive:0x22c55e,emissiveIntensity:.25}));
+    m.position.set(x-.3+c*.2,.45+r*.2,.5);server.add(m);leds.push(m);
+  }
+  else for(let r=0;r<6;r++)server.add(box(.85,.22,.03,0x24272d,x,.3+r*.3,.5,{r:.02}));
+});
+at(server,SX,0,-2.7);scene.add(server);
+label("API server",COL.api,server,2.95);
+zone(SX,-2.7,2.8,1.6,COL.api);
+
+/* ---------- storage: pallet rack (database) or filing cabinets (accounts) ---------- */
+const RX=8.9,LV=[0,1.45,2.9];
+const rack=G();
+[-.6,.6].forEach(x=>[-2.4,-.8,.8,2.4].forEach(z=>rack.add(box(.09,4.1,.09,C.blue,x,0,z,{r:.015,mat:M(C.blue,{metalness:.3,roughness:.45})}))));
+[-2.4,-.8,.8,2.4].forEach(z=>[.9,2.3,3.6].forEach(y=>rack.add(box(1.2,.04,.04,C.blue,0,y,z,{r:0}))));
+LV.slice(1).forEach(y=>[-.6,.6].forEach(x=>rack.add(box(.1,.14,4.9,C.beam,x,y-.14,0,{r:.02,mat:M(C.beam,{roughness:.4})}))));
+const looks=["kraft","green","white","blue","kraft","white","green","kraft","blue"];
+let slot;   // the centre bay on the first beam level is the one requests touch
+const slotMat=M(0xffffff,{roughness:.8}).clone();
+LV.forEach((y,l)=>[-1.6,0,1.6].forEach((z,b)=>{
+  if(!l&&b===1)return;   // keep the floor bay clear so the forks can slide in
+  const s=stack(3,3,3,{...STACKS[looks[l*3+b]],mat:l===1&&b===1?slotMat:undefined,wrap:(l+b)%2===0});
+  s.rotation.y=Math.PI/2;at(s,0,y,z,Math.PI/2);rack.add(s);if(l===1&&b===1)slot=s;
+}));
+at(rack,RX,0,0);scene.add(rack);
+const storeAnchor=at(G(),RX,0,0);scene.add(storeAnchor);
+const storeLabel=label("Database",COL.store,storeAnchor,4.6);
+zone(RX,0,1.9,5.4,COL.store);
+
+const cabinets=G(),drawerFiles=[];
+let drawer;
+[-1,0,1].forEach(k=>{
+  const c=G(box(1,1.6,1.05,0x4a5463,0,0,0,{r:.05}));
+  [.12,.62,1.12].forEach((y,i)=>{
+    const front=G(box(.06,.44,.95,0x5d6878,0,0,0,{r:.03}),box(.04,.05,.3,0xd0d3d8,-.05,.3,0,{r:.02}));
+    if(k===0&&i===1){
+      drawer=G(front,box(.9,.06,.85,0x3a414c,.48,.02,0,{r:.01}));
+      [0xe8c872,0xd9b65a,0xe8c872,0xcfa94e].forEach((col,j)=>{const f=box(.7,.34,.03,col,.48,.08,-.3+j*.2,{r:.01});drawer.add(f);drawerFiles.push(f)});
+      at(drawer,-.53,y,0);c.add(drawer);
+    }else c.add(at(front,-.53,y,0));
+  });
+  cabinets.add(at(c,0,0,k*1.1));
+});
+at(cabinets,RX-.1,0,0);scene.add(cabinets);
+const fileMat=M(0xd9b65a).clone();drawerFiles[1].material=fileMat;
+
+// the slab of decoration that makes it feel like a working floor
+[[-.4,-4.2,"green",4],[3.4,-4.2,"kraft",4],[4.8,-4.2,"white",3],[1.2,3.6,"blue",2],[2.7,3.6,"kraft",3],[-5.5,3.7,"white",2]].forEach(([x,z,k,l],i)=>{
+  scene.add(at(stack(3,3,l,{...STACKS[k],wrap:i%2===1}),x,0,z));
+  zone(x,z,1.5,1.3,[COL.dock,COL.api,COL.store,0xa855f7,0xec4899,COL.sec][i]);
+});
+
+/* ---------- actors ---------- */
+function forklift(){
+  const g=G(),O=M(C.orange,{roughness:.38}),wheels=[];
+  g.add(box(1.35,.55,1.02,0,-.05,.2,0,{r:.12,mat:O}));                 // chassis
+  g.add(box(.5,.8,1.02,0,-.62,.2,0,{r:.16,mat:O}));                    // counterweight
+  g.add(box(.42,.1,.46,0x18191c,-.22,.75,0,{r:.04}),box(.1,.42,.46,0x18191c,-.43,.8,0,{r:.04}));   // seat
+  const col=cyl(.03,.5,0x18191c,.28,1.0,0);col.rotation.z=.5;g.add(col);
+  const sw=new THREE.Mesh(new THREE.TorusGeometry(.13,.022,10,28),M(0x18191c));sw.position.set(.18,1.25,0);sw.rotation.set(Math.PI/2,.5,0);g.add(sw);
+  [[.38,-.43],[.38,.43],[-.58,-.43],[-.58,.43]].forEach(([x,z])=>g.add(cyl(.03,1.38,0x2b2e35,x,1.44,z)));
+  g.add(box(1.04,.05,.92,0x2b2e35,-.1,2.12,0,{r:.02}));
+  const beacon=new THREE.Mesh(new THREE.SphereGeometry(.07,16,10),new THREE.MeshStandardMaterial({color:0x4a2a00,emissive:0xffa000,emissiveIntensity:2}));beacon.position.set(-.5,2.22,0);g.add(beacon);
+  [[.42,.27,.24],[-.55,.22,.2]].forEach(([x,r,w])=>[-1,1].forEach(s=>{const wl=wheel(r,w,x,r,s*.47);wl.userData.r=r;wheels.push(wl);g.add(wl)}));
+  [-.32,.32].forEach(z=>g.add(box(.08,2.15,.09,0x2b2e35,.72,.1,z,{r:.015})));
+  g.add(box(.08,.08,.72,0x2b2e35,.72,2.17,0,{r:.015}),cyl(.035,1.7,C.steel,.66,.95,0,"y",{mat:M(C.steel,{metalness:.9,roughness:.2})}));
+  const carriage=G(box(.06,.55,.82,0x2b2e35,.8,.06,0,{r:.015}));
+  [-.24,.24].forEach(z=>carriage.add(box(1.12,.045,.12,0x3a3d44,1.38,.06,z,{r:.01}),box(.05,.48,.12,0x3a3d44,.84,.06,z,{r:.01})));
+  const load=stack(3,3,3,{...STACKS.kraft});at(load,1.42,0,0,Math.PI/2);carriage.add(load);
+  g.add(carriage);
+  return {g,carriage,load,wheels,spin(dx){wheels.forEach(w=>w.rotation.z-=dx/w.userData.r)},lift:LV[1]};
+}
+const lift=forklift();scene.add(lift.g);
+
+const clerkP=person(0xfafaf8,0x3a2a1e,0x30384a);
+const folder=box(.04,.32,.26,0xe8c872,.2,1.02,.3,{r:.01});clerkP.g.add(folder);
+const clerk={g:clerkP.g,load:folder,phase:0,spin(dx){this.phase+=dx*5.5;clerkP.legs.forEach((l,i)=>l.rotation.z=Math.sin(this.phase+i*Math.PI)*.45)}};
+scene.add(clerk.g);
+
+const bubEl=document.createElement("div");bubEl.className="bub";
+const bub=new CSS2DObject(bubEl);
+
+/* ---------- tiny tween engine ---------- */
+const tweens=new Map(),ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+function tween(key,ms,fn){
+  tweens.get(key)?.end();
+  return new Promise(res=>{const t0=performance.now();tweens.set(key,{t0,ms:ms*SPEED,fn,end(){tweens.delete(key);res()}})});
+}
+function stepTweens(now){tweens.forEach(t=>{const p=Math.min(1,(now-t.t0)/t.ms);t.fn(ease(p));if(p>=1)t.end()})}
+
+/* ---------- the API used by the docs script ---------- */
+let actor=lift,people=false,put=false,ledMode="",blinkOn=false,userMoved=false;
+const STOP={dock:-5.6,gate:GX-2.1,server:SX,store:RX-1.42};
+const STOP_PEOPLE={...STOP,gate:GX-.8,store:RX-1.75};
+function place(){actor.g.position.set(STOP.dock,0,0);actor.g.rotation.y=0}
+function setGate(s){lamp.material.emissive.setHex({closed:0xef4444,check:0xf59e0b,open:0x22c55e}[s]);tween("arm",500,t=>{const from=arm.rotation.x,to=s==="open"?-1.38:0;arm.rotation.x=from+(to-from)*t})}
+window.FLOOR={ready:true,
+  reset(o){
+    tweens.forEach(t=>t.end());people=o.people;put=o.put;
+    lift.g.visible=rack.visible=!people;clerk.g.visible=cabinets.visible=people;
+    actor=people?clerk:lift;actor.g.add(bub);bub.position.set(people?0:.4,people?2.25:2.75,0);bubEl.className="bub";
+    storeLabel.lastChild.textContent=people?"File storage":"Database";
+    place();lift.carriage.position.y=0;drawer.position.x=-.53;
+    slot.visible=!put;drawerFiles[1].visible=!put;actor.load.visible=put;
+    this.blink(false);setGate("closed");this.guard(false);ledMode="";
+  },
+  drive(stop){
+    const a=actor,x0=a.g.position.x,x1=(people?STOP_PEOPLE:STOP)[stop],dx=x1-x0;
+    if(Math.abs(dx)<.01)return Promise.resolve();
+    let last=x0;a.moving=true;
+    return tween("drive",Math.max(600,Math.abs(dx)*(people?260:170)),t=>{const x=x0+dx*t;a.spin(x-last);last=x;a.g.position.x=x}).then(()=>{a.moving=false;if(people)clerkP.legs.forEach(l=>l.rotation.z=0)});
+  },
+  gate:setGate,
+  guard(on){const from=guard.g.rotation.y,to=on?-Math.PI*.95:-Math.PI/2;tween("guard",400,t=>guard.g.rotation.y=from+(to-from)*t)},
+  leds(m){ledMode=m},
+  reach(on){
+    if(people){const from=drawer.position.x,to=on?-1.1:-.53;return tween("reach",450,t=>drawer.position.x=from+(to-from)*t)}
+    const from=lift.carriage.position.y,to=on?lift.lift:0;return tween("reach",700,t=>lift.carriage.position.y=from+(to-from)*t);
+  },
+  blink(on){blinkOn=on??!blinkOn;const m=people?fileMat:slotMat;m.emissive.setHex(0xf59e0b);m.emissiveIntensity=blinkOn?.45:0},
+  settle(){if(people)drawerFiles[1].visible=put;else slot.visible=put;actor.load.visible=!put},
+  carry(v){actor.load.visible=v},
+  bubble(text,ok){bubEl.textContent=text;bubEl.className="bub show "+(ok?"ok":"err")},
+  view(v){userMoved=false;frame(v,900)},
+};
+window.FLOOR.reset({people:false,put:false});actor.load.visible=false;
+
+/* ---------- camera ---------- */
+const camera=new THREE.PerspectiveCamera(30,1,.1,200);
+const controls=new OrbitControls(camera,renderer.domElement);
+Object.assign(controls,{enableDamping:true,dampingFactor:.08,maxPolarAngle:Math.PI*.48,minDistance:6,maxDistance:70});
+controls.addEventListener("start",()=>userMoved=true);
+const VIEWS={"3d":[[11,13,15],[-.6,.4,-.4]],side:[[-1.5,3,26],[-1.5,1.3,-.6]],top:[[-1.5,32,.01],[-1.5,0,-.4]]};
+let view="3d";
+function frame(v,ms=0){
+  view=v;const [p,t]=VIEWS[v],k=Math.max(1.2,1.75/camera.aspect);
+  const to=new THREE.Vector3(...p).sub(new THREE.Vector3(...t)).multiplyScalar(k).add(new THREE.Vector3(...t)),tt=new THREE.Vector3(...t);
+  if(!ms){camera.position.copy(to);controls.target.copy(tt);return}
+  const p0=camera.position.clone(),t0=controls.target.clone();
+  tween("cam",ms,e=>{camera.position.lerpVectors(p0,to,e);controls.target.lerpVectors(t0,tt,e)});
+}
+function resize(){
+  const w=vp.clientWidth,h=vp.clientHeight;if(!w||!h)return;
+  renderer.setSize(w,h);css.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();
+  if(!userMoved)frame(view);
+}
+new ResizeObserver(resize).observe(vp);resize();
+
+/* ---------- loop (paused while the dock is off-screen) ---------- */
+function tick(now){
+  stepTweens(now);
+  const s=now/1000;
+  leds.forEach((l,i)=>{l.material.emissive.setHex(ledMode==="bad"?0xef4444:0x22c55e);
+    l.material.emissiveIntensity=ledMode==="run"?(Math.sin(s*18+i*2.3)>.2?2.2:.15):ledMode==="bad"?2:(Math.sin(s*1.5+i)>.6?.9:.25)});
+  controls.update();renderer.render(scene,camera);css.render(scene,camera);
+}
+new IntersectionObserver(([e])=>renderer.setAnimationLoop(e.isIntersecting?tick:null)).observe(vp);
 </script>
 </body>
 </html>

@@ -37,7 +37,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
 
                 // ======== PUBLIC ========
-                .requestMatchers(HttpMethod.GET, "/docs", "/docs.html", "/favicon.png").permitAll()
+                .requestMatchers(HttpMethod.GET, "/", "/docs","/docs.html", "/favicon.png").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/refresh").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/logout").permitAll()
